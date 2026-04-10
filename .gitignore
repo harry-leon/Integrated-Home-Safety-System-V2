@@ -32,7 +32,15 @@ mvnw.cmd
 .idea/
 *.iml
 .vscode/
+
+# Build folders
+backend/target/
+target/
+*.class
+.mvn/
+
+# Project files
 bin/
 .settings/
-.classpath
 .project
+.factorypath

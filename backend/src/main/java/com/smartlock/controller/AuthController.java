@@ -3,6 +3,7 @@ package com.smartlock.controller;
 import com.smartlock.dto.LoginRequestDTO;
 import com.smartlock.dto.LoginResponseDTO;
 import com.smartlock.dto.ReAuthRequestDTO;
+import com.smartlock.dto.RegisterRequestDTO;
 import com.smartlock.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,11 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO request) {
         return ResponseEntity.ok(authService.login(request));
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<LoginResponseDTO> register(@RequestBody RegisterRequestDTO request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(authService.register(request));
     }
 
     @PostMapping("/re-auth")
