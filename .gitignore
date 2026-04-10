@@ -1,0 +1,27 @@
+# Java
+target/
+*.class
+*.jar
+*.war
+*.ear
+.mvn/
+.metadata/
+bin/
+tmp/
+*.swp
+*.log
+.DS_Store
+
+# Node
+node_modules/
+.next/
+out/
+build/
+.env*.local
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
