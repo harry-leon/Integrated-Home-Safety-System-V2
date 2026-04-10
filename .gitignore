@@ -28,15 +28,19 @@ hs_err_pid*
 mvnw
 mvnw.cmd
 
-# I.DS_Store
+# IDEs
 .idea/
 *.iml
+.vscode/
+
+# Build folders
 backend/target/
 target/
 *.class
 .mvn/
-.vscode/
+
+# Project files
 bin/
 .settings/
-.classpath
 .project
+.factorypath

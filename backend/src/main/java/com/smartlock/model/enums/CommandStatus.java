@@ -5,5 +5,6 @@ public enum CommandStatus {
     SENT,
     DELIVERED,
     SUCCESS,
-    FAILURE
+    FAILURE,
+    TIMEOUT
 }
