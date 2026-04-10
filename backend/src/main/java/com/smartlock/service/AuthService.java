@@ -3,7 +3,9 @@ package com.smartlock.service;
 import com.smartlock.dto.LoginRequestDTO;
 import com.smartlock.dto.LoginResponseDTO;
 import com.smartlock.dto.ReAuthRequestDTO;
+import com.smartlock.dto.RegisterRequestDTO;
 import com.smartlock.model.User;
+import com.smartlock.model.enums.UserRole;
 import com.smartlock.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,6 +26,26 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
+
+    public LoginResponseDTO register(RegisterRequestDTO request) {
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new RuntimeException("Email already exists");
+        }
+        User user = new User();
+        user.setFullName(request.getFullName());
+        user.setEmail(request.getEmail());
+        user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        user.setRole(UserRole.MEMBER);
+        user.setIsActive(true);
+        user.setCreatedAt(LocalDateTime.now());
+        user.setUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
+
+        LoginRequestDTO loginRequest = new LoginRequestDTO();
+        loginRequest.setEmail(request.getEmail());
+        loginRequest.setPassword(request.getPassword());
+        return login(loginRequest);
+    }
 
     public LoginResponseDTO login(LoginRequestDTO request) {
         authenticationManager.authenticate(
