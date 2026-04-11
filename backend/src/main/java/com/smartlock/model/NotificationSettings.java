@@ -28,12 +28,18 @@ public class NotificationSettings {
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
+    @Builder.Default
     private boolean webPushEnabled = true;
+    @Builder.Default
     private boolean emailEnabled = true;
 
+    @Builder.Default
     private boolean gasAlertEnabled = true;
+    @Builder.Default
     private boolean intruderAlertEnabled = true;
+    @Builder.Default
     private boolean wrongPassAlertEnabled = true;
+    @Builder.Default
     private boolean fingerprintAlertEnabled = true;
 
     @UpdateTimestamp

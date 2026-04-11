@@ -41,6 +41,7 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private UserRole role;
 
+    @Builder.Default
     private boolean isActive = true;
 
     @CreationTimestamp

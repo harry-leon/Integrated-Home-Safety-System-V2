@@ -32,11 +32,14 @@ public class Fingerprint {
 
     private String personName;
     private String accessLevel;
+    @Builder.Default
     private boolean isActive = true;
 
     @CreationTimestamp
     private LocalDateTime registeredAt;
 
     private LocalDateTime lastAccess;
+    
+    @Builder.Default
     private Integer totalAccessCount = 0;
 }
