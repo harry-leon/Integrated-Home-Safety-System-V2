@@ -21,7 +21,6 @@ public class OpenApiConfig {
                         .description("REST API documentation for the Smart Lock and Home Safety System.")
                         .version("v2.0")
                         .contact(new Contact().name("Smart Lock Team")))
-                .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
                 .components(new Components()
                         .addSecuritySchemes(securitySchemeName, new SecurityScheme()
                                 .name(securitySchemeName)
