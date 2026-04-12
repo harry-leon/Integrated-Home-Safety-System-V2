@@ -1,0 +1,343 @@
+<html class="light"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;family=Inter:wght@300..700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-error-container": "#410002",
+            "outline": "#747785",
+            "background": "#F8FAFC",
+            "on-secondary": "#ffffff",
+            "surface-container-low": "#ffffff",
+            "on-primary-container": "#001d35",
+            "on-secondary-container": "#001d35",
+            "on-secondary-fixed-variant": "#0e2b6f",
+            "inverse-on-surface": "#f1f0f7",
+            "on-primary": "#ffffff",
+            "outline-variant": "#c4c6d0",
+            "secondary-fixed": "#dbe1ff",
+            "on-primary-fixed": "#001945",
+            "on-surface": "#1a1c22",
+            "surface-dim": "#ded9e0",
+            "on-surface-variant": "#44474f",
+            "secondary-container": "#dbe1ff",
+            "inverse-surface": "#2f3036",
+            "surface": "#F8FAFC",
+            "error-container": "#ffdad6",
+            "primary-container": "#d6e3ff",
+            "on-secondary-fixed": "#001945",
+            "surface-container": "#ffffff",
+            "tertiary-container": "#ffdbd0",
+            "on-background": "#1a1c22",
+            "primary": "#0f62fe",
+            "on-primary-fixed-variant": "#0046a2",
+            "error": "#ba1a1a",
+            "primary-fixed": "#d6e3ff",
+            "on-tertiary": "#ffffff",
+            "on-tertiary-container": "#390c00",
+            "inverse-primary": "#aac7ff",
+            "secondary-fixed-dim": "#b4c5ff",
+            "surface-bright": "#fdf8ff",
+            "on-tertiary-fixed": "#390c00",
+            "secondary": "#3f5f90",
+            "surface-container-highest": "#e2e2e9",
+            "tertiary": "#934b00",
+            "surface-container-high": "#e8e7ef",
+            "surface-tint": "#3f5f90",
+            "primary-fixed-dim": "#aac7ff",
+            "on-tertiary-fixed-variant": "#743500",
+            "tertiary-fixed": "#ffdbd0",
+            "on-error": "#ffffff",
+            "surface-variant": "#e1e2ec",
+            "surface-container-lowest": "#ffffff",
+            "tertiary-fixed-dim": "#ffb68e"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "fontFamily": {
+            "headline": ["Manrope"],
+            "body": ["Manrope"],
+            "label": ["Inter"]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .status-gradient {
+      background: linear-gradient(135deg, #0f62fe 0%, #3d8bff 100%);
+    }
+    body {
+      background-color: #F8FAFC;
+      color: #1a1c22;
+      font-family: 'Manrope', sans-serif;
+    }
+  </style>
+</head>
+<body class="antialiased overflow-hidden">
+<div class="flex h-screen overflow-hidden">
+<!-- SideNavBar -->
+<aside class="hidden md:flex h-screen w-64 fixed left-0 top-0 bg-white flex-col py-8 px-4 shadow-[1px_0_10px_rgba(0,0,0,0.05)] z-30">
+<div class="mb-12 px-2">
+<h1 class="text-xl font-bold tracking-tight text-primary font-headline">SENTINEL</h1>
+<p class="text-xs text-slate-400 font-medium tracking-widest uppercase">Precision Security</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 bg-blue-50 text-blue-600 border-l-4 border-blue-600 font-['Manrope'] text-sm font-semibold transition-transform active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-600 hover:bg-slate-50 transition-all duration-300 font-['Manrope'] text-sm font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="settings_remote">settings_remote</span>
+<span>Remote Control</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-600 hover:bg-slate-50 transition-all duration-300 font-['Manrope'] text-sm font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="fingerprint">fingerprint</span>
+<span>Fingerprints</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-600 hover:bg-slate-50 transition-all duration-300 font-['Manrope'] text-sm font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span>Logs</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-600 hover:bg-slate-50 transition-all duration-300 font-['Manrope'] text-sm font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span>Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-600 hover:bg-slate-50 transition-all duration-300 font-['Manrope'] text-sm font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span>Settings</span>
+</a>
+</nav>
+<div class="mt-auto space-y-1 pt-8 border-t border-slate-100">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-600 hover:bg-slate-50 transition-all duration-300 font-['Manrope'] text-sm font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span>Support</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-red-600 hover:bg-red-50 transition-all duration-300 font-['Manrope'] text-sm font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span>Log Out</span>
+</a>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 md:ml-64 bg-background h-screen overflow-y-auto">
+<!-- TopNavBar -->
+<header class="w-full sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200 flex justify-between items-center px-8 py-4 font-['Manrope'] antialiased tracking-tight">
+<div class="flex items-center gap-8">
+<span class="md:hidden text-2xl font-black tracking-tighter text-blue-600">SENTINEL</span>
+<div class="hidden md:flex items-center bg-slate-100 rounded-xl px-4 py-2 w-96 border border-slate-200">
+<span class="material-symbols-outlined text-slate-400 mr-2" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm text-slate-700 w-full" placeholder="Tìm kiếm thiết bị..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-4 text-slate-500">
+<span class="material-symbols-outlined hover:bg-slate-100 p-2 rounded-full transition-colors duration-300 cursor-pointer" data-icon="language">language</span>
+<span class="material-symbols-outlined hover:bg-slate-100 p-2 rounded-full transition-colors duration-300 cursor-pointer" data-icon="light_mode">light_mode</span>
+</div>
+<div class="flex items-center gap-3 pl-6 border-l border-slate-200">
+<div class="text-right hidden sm:block">
+<p class="text-sm font-bold text-slate-900">Admin</p>
+<p class="text-xs text-slate-500">Quản trị viên</p>
+</div>
+<img class="w-10 h-10 rounded-full object-cover border border-slate-200" data-alt="Security Admin Avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB0W6fRALKTF9hZUnU0dGoofTFJYoyA6XRsdFNaqJZoYKeGWAY0vjkNfr0CHNshgwRniAOjZvkMDFkUnwOisPywNOFrJtiTUrLkdAwJblflKbUIg1Xt7g-96Ed7jUkskDSzCzz64OrTBrucYs7caqAx0LLKcRZ6jdGTFXBt0VFAwb5WQ23C6Q6_CU0QmVJ0ophnY74jT1d75FHy0ELqW2kTtcNw5xGQI_5oX3jd8WsBfwz-985EMDO3nhr7RwXZhquC6HMfPSp6tGZP"/>
+</div>
+</div>
+</header>
+<!-- Dashboard Canvas -->
+<div class="p-8 max-w-7xl mx-auto space-y-8">
+<!-- Hero Section: Lock Status -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<div class="lg:col-span-8 bg-white border border-slate-200 rounded-[2rem] p-12 relative overflow-hidden flex flex-col justify-between min-h-[400px] shadow-sm">
+<div class="relative z-10">
+<span class="text-blue-600 font-bold tracking-[0.2em] uppercase text-xs">Trạng thái hệ thống</span>
+<h2 class="text-6xl font-black font-headline mt-4 tracking-tighter text-slate-900">ĐÃ KHÓA</h2>
+<p class="text-slate-500 mt-2 max-w-md">Hệ thống an ninh Sentinel đang hoạt động. Tất cả các điểm truy cập đều được bảo mật.</p>
+</div>
+<div class="flex gap-12 mt-12 relative z-10">
+<div class="flex flex-col">
+<span class="text-slate-400 text-xs font-label mb-1">Tín hiệu Wifi</span>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-blue-600" data-icon="wifi">wifi</span>
+<span class="font-bold text-xl text-slate-800">Mạnh (92%)</span>
+</div>
+</div>
+<div class="flex flex-col">
+<span class="text-slate-400 text-xs font-label mb-1">Dung lượng Pin</span>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-orange-500" data-icon="battery_full">battery_full</span>
+<span class="font-bold text-xl text-slate-800">85%</span>
+</div>
+</div>
+</div>
+<!-- Lock Action Button -->
+<button class="absolute bottom-12 right-12 w-24 h-24 rounded-full status-gradient flex items-center justify-center shadow-[0px_20px_40px_rgba(15,98,254,0.2)] hover:scale-105 active:scale-95 transition-all duration-300">
+<span class="material-symbols-outlined text-4xl text-white" data-icon="lock_open" style="font-variation-settings: 'FILL' 1;">lock_open</span>
+</button>
+<!-- Decorative background element -->
+<div class="absolute -right-10 -top-10 w-64 h-64 bg-blue-50 rounded-full blur-[80px]"></div>
+</div>
+<!-- Secondary Quick Info -->
+<div class="lg:col-span-4 bg-slate-50 border border-slate-200 rounded-[2rem] p-8 flex flex-col shadow-sm">
+<h3 class="text-lg font-bold font-headline mb-6 text-slate-900">Môi trường hiện tại</h3>
+<div class="space-y-4 flex-1">
+<div class="bg-white border border-slate-100 p-4 rounded-xl flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-orange-50 flex items-center justify-center border border-orange-100">
+<span class="material-symbols-outlined text-orange-600" data-icon="cloud">cloud</span>
+</div>
+<div>
+<p class="text-xs text-slate-400">Thời tiết</p>
+<p class="font-bold text-slate-800">Nhiều mây</p>
+</div>
+</div>
+<span class="text-2xl font-bold text-slate-900">28°C</span>
+</div>
+<div class="bg-white border border-slate-100 p-4 rounded-xl flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center border border-blue-100">
+<span class="material-symbols-outlined text-blue-600" data-icon="light_mode">light_mode</span>
+</div>
+<div>
+<p class="text-xs text-slate-400">Độ sáng (LDR)</p>
+<p class="font-bold text-slate-800">Trong nhà</p>
+</div>
+</div>
+<span class="text-2xl font-bold text-slate-900">420 lx</span>
+</div>
+<div class="bg-white border border-slate-100 p-4 rounded-xl flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center border border-green-100">
+<span class="material-symbols-outlined text-green-600" data-icon="co2">co2</span>
+</div>
+<div>
+<p class="text-xs text-slate-400">Nồng độ Gas</p>
+<p class="font-bold text-slate-800">An toàn</p>
+</div>
+</div>
+<span class="text-2xl font-bold text-slate-900">0.02%</span>
+</div>
+</div>
+<button class="w-full mt-6 py-4 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all">
+              Xem chi tiết cảm biến
+            </button>
+</div>
+</section>
+<!-- Bento Grid: Analytics & Status -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Recent Activity / Alerts -->
+<div class="md:col-span-2 bg-white border border-slate-200 rounded-[2rem] p-8 shadow-sm">
+<div class="flex justify-between items-center mb-8">
+<h3 class="text-xl font-bold font-headline text-slate-900">Cảnh báo gần đây</h3>
+<a class="text-blue-600 text-sm font-semibold hover:underline" href="#">Xem tất cả nhật ký</a>
+</div>
+<div class="space-y-4">
+<!-- Alert Item 1 -->
+<div class="flex items-center p-5 bg-slate-50 border border-slate-100 rounded-2xl relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-red-500"></div>
+<div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mr-4">
+<span class="material-symbols-outlined text-red-600" data-icon="warning">warning</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<h4 class="font-bold text-slate-800">Phát hiện truy cập trái phép</h4>
+<span class="text-xs font-label text-slate-400">14:20 Hôm nay</span>
+</div>
+<p class="text-sm text-slate-500 mt-1">Cửa chính đã được thử mở bằng vân tay không hợp lệ 3 lần liên tiếp.</p>
+</div>
+</div>
+<!-- Alert Item 2 -->
+<div class="flex items-center p-5 bg-slate-50 border border-slate-100 rounded-2xl relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-orange-500"></div>
+<div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center mr-4">
+<span class="material-symbols-outlined text-orange-600" data-icon="battery_alert">battery_alert</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<h4 class="font-bold text-slate-800">Pin yếu (Smart Lock B)</h4>
+<span class="text-xs font-label text-slate-400">Hôm qua</span>
+</div>
+<p class="text-sm text-slate-500 mt-1">Dung lượng pin dưới 15%. Vui lòng thay pin hoặc sạc thiết bị.</p>
+</div>
+</div>
+<!-- Alert Item 3 -->
+<div class="flex items-center p-5 bg-slate-50 border border-slate-100 rounded-2xl">
+<div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mr-4">
+<span class="material-symbols-outlined text-blue-600" data-icon="lock">lock</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<h4 class="font-bold text-slate-800">Cửa đã được khóa tự động</h4>
+<span class="text-xs font-label text-slate-400">08:05 Hôm nay</span>
+</div>
+<p class="text-sm text-slate-500 mt-1">Tính năng khóa tự động đã kích hoạt sau 30 giây cửa đóng.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Camera Feed / Visual Context -->
+<div class="bg-white border border-slate-200 rounded-[2rem] overflow-hidden flex flex-col shadow-sm">
+<div class="relative h-64">
+<img class="w-full h-full object-cover" data-alt="Modern high-tech entrance door" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCkJt60n6k4uU-Cz7VUgfqi_cIdh3etuyKxKULn9VoU35scSI_rqQMZGngEDFJWFO_HXlscdYazZHsGXAanZZYq7jb6_SesBVNcr-Wh_94rtrS5y_l64-4zj0gASi8vXm79MHQbx-sHrrpFjT7By1TYyOVrse1netl_PthGpcOnwDLvwsuy31qVgmrJIAev2npbSGEOm1N1KtOVMWqm0wEpsz64DAm4WpssXA_rCjr4X-sQUApiPh6gIsGdBzh0RMXloQh4vBed10wK"/>
+<div class="absolute top-4 left-4 bg-red-600 px-3 py-1 rounded-full flex items-center gap-2">
+<span class="w-2 h-2 bg-white rounded-full animate-pulse"></span>
+<span class="text-[10px] font-bold text-white tracking-widest uppercase">TRỰC TIẾP</span>
+</div>
+<div class="absolute bottom-4 right-4 bg-white/80 backdrop-blur-md border border-slate-200 px-3 py-1 rounded-lg text-[10px] font-bold text-slate-900">
+                CAM_FRONT_01
+              </div>
+</div>
+<div class="p-6 flex-1 flex flex-col justify-between">
+<div>
+<h4 class="font-bold font-headline text-slate-900">Cửa chính</h4>
+<p class="text-xs text-slate-400 mt-1">Cập nhật lần cuối: 2 phút trước</p>
+</div>
+<div class="grid grid-cols-2 gap-4 mt-6">
+<button class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-50 border border-slate-200 rounded-2xl hover:bg-blue-50 hover:border-blue-200 transition-all group">
+<span class="material-symbols-outlined text-slate-400 group-hover:text-blue-600" data-icon="videocam">videocam</span>
+<span class="text-xs font-bold text-slate-700 group-hover:text-blue-700">Xem lại</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-50 border border-slate-200 rounded-2xl hover:bg-blue-50 hover:border-blue-200 transition-all group">
+<span class="material-symbols-outlined text-slate-400 group-hover:text-blue-600" data-icon="mic">mic</span>
+<span class="text-xs font-bold text-slate-700 group-hover:text-blue-700">Đàm thoại</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Mobile Navigation -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-slate-200 flex justify-around items-center py-4 px-6 z-50">
+<a class="flex flex-col items-center text-blue-600" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="text-[10px] font-bold mt-1">Tổng quan</span>
+</a>
+<a class="flex flex-col items-center text-slate-400" href="#">
+<span class="material-symbols-outlined" data-icon="lock">lock</span>
+<span class="text-[10px] font-bold mt-1">Khóa</span>
+</a>
+<a class="flex flex-col items-center text-slate-400" href="#">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="text-[10px] font-bold mt-1">Cảnh báo</span>
+</a>
+<a class="flex flex-col items-center text-slate-400" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="text-[10px] font-bold mt-1">Tôi</span>
+</a>
+</nav>
+</div>
+</body></html>

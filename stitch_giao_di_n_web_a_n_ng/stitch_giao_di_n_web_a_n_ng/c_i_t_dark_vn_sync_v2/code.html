@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SENTINEL - Cài đặt Hệ thống</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-low": "#191c22",
+                        "error-container": "#93000a",
+                        "on-tertiary-container": "#fff1ed",
+                        "on-surface-variant": "#c3c6d8",
+                        "secondary-fixed": "#dbe1ff",
+                        "on-secondary": "#0e2b6f",
+                        "primary-container": "#0f62fe",
+                        "on-background": "#e1e2eb",
+                        "background": "#101319",
+                        "outline": "#8c90a2",
+                        "surface": "#101319",
+                        "on-primary-container": "#f3f3ff",
+                        "on-secondary-fixed-variant": "#2a4387",
+                        "error": "#ffb4ab",
+                        "on-error-container": "#ffdad6",
+                        "surface-container-high": "#272a31",
+                        "on-secondary-fixed": "#00174c",
+                        "surface-container": "#1d2026",
+                        "surface-container-highest": "#32353c",
+                        "secondary": "#b4c5ff",
+                        "surface-bright": "#363940",
+                        "outline-variant": "#424656",
+                        "surface-tint": "#b4c5ff",
+                        "inverse-on-surface": "#2e3037",
+                        "on-error": "#690005",
+                        "surface-dim": "#101319",
+                        "on-primary-fixed-variant": "#003da9",
+                        "surface-variant": "#32353c",
+                        "on-primary": "#002979",
+                        "on-tertiary": "#5d1900",
+                        "primary-fixed": "#dbe1ff",
+                        "surface-container-lowest": "#0b0e14",
+                        "tertiary-fixed-dim": "#ffb59d",
+                        "tertiary-container": "#c84000",
+                        "inverse-primary": "#0052dd",
+                        "secondary-container": "#2d458a",
+                        "primary": "#b4c5ff",
+                        "on-surface": "#e1e2eb",
+                        "secondary-fixed-dim": "#b4c5ff",
+                        "tertiary-fixed": "#ffdbd0",
+                        "tertiary": "#ffb59d",
+                        "inverse-surface": "#e1e2eb",
+                        "on-tertiary-fixed-variant": "#832700",
+                        "on-secondary-container": "#a0b6ff",
+                        "on-primary-fixed": "#00174c",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "on-tertiary-fixed": "#390c00"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Manrope"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bg-primary-gradient {
+            background: linear-gradient(135deg, #0f62fe 0%, #b4c5ff 100%);
+        }
+        body {
+            background-color: #101319;
+            color: #e1e2eb;
+            font-family: 'Manrope', sans-serif;
+        }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-[#101319]/70 backdrop-blur-xl shadow-[0px_24px_48px_rgba(15,98,254,0.08)]">
+<div class="flex justify-between items-center px-8 h-20 w-full max-w-[1920px] mx-auto">
+<div class="flex items-center gap-8">
+<span class="text-2xl font-bold tracking-tighter text-blue-600 dark:text-blue-500">SENTINEL</span>
+<div class="hidden md:flex gap-6">
+<a class="text-slate-500 dark:text-slate-400 font-medium font-manrope tracking-tight hover:text-blue-500 transition-colors duration-300" href="#">Dashboard</a>
+<a class="text-slate-500 dark:text-slate-400 font-medium font-manrope tracking-tight hover:text-blue-500 transition-colors duration-300" href="#">Logs</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-slate-400 hover:text-blue-500 cursor-pointer">language</span>
+<span class="material-symbols-outlined text-slate-400 hover:text-blue-500 cursor-pointer">dark_mode</span>
+<span class="material-symbols-outlined text-blue-600 dark:text-blue-500 cursor-pointer" data-weight="fill" style="font-variation-settings: 'FILL' 1;">account_circle</span>
+</div>
+</div>
+</nav>
+<!-- SideNavBar -->
+<aside class="hidden lg:flex flex-col py-8 px-6 space-y-4 h-screen w-72 left-0 top-0 fixed border-r border-slate-800/20 bg-[#101319] z-40">
+<div class="mb-10 mt-20">
+<h2 class="font-headline text-sm uppercase tracking-widest text-blue-500 font-bold mb-1">Security Hub</h2>
+<p class="text-xs text-slate-500 uppercase tracking-tighter">Precision Monitoring</p>
+</div>
+<div class="flex flex-col space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-slate-800/30 transition-all font-manrope text-sm uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined">dashboard</span> Dashboard
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-slate-800/30 transition-all font-manrope text-sm uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined">settings_remote</span> Remote Control
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-slate-800/30 transition-all font-manrope text-sm uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined">fingerprint</span> Fingerprints
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-slate-800/30 transition-all font-manrope text-sm uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined">receipt_long</span> Logs
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-slate-800/30 transition-all font-manrope text-sm uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined">analytics</span> Analytics
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg bg-blue-600/10 text-blue-500 border-r-4 border-blue-600 font-bold font-manrope text-sm uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined">settings</span> Settings
+            </a>
+</div>
+<div class="mt-auto flex flex-col space-y-2 pt-8 border-t border-slate-800/20">
+<a class="flex items-center gap-3 px-4 py-2 text-slate-500 hover:text-white transition-all font-manrope text-xs uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined text-lg">help</span> Support
+            </a>
+<a class="flex items-center gap-3 px-4 py-2 text-slate-500 hover:text-white transition-all font-manrope text-xs uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined text-lg">check_circle</span> System Status
+            </a>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="lg:ml-72 pt-32 px-6 lg:px-12 pb-20">
+<header class="mb-12">
+<h1 class="text-4xl lg:text-6xl font-headline font-extrabold tracking-tight text-on-background mb-4 uppercase">Cài đặt Hệ thống</h1>
+<p class="text-slate-400 max-w-2xl font-body leading-relaxed">Cấu hình tham số bảo mật và ngưỡng cảm biến cho thiết bị Sentinel của bạn. Mọi thay đổi đều được mã hóa đầu cuối.</p>
+</header>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Hồ sơ truy cập (Access Profile) -->
+<section class="lg:col-span-8 bg-surface-container rounded-xl p-8 lg:p-12 relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-8xl">verified_user</span>
+</div>
+<div class="relative z-10">
+<h2 class="text-2xl font-headline font-bold mb-8 text-secondary tracking-tight">Hồ sơ truy cập</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="space-y-4">
+<label class="block text-sm font-label text-on-surface-variant/70 uppercase tracking-widest">Mật khẩu chính (Master Key)</label>
+<div class="flex items-center gap-4 bg-surface-container-highest p-4 rounded-xl border border-transparent focus-within:border-primary/40 transition-all">
+<span class="material-symbols-outlined text-primary">key</span>
+<input class="bg-transparent border-none focus:ring-0 text-on-surface w-full font-label tracking-widest" type="password" value="••••••••••••"/>
+<button class="text-slate-500 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+</div>
+</div>
+<div class="space-y-4">
+<label class="block text-sm font-label text-on-surface-variant/70 uppercase tracking-widest">Thời gian chờ PIN (S)</label>
+<div class="flex items-center gap-4 bg-surface-container-highest p-4 rounded-xl">
+<span class="material-symbols-outlined text-primary">timer</span>
+<input class="bg-transparent border-none focus:ring-0 text-on-surface w-full font-headline text-lg" type="number" value="30"/>
+<span class="text-xs text-slate-500 font-label">GIÂY</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Cấu hình ngưỡng (Sensor Thresholds) -->
+<section class="lg:col-span-4 bg-surface-container-low rounded-xl p-8 border-l-4 border-tertiary">
+<h2 class="text-xl font-headline font-bold mb-8 text-on-surface tracking-tight flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary">sensors</span> Cấu hình ngưỡng
+                </h2>
+<div class="space-y-10">
+<div class="space-y-4">
+<div class="flex justify-between items-center">
+<span class="text-sm font-label text-on-surface-variant">Độ nhạy Gas (PPM)</span>
+<span class="text-tertiary font-headline font-bold">450</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-tertiary w-[45%]"></div>
+</div>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between items-center">
+<span class="text-sm font-label text-on-surface-variant">Ngưỡng Ánh sáng (Lux)</span>
+<span class="text-secondary font-headline font-bold">120</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-[30%]"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Ràng buộc thời gian (Time Constraints) -->
+<section class="lg:col-span-6 bg-surface-container-high rounded-xl p-8 lg:p-10">
+<h2 class="text-xl font-headline font-bold mb-8 text-on-surface tracking-tight flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">lock_clock</span> Ràng buộc thời gian
+                </h2>
+<div class="space-y-6">
+<div class="flex items-center justify-between p-4 bg-surface-container rounded-xl hover:bg-surface-container-highest transition-all duration-300">
+<div>
+<p class="font-headline font-medium">Tự động khóa (Auto-Lock)</p>
+<p class="text-xs text-slate-500 font-label">Tự động kích hoạt sau khi không có chuyển động</p>
+</div>
+<div class="flex items-center gap-3">
+<span class="text-sm font-bold text-primary">5 MIN</span>
+<span class="material-symbols-outlined text-slate-600">chevron_right</span>
+</div>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container rounded-xl hover:bg-surface-container-highest transition-all duration-300">
+<div>
+<p class="font-headline font-medium">Khóa bàn phím</p>
+<p class="text-xs text-slate-500 font-label">Vô hiệu hóa nhập liệu sau 5 lần sai</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+</section>
+<!-- Dòng thông báo (Notification Flow) -->
+<section class="lg:col-span-6 bg-surface-container-lowest rounded-xl p-8 lg:p-10 border border-outline-variant/10">
+<h2 class="text-xl font-headline font-bold mb-8 text-on-surface tracking-tight flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">notifications_active</span> Dòng thông báo
+                </h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="p-6 rounded-xl bg-surface-container-high/50 border border-outline-variant/5">
+<span class="material-symbols-outlined text-blue-500 mb-4">send_to_mobile</span>
+<h3 class="font-headline font-bold mb-2">Web Push</h3>
+<p class="text-xs text-slate-400 mb-4 leading-relaxed">Thông báo đẩy tức thời lên trình duyệt và thiết bị di động.</p>
+<span class="inline-flex items-center px-3 py-1 rounded-full bg-primary-container/20 text-primary text-[10px] font-bold uppercase tracking-widest">Đang hoạt động</span>
+</div>
+<div class="p-6 rounded-xl bg-surface-container-high/50 border border-outline-variant/5">
+<span class="material-symbols-outlined text-tertiary mb-4">mail</span>
+<h3 class="font-headline font-bold mb-2">Email tóm tắt</h3>
+<p class="text-xs text-slate-400 mb-4 leading-relaxed">Gửi báo cáo an ninh hàng tuần vào hòm thư đăng ký.</p>
+<button class="w-full py-2 bg-surface-container-highest text-on-surface text-[10px] font-bold uppercase tracking-widest rounded-lg hover:bg-slate-700 transition-colors">Cấu hình</button>
+</div>
+</div>
+</section>
+</div>
+<!-- Sticky Action Bar -->
+<div class="fixed bottom-10 right-10 flex items-center gap-4 z-50">
+<button class="px-8 h-14 bg-surface-container-highest text-on-surface font-headline font-bold rounded-xl shadow-lg hover:bg-slate-700 transition-all active:scale-95">Hủy bỏ</button>
+<button class="px-10 h-14 bg-primary-gradient text-on-primary-container font-headline font-extrabold rounded-xl shadow-[0px_24px_48px_rgba(15,98,254,0.3)] hover:brightness-110 transition-all active:scale-95 uppercase tracking-tight">Lưu thay đổi</button>
+</div>
+</main>
+<!-- Visual Decorative Element -->
+<div class="fixed top-0 right-0 -z-10 w-1/2 h-full opacity-20 pointer-events-none">
+<div class="absolute inset-0 bg-gradient-to-l from-blue-600/20 to-transparent blur-3xl"></div>
+</div>
+</body></html>

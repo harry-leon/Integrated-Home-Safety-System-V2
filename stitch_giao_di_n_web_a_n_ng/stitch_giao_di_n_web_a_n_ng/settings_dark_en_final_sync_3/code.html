@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SENTINEL | System Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container": "#1d2026",
+                        "secondary-fixed-dim": "#b4c5ff",
+                        "on-secondary-container": "#a0b6ff",
+                        "tertiary-container": "#c84000",
+                        "on-secondary": "#0e2b6f",
+                        "surface-container-lowest": "#0b0e14",
+                        "inverse-on-surface": "#2e3037",
+                        "secondary-container": "#2d458a",
+                        "surface-container-low": "#191c22",
+                        "surface-container-highest": "#32353c",
+                        "on-error": "#690005",
+                        "surface-container-high": "#272a31",
+                        "tertiary": "#ffb59d",
+                        "on-tertiary": "#5d1900",
+                        "outline-variant": "#424656",
+                        "on-primary": "#002979",
+                        "on-primary-fixed-variant": "#003da9",
+                        "surface-bright": "#363940",
+                        "tertiary-fixed": "#ffdbd0",
+                        "surface-tint": "#b4c5ff",
+                        "on-secondary-fixed-variant": "#2a4387",
+                        "secondary-fixed": "#dbe1ff",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "surface-dim": "#101319",
+                        "on-primary-container": "#f3f3ff",
+                        "secondary": "#b4c5ff",
+                        "outline": "#8c90a2",
+                        "on-tertiary-container": "#fff1ed",
+                        "on-tertiary-fixed-variant": "#832700",
+                        "surface": "#101319",
+                        "error-container": "#93000a",
+                        "on-primary-fixed": "#00174c",
+                        "on-error-container": "#ffdad6",
+                        "surface-variant": "#32353c",
+                        "on-background": "#e1e2eb",
+                        "tertiary-fixed-dim": "#ffb59d",
+                        "on-tertiary-fixed": "#390c00",
+                        "inverse-primary": "#0052dd",
+                        "background": "#101319",
+                        "on-surface": "#e1e2eb",
+                        "on-surface-variant": "#c3c6d8",
+                        "primary": "#b4c5ff",
+                        "error": "#ffb4ab",
+                        "primary-fixed": "#dbe1ff",
+                        "on-secondary-fixed": "#00174c",
+                        "primary-container": "#0f62fe",
+                        "inverse-surface": "#e1e2eb"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Manrope"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #0f62fe 0%, #b4c5ff 100%);
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar Implementation -->
+<nav class="fixed top-0 w-full flex justify-between items-center px-8 h-20 bg-slate-900/70 backdrop-blur-xl z-50 shadow-[0px_24px_48px_rgba(15,98,254,0.08)]">
+<div class="flex items-center gap-8">
+<span class="text-2xl font-bold tracking-tighter text-slate-100 font-['Manrope']">SENTINEL</span>
+<div class="hidden md:flex items-center bg-surface-container-high rounded-full px-4 py-1.5 gap-3">
+<span class="material-symbols-outlined text-outline text-lg" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-64 text-on-surface-variant placeholder:opacity-50" placeholder="Search system settings..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<button class="text-slate-400 hover:text-blue-400 transition-colors duration-300 scale-98 active:opacity-80">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-slate-400 hover:text-blue-400 transition-colors duration-300 scale-98 active:opacity-80">
+<span class="material-symbols-outlined" data-icon="admin_panel_settings">admin_panel_settings</span>
+</button>
+<img class="w-10 h-10 rounded-full object-cover border border-outline-variant/30" data-alt="Security Administrator Profile portrait in professional attire with high-tech workspace background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD973N8tYV3PcQflNDU-_XlY4OeTELzVSCti2vdncFgU5c1tAQb6VNjgd_TeK7nTHmE0az54aJGuk-xf9sBKxg1YF3b9ZOUzTRbF6rK4kYTYrxp-G05k2k6erNjL8tlRc6QqQqxg1hP1kq-MoTHu7x3NiwZZTeOvuyPRpMJPcB0FMX_CYth7kys9RGHv-0HpyB6yGIGyrZnwSAUesAlh2U12uXp5a-dNwo5jf0J9j6PE6fo56-5RkHs-XTEPibg3HTrkcTYOXxlAC3P"/>
+</div>
+</nav>
+<!-- SideNavBar Implementation -->
+<aside class="fixed left-0 top-0 h-full flex flex-col py-8 bg-slate-900 dark:bg-slate-950 w-72 z-40 hidden md:flex">
+<div class="px-8 mt-20 mb-10">
+<div class="flex items-center gap-3">
+<div class="p-2 bg-blue-600/10 rounded-lg">
+<span class="material-symbols-outlined text-blue-500" data-icon="shield">shield</span>
+</div>
+<div>
+<p class="text-blue-500 font-bold font-['Manrope']">System Armed</p>
+<p class="text-[10px] uppercase tracking-widest text-slate-500">Precision Security</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-1">
+<a class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:text-slate-300 hover:bg-slate-800/50 transition-all duration-200 font-['Manrope'] text-sm font-medium rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:text-slate-300 hover:bg-slate-800/50 transition-all duration-200 font-['Manrope'] text-sm font-medium rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="settings_remote">settings_remote</span>
+                Remote Control
+            </a>
+<a class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:text-slate-300 hover:bg-slate-800/50 transition-all duration-200 font-['Manrope'] text-sm font-medium rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="fingerprint">fingerprint</span>
+                Fingerprints
+            </a>
+<a class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:text-slate-300 hover:bg-slate-800/50 transition-all duration-200 font-['Manrope'] text-sm font-medium rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="history_edu">history_edu</span>
+                Logs
+            </a>
+<a class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:text-slate-300 hover:bg-slate-800/50 transition-all duration-200 font-['Manrope'] text-sm font-medium rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="query_stats">query_stats</span>
+                Analytics
+            </a>
+<a class="flex items-center gap-4 px-4 py-3 bg-blue-600/10 text-blue-500 border-r-4 border-blue-600 font-['Manrope'] text-sm font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+                Settings
+            </a>
+</nav>
+<div class="px-4 mt-auto space-y-1">
+<a class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:text-slate-300 hover:bg-slate-800/50 transition-all duration-200 font-['Manrope'] text-sm font-medium rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="contact_support">contact_support</span>
+                Support
+            </a>
+<a class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:text-slate-300 hover:bg-slate-800/50 transition-all duration-200 font-['Manrope'] text-sm font-medium rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+                Sign Out
+            </a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="md:pl-72 pt-20 min-h-screen">
+<div class="max-w-7xl mx-auto p-8">
+<!-- Editorial Header -->
+<header class="mb-12">
+<h1 class="text-6xl font-extrabold tracking-tighter font-headline mb-2 text-on-surface">SYSTEM SETTINGS</h1>
+<p class="text-on-surface-variant/60 font-medium tracking-wide">CONFIGURATION &amp; ACCESS CONTROL PROTOCOLS</p>
+</header>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-12 gap-8">
+<!-- Access Management (Large) -->
+<section class="col-span-12 lg:col-span-8 bg-surface-container rounded-xl p-8 transition-colors duration-300 hover:bg-surface-container-high group">
+<div class="flex justify-between items-end mb-8">
+<div>
+<h3 class="text-2xl font-semibold font-headline mb-1">Access Management</h3>
+<p class="text-sm text-on-surface-variant opacity-70">Authorize and manage secure facility credentials</p>
+</div>
+<button class="bg-gradient-primary text-on-primary-container px-6 py-2.5 rounded-xl font-semibold text-sm flex items-center gap-2 transition-transform active:scale-95 shadow-[0px_24px_48px_rgba(15,98,254,0.12)]">
+<span class="material-symbols-outlined text-lg" data-icon="person_add">person_add</span>
+                            Provision New User
+                        </button>
+</div>
+<div class="space-y-4">
+<!-- User Card 1 -->
+<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-lg hover:bg-surface-container-highest transition-all">
+<div class="flex items-center gap-4">
+<img class="w-12 h-12 rounded-full grayscale hover:grayscale-0 transition-all" data-alt="Close-up of a diverse male security professional with neutral expression" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_PTH85JzpKEQ_WBv7hgj1w5-1pmhNph3YA7j_JOTqewXTEv_g3HjQp0dPV3K8DeFWLddLoSdgr3QQL_3eNtBq8a5BFKUeyk7yDsS7NgNn59ZgWB0Yx6NXiWPek0P-lEr6l2OXAplSidU581Uyo9DWb8D_kuB-oA3hnFXsyaNnd5LeZcrT7u71S42VqI6KUNilO6V-MabWjSJgw8bCc1G__F3nQ6EJMbNvD5ESG2uZ7uf5wO8VVgh2c151B7kWQ1t4j0W_oG0uezOe"/>
+<div>
+<p class="font-bold text-on-surface">Alexander Vance</p>
+<p class="text-xs text-on-surface-variant font-label opacity-60">Level 5 • Master Access</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="bg-primary-container/20 text-primary text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-tighter">Active</span>
+<button class="text-on-surface-variant hover:text-white transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</div>
+<!-- User Card 2 -->
+<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-lg hover:bg-surface-container-highest transition-all">
+<div class="flex items-center gap-4">
+<img class="w-12 h-12 rounded-full grayscale hover:grayscale-0 transition-all" data-alt="Close-up of a professional woman in technical gear" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBdfAxEewxMCwMmKpLlte1mck5J8z4F2r1QTl2BOeWwrmWNKc0nl0mP4l58j0llaCK111G4jVZG2AXw3Z9AyosMp1IsiC_HsRTs1-W5e_z5QTZX1mBJcmYUS7EeBW--E57PiyK38zt4obPDCO3XdpqMI-z9YYMvzM57FXZa0NevND0q_o1B7BGEXrF7xTFsWdvbyVolFdZyZjQ18ib-QFEuNdiWV2ae9EweJ-Rlg3Qdq5yu0BQnfCF1eMNNBHSTrU6IbuBOsYZaMVNs"/>
+<div>
+<p class="font-bold text-on-surface">Elena Rodriguez</p>
+<p class="text-xs text-on-surface-variant font-label opacity-60">Level 3 • Daily Access</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="bg-primary-container/20 text-primary text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-tighter">Active</span>
+<button class="text-on-surface-variant hover:text-white transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Temporal Constraints (Small) -->
+<section class="col-span-12 lg:col-span-4 bg-surface-container rounded-xl p-8 hover:bg-surface-container-high transition-colors">
+<h3 class="text-xl font-semibold font-headline mb-6">Temporal Constraints</h3>
+<div class="space-y-8">
+<div>
+<div class="flex justify-between items-center mb-3">
+<label class="text-sm font-medium text-on-surface-variant">Auto-lock Timer</label>
+<span class="text-sm font-bold text-primary font-label">30s</span>
+</div>
+<input class="w-full h-1 bg-surface-container-highest rounded-lg appearance-none cursor-pointer accent-primary" type="range"/>
+</div>
+<div>
+<div class="flex justify-between items-center mb-3">
+<label class="text-sm font-medium text-on-surface-variant">Keypad Lockout</label>
+<span class="text-sm font-bold text-primary font-label">5m</span>
+</div>
+<input class="w-full h-1 bg-surface-container-highest rounded-lg appearance-none cursor-pointer accent-primary" type="range"/>
+</div>
+<div class="flex items-center justify-between pt-4 border-t border-outline-variant/10">
+<div>
+<p class="text-sm font-bold">Enforce Night Cycle</p>
+<p class="text-xs text-on-surface-variant opacity-60">22:00 - 06:00</p>
+</div>
+<div class="w-12 h-6 bg-primary-container rounded-full flex items-center justify-end px-1 cursor-pointer">
+<div class="w-4 h-4 bg-on-primary-container rounded-full"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Threshold Config (Middle) -->
+<section class="col-span-12 md:col-span-6 bg-surface-container rounded-xl p-8 hover:bg-surface-container-high transition-colors">
+<div class="flex items-center gap-3 mb-8">
+<span class="material-symbols-outlined text-tertiary" data-icon="sensors">sensors</span>
+<h3 class="text-xl font-semibold font-headline">Threshold Configuration</h3>
+</div>
+<div class="grid grid-cols-1 gap-6">
+<div class="p-6 bg-surface-container-low rounded-xl border-l-4 border-tertiary">
+<div class="flex justify-between items-center mb-2">
+<span class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Gas Sensitivity</span>
+<span class="text-xs font-label text-tertiary">SENSITIVE</span>
+</div>
+<div class="flex gap-1 h-3">
+<div class="flex-1 bg-tertiary rounded-sm"></div>
+<div class="flex-1 bg-tertiary rounded-sm"></div>
+<div class="flex-1 bg-tertiary rounded-sm"></div>
+<div class="flex-1 bg-tertiary rounded-sm"></div>
+<div class="flex-1 bg-surface-container-highest rounded-sm"></div>
+</div>
+<p class="mt-4 text-[11px] text-on-surface-variant leading-relaxed">System will trigger alert at 400ppm detection.</p>
+</div>
+<div class="p-6 bg-surface-container-low rounded-xl">
+<div class="flex justify-between items-center mb-2">
+<span class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Light Sensor Ambient</span>
+<span class="text-xs font-label text-primary">OPTIMIZED</span>
+</div>
+<div class="flex gap-1 h-3">
+<div class="flex-1 bg-primary rounded-sm"></div>
+<div class="flex-1 bg-primary rounded-sm"></div>
+<div class="flex-1 bg-surface-container-highest rounded-sm"></div>
+<div class="flex-1 bg-surface-container-highest rounded-sm"></div>
+<div class="flex-1 bg-surface-container-highest rounded-sm"></div>
+</div>
+<p class="mt-4 text-[11px] text-on-surface-variant leading-relaxed">Auto-illumination active below 15 Lux.</p>
+</div>
+</div>
+</section>
+<!-- Notification Stream Toggles (Middle) -->
+<section class="col-span-12 md:col-span-6 bg-surface-container rounded-xl p-8 hover:bg-surface-container-high transition-colors">
+<h3 class="text-xl font-semibold font-headline mb-8">Notification Stream</h3>
+<div class="space-y-6">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-xl" data-icon="lock_open">lock_open</span>
+</div>
+<div>
+<p class="text-sm font-bold">Unlocking Events</p>
+<p class="text-xs text-on-surface-variant opacity-60">Push &amp; SMS</p>
+</div>
+</div>
+<div class="w-10 h-5 bg-primary-container rounded-full flex items-center justify-end px-1 cursor-pointer">
+<div class="w-3 h-3 bg-on-primary-container rounded-full"></div>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary text-xl" data-icon="warning">warning</span>
+</div>
+<div>
+<p class="text-sm font-bold">Threat Detection</p>
+<p class="text-xs text-on-surface-variant opacity-60">Critical Alerts Only</p>
+</div>
+</div>
+<div class="w-10 h-5 bg-primary-container rounded-full flex items-center justify-end px-1 cursor-pointer">
+<div class="w-3 h-3 bg-on-primary-container rounded-full"></div>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant text-xl" data-icon="sync">sync</span>
+</div>
+<div>
+<p class="text-sm font-bold">System Health</p>
+<p class="text-xs text-on-surface-variant opacity-60">Weekly Summary</p>
+</div>
+</div>
+<div class="w-10 h-5 bg-surface-container-highest rounded-full flex items-center justify-start px-1 cursor-pointer">
+<div class="w-3 h-3 bg-outline rounded-full"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Footer Actions -->
+<div class="col-span-12 flex flex-col md:flex-row justify-between items-center gap-6 mt-4 p-8 bg-surface-container-low rounded-xl border border-outline-variant/10">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-error" data-icon="report_problem">report_problem</span>
+<div>
+<p class="text-sm font-bold">Hardware Reset Protocol</p>
+<p class="text-xs text-on-surface-variant opacity-60">Reverts all configurations to factory defaults.</p>
+</div>
+</div>
+<div class="flex items-center gap-4 w-full md:w-auto">
+<button class="flex-1 md:flex-none px-8 py-3 rounded-xl border border-error/30 text-error font-bold text-sm hover:bg-error/10 transition-colors">
+                            Reset to Factory
+                        </button>
+<button class="flex-1 md:flex-none px-12 py-3 rounded-xl bg-gradient-primary text-on-primary-container font-extrabold text-sm shadow-xl shadow-primary-container/20 transition-all hover:scale-105 active:scale-95">
+                            Apply Changes
+                        </button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Mobile BottomNavBar (Hidden on desktop) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-slate-900/90 backdrop-blur-xl flex justify-around items-center py-4 px-2 z-50">
+<button class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="text-[10px] font-medium">Home</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-symbols-outlined" data-icon="fingerprint">fingerprint</span>
+<span class="text-[10px] font-medium">Access</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-blue-500">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="text-[10px] font-medium">Settings</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-symbols-outlined" data-icon="history_edu">history_edu</span>
+<span class="text-[10px] font-medium">Logs</span>
+</button>
+</nav>
+</body></html>

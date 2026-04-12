@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SENTINEL | Security Hub Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-low": "#191c22",
+                    "error-container": "#93000a",
+                    "on-tertiary-container": "#fff1ed",
+                    "on-surface-variant": "#c3c6d8",
+                    "secondary-fixed": "#dbe1ff",
+                    "on-secondary": "#0e2b6f",
+                    "primary-container": "#0f62fe",
+                    "on-background": "#e1e2eb",
+                    "background": "#101319",
+                    "outline": "#8c90a2",
+                    "surface": "#101319",
+                    "on-primary-container": "#f3f3ff",
+                    "on-secondary-fixed-variant": "#2a4387",
+                    "error": "#ffb4ab",
+                    "on-error-container": "#ffdad6",
+                    "surface-container-high": "#272a31",
+                    "on-secondary-fixed": "#00174c",
+                    "surface-container": "#1d2026",
+                    "surface-container-highest": "#32353c",
+                    "secondary": "#b4c5ff",
+                    "surface-bright": "#363940",
+                    "outline-variant": "#424656",
+                    "surface-tint": "#b4c5ff",
+                    "inverse-on-surface": "#2e3037",
+                    "on-error": "#690005",
+                    "surface-dim": "#101319",
+                    "on-primary-fixed-variant": "#003da9",
+                    "surface-variant": "#32353c",
+                    "on-primary": "#002979",
+                    "on-tertiary": "#5d1900",
+                    "primary-fixed": "#dbe1ff",
+                    "surface-container-lowest": "#0b0e14",
+                    "tertiary-fixed-dim": "#ffb59d",
+                    "tertiary-container": "#c84000",
+                    "inverse-primary": "#0052dd",
+                    "secondary-container": "#2d458a",
+                    "primary": "#b4c5ff",
+                    "on-surface": "#e1e2eb",
+                    "secondary-fixed-dim": "#b4c5ff",
+                    "tertiary-fixed": "#ffdbd0",
+                    "tertiary": "#ffb59d",
+                    "inverse-surface": "#e1e2eb",
+                    "on-tertiary-fixed-variant": "#832700",
+                    "on-secondary-container": "#a0b6ff",
+                    "on-primary-fixed": "#00174c",
+                    "primary-fixed-dim": "#b4c5ff",
+                    "on-tertiary-fixed": "#390c00"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Manrope"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      body {
+        font-family: 'Manrope', sans-serif;
+      }
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #32353c;
+        border-radius: 10px;
+      }
+    </style>
+</head>
+<body class="bg-background text-on-background selection:bg-primary-container selection:text-on-primary-container min-h-screen">
+<!-- SideNavBar Shell -->
+<aside class="bg-[#101319] dark:bg-[#101319] h-screen w-72 left-0 top-0 fixed border-r border-slate-800/20 flex flex-col py-8 px-6 space-y-4 z-40">
+<div class="mb-8 px-2">
+<div class="flex items-center gap-3 mb-6">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center shadow-[0px_0px_20px_rgba(15,98,254,0.3)]">
+<span class="material-symbols-outlined text-on-primary-container" data-icon="shield">shield</span>
+</div>
+<div>
+<h1 class="text-on-surface font-headline font-extrabold tracking-tighter text-xl">SENTINEL</h1>
+<p class="text-slate-500 font-label text-[10px] uppercase tracking-[0.2em]">Security Hub</p>
+</div>
+</div>
+<div class="p-4 bg-surface-container rounded-xl flex items-center gap-3">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-highest">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="Professional male user profile portrait with neutral background and soft studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJR7e4tfl7pXfEHp6RnPTwYGVtPtIu4QozAEFMYJrJPw1y3LErwDKcm473SRcaHb4MWHQiOjJLJbPaZ87vMP3wMYjpvfHpIK0C6N4LbEE2rlaEa9ctZLzVkM3Z0DoSvzqgGc9fPlDcW3LlZL7bbdSDa-_Vhx4msJFeocyn4lgZYli6k1hp0JzDMa59rfjHqNlIOEnM5MK6fniHJzABEWHeM1pcsz45XrMk_-20zoLQA5rsZT2IDhqC1W_k6BST-ResonLZU-sskeZ4"/>
+</div>
+<div class="overflow-hidden">
+<p class="text-on-surface font-bold text-sm truncate">Admin User</p>
+<p class="text-slate-400 text-xs truncate">Precision Monitoring</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-2 overflow-y-auto custom-scrollbar">
+<a class="flex items-center gap-4 py-3 px-4 rounded-lg font-manrope text-sm uppercase tracking-widest text-slate-400 hover:bg-slate-800/30 transition-all group" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="dashboard">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-4 py-3 px-4 rounded-lg font-manrope text-sm uppercase tracking-widest text-slate-400 hover:bg-slate-800/30 transition-all group" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="settings_remote">settings_remote</span>
+<span>Remote Control</span>
+</a>
+<a class="flex items-center gap-4 py-3 px-4 rounded-lg font-manrope text-sm uppercase tracking-widest text-slate-400 hover:bg-slate-800/30 transition-all group" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="fingerprint">fingerprint</span>
+<span>Fingerprints</span>
+</a>
+<a class="flex items-center gap-4 py-3 px-4 rounded-lg font-manrope text-sm uppercase tracking-widest text-slate-400 hover:bg-slate-800/30 transition-all group" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="receipt_long">receipt_long</span>
+<span>Logs</span>
+</a>
+<a class="flex items-center gap-4 py-3 px-4 rounded-lg font-manrope text-sm uppercase tracking-widest text-slate-400 hover:bg-slate-800/30 transition-all group" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="analytics">analytics</span>
+<span>Analytics</span>
+</a>
+<a class="flex items-center gap-4 py-3 px-4 rounded-lg font-manrope text-sm uppercase tracking-widest bg-blue-600/10 text-blue-500 border-r-4 border-blue-600 font-bold" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="settings">settings</span>
+<span>Settings</span>
+</a>
+</nav>
+<div class="pt-6 border-t border-slate-800/20 space-y-2">
+<a class="flex items-center gap-4 py-3 px-4 rounded-lg font-manrope text-sm uppercase tracking-widest text-slate-400 hover:bg-slate-800/30 transition-all" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="help">help</span>
+<span>Support</span>
+</a>
+<a class="flex items-center gap-4 py-3 px-4 rounded-lg font-manrope text-sm uppercase tracking-widest text-slate-400 hover:bg-slate-800/30 transition-all" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="check_circle">check_circle</span>
+<span>System Status</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-72 min-h-screen relative p-12">
+<!-- Header Section -->
+<header class="max-w-6xl mx-auto mb-16 flex justify-between items-end">
+<div class="space-y-2">
+<h2 class="text-5xl font-headline font-extrabold tracking-tighter text-on-surface">SYSTEM PREFERENCES</h2>
+<p class="text-slate-400 font-body text-lg max-w-xl">Configure administrative protocols, sensory thresholds, and automated responses for the Sentinel Network.</p>
+</div>
+<div class="flex gap-4">
+<button class="bg-surface-container-high text-on-surface px-6 py-3 rounded-xl font-bold text-sm tracking-tight hover:bg-surface-container-highest transition-all active:scale-95">RESET ALL</button>
+<button class="bg-gradient-to-br from-primary-container to-primary text-on-primary-container px-8 py-3 rounded-xl font-bold text-sm tracking-tight shadow-[0px_10px_30px_rgba(15,98,254,0.3)] hover:brightness-110 transition-all active:scale-95">DEPLOY UPDATES</button>
+</div>
+</header>
+<div class="max-w-6xl mx-auto grid grid-cols-12 gap-8">
+<!-- Bento Column 1: Access & Profile -->
+<div class="col-span-12 lg:col-span-7 space-y-8">
+<!-- Access Profile Card -->
+<section class="bg-surface-container rounded-[2rem] p-10 relative overflow-hidden group">
+<div class="absolute top-0 left-0 w-1 h-full bg-primary-container"></div>
+<div class="flex justify-between items-start mb-10">
+<div>
+<h3 class="text-2xl font-headline font-semibold text-on-surface mb-1">Access Profile</h3>
+<p class="text-slate-500 text-sm">Security credentials and authentication rules</p>
+</div>
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="admin_panel_settings">admin_panel_settings</span>
+</div>
+<div class="space-y-6">
+<div class="flex flex-col gap-2">
+<label class="text-xs font-label uppercase tracking-widest text-slate-400 px-1">Master Password</label>
+<div class="relative">
+<input class="w-full bg-surface-container-highest border-none rounded-xl py-4 px-6 text-on-surface focus:ring-2 focus:ring-primary/50 transition-all font-mono" type="password" value="••••••••••••"/>
+<button class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-primary">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+</button>
+</div>
+<p class="text-[10px] text-slate-500 px-1 italic">Last updated: 14 days ago</p>
+</div>
+<div class="grid grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="text-xs font-label uppercase tracking-widest text-slate-400 px-1">PIN Timeout</label>
+<div class="flex items-center gap-3 bg-surface-container-highest rounded-xl p-4">
+<span class="material-symbols-outlined text-slate-400" data-icon="timer">timer</span>
+<select class="bg-transparent border-none text-on-surface w-full focus:ring-0 font-medium">
+<option>30 Seconds</option>
+<option selected="">60 Seconds</option>
+<option>5 Minutes</option>
+<option>Never</option>
+</select>
+</div>
+</div>
+<div class="space-y-2">
+<label class="text-xs font-label uppercase tracking-widest text-slate-400 px-1">Biometric Layer</label>
+<div class="flex items-center justify-between bg-surface-container-highest rounded-xl p-4">
+<span class="text-on-surface font-medium">Face ID/Touch</span>
+<div class="w-10 h-5 bg-primary-container rounded-full relative flex items-center px-1">
+<div class="w-3 h-3 bg-white rounded-full ml-auto"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Threshold Configuration -->
+<section class="bg-surface-container rounded-[2rem] p-10 relative overflow-hidden">
+<div class="flex justify-between items-start mb-10">
+<div>
+<h3 class="text-2xl font-headline font-semibold text-on-surface mb-1">Threshold Configuration</h3>
+<p class="text-slate-500 text-sm">Environmental sensor sensitivity levels</p>
+</div>
+<span class="material-symbols-outlined text-tertiary text-3xl" data-icon="tune">tune</span>
+</div>
+<div class="space-y-10">
+<!-- Gas Sensitivity -->
+<div class="space-y-4">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-slate-400 text-xl" data-icon="gas_meter">gas_meter</span>
+<span class="text-on-surface font-medium">Gas Sensitivity</span>
+</div>
+<span class="bg-primary-container/20 text-primary font-bold px-3 py-1 rounded-full text-xs">240 PPM</span>
+</div>
+<div class="relative h-2 bg-surface-container-highest rounded-full">
+<div class="absolute left-0 top-0 h-full w-[45%] bg-gradient-to-r from-primary to-secondary rounded-full"></div>
+<div class="absolute left-[45%] top-1/2 -translate-y-1/2 w-4 h-4 bg-on-primary rounded-full shadow-lg border-2 border-primary cursor-pointer"></div>
+</div>
+<div class="flex justify-between text-[10px] uppercase tracking-tighter text-slate-500 font-bold">
+<span>Precise</span>
+<span>High Alert</span>
+</div>
+</div>
+<!-- LDR Lux -->
+<div class="space-y-4">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-slate-400 text-xl" data-icon="light_mode">light_mode</span>
+<span class="text-on-surface font-medium">LDR Lux (Luminosity)</span>
+</div>
+<span class="bg-tertiary-container/20 text-tertiary font-bold px-3 py-1 rounded-full text-xs">12.5 LUX</span>
+</div>
+<div class="relative h-2 bg-surface-container-highest rounded-full">
+<div class="absolute left-0 top-0 h-full w-[25%] bg-tertiary rounded-full"></div>
+<div class="absolute left-[25%] top-1/2 -translate-y-1/2 w-4 h-4 bg-on-tertiary rounded-full shadow-lg border-2 border-tertiary cursor-pointer"></div>
+</div>
+<div class="flex justify-between text-[10px] uppercase tracking-tighter text-slate-500 font-bold">
+<span>Pitch Black</span>
+<span>Daylight</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Bento Column 2: Temporal & Notifications -->
+<div class="col-span-12 lg:col-span-5 space-y-8">
+<!-- Temporal Constraints -->
+<section class="bg-surface-container rounded-[2rem] p-10 relative overflow-hidden h-full">
+<div class="flex justify-between items-start mb-8">
+<div>
+<h3 class="text-2xl font-headline font-semibold text-on-surface mb-1">Temporal Constraints</h3>
+<p class="text-slate-500 text-sm">Automated lockout schedules</p>
+</div>
+</div>
+<div class="space-y-8">
+<div class="p-6 bg-surface-container-low rounded-2xl flex items-center justify-between group hover:bg-surface-container-high transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-surface-container-highest rounded-xl flex items-center justify-center text-slate-400 group-hover:text-primary">
+<span class="material-symbols-outlined" data-icon="lock_clock">lock_clock</span>
+</div>
+<div>
+<p class="text-on-surface font-bold">Auto-lock delay</p>
+<p class="text-slate-500 text-xs">Seconds before engagement</p>
+</div>
+</div>
+<div class="text-primary font-headline text-2xl font-bold italic tracking-tighter">15s</div>
+</div>
+<div class="p-6 bg-surface-container-low rounded-2xl flex items-center justify-between group hover:bg-surface-container-high transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-surface-container-highest rounded-xl flex items-center justify-center text-slate-400 group-hover:text-tertiary">
+<span class="material-symbols-outlined" data-icon="emergency_home">emergency_home</span>
+</div>
+<div>
+<p class="text-on-surface font-bold">Keypad lockout</p>
+<p class="text-slate-500 text-xs">Duration after 3 fails</p>
+</div>
+</div>
+<div class="text-tertiary font-headline text-2xl font-bold italic tracking-tighter">05m</div>
+</div>
+<div class="pt-4 px-2">
+<div class="flex items-center justify-between mb-2">
+<span class="text-xs font-label uppercase tracking-widest text-slate-400">Strict Enforcement</span>
+<div class="w-10 h-5 bg-surface-container-highest rounded-full relative flex items-center px-1">
+<div class="w-3 h-3 bg-slate-500 rounded-full"></div>
+</div>
+</div>
+<p class="text-[10px] text-slate-600">Strict mode disables all remote entry bypasses during lockout periods.</p>
+</div>
+</div>
+<!-- Decorative Background Element -->
+<div class="absolute -bottom-10 -right-10 opacity-5 pointer-events-none">
+<span class="material-symbols-outlined text-[160px]" data-icon="schedule">schedule</span>
+</div>
+</section>
+<!-- Notification Stream -->
+<section class="bg-surface-container rounded-[2rem] p-10 relative overflow-hidden">
+<div class="flex justify-between items-start mb-8">
+<div>
+<h3 class="text-2xl font-headline font-semibold text-on-surface mb-1">Notification Stream</h3>
+<p class="text-slate-500 text-sm">Communication channel protocols</p>
+</div>
+</div>
+<div class="space-y-4">
+<div class="flex items-center justify-between p-4 bg-surface-container-highest/30 rounded-xl border border-outline-variant/10">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="notifications_active">notifications_active</span>
+<span class="text-on-surface font-medium">Web Push Alerts</span>
+</div>
+<div class="w-12 h-6 bg-primary-container rounded-full relative flex items-center px-1">
+<div class="w-4 h-4 bg-white rounded-full ml-auto"></div>
+</div>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container-highest/30 rounded-xl border border-outline-variant/10">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-500" data-icon="mark_email_read">mark_email_read</span>
+<span class="text-on-surface font-medium">Email Digest</span>
+</div>
+<div class="w-12 h-6 bg-surface-container-highest rounded-full relative flex items-center px-1">
+<div class="w-4 h-4 bg-slate-500 rounded-full"></div>
+</div>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container-highest/30 rounded-xl border border-outline-variant/10">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-500" data-icon="sms">sms</span>
+<span class="text-on-surface font-medium">Critical SMS</span>
+</div>
+<div class="w-12 h-6 bg-primary-container rounded-full relative flex items-center px-1">
+<div class="w-4 h-4 bg-white rounded-full ml-auto"></div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+<!-- System State Overview Floating Element -->
+<div class="fixed bottom-10 right-10 bg-surface-container-high/70 backdrop-blur-xl border border-outline-variant/10 p-6 rounded-[2rem] shadow-[0px_24px_48px_rgba(15,98,254,0.08)] max-w-xs z-50">
+<div class="flex items-center gap-4 mb-4">
+<div class="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0px_0px_10px_rgba(15,98,254,0.8)]"></div>
+<p class="text-xs font-label uppercase tracking-widest text-on-surface">System integrity optimal</p>
+</div>
+<p class="text-slate-400 text-sm leading-relaxed mb-4">Network nodes synchronized with local settings. No conflicting protocols detected.</p>
+<div class="flex gap-2">
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-[10px] text-slate-300 font-bold uppercase tracking-wider">v4.2.1-stable</span>
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-[10px] text-slate-300 font-bold uppercase tracking-wider">AES-256</span>
+</div>
+</div>
+</main>
+<!-- Visual Signal - Right Gradient Accent -->
+<div class="fixed top-0 right-0 h-screen w-1 bg-gradient-to-b from-primary-container via-transparent to-tertiary-container opacity-20"></div>
+</body></html>

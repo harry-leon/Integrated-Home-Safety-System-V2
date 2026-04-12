@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SENTINEL | System Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-fixed": "#00174c",
+                    "secondary-container": "#2d458a",
+                    "primary": "#b4c5ff",
+                    "error": "#ffb4ab",
+                    "surface-container-low": "#191c22",
+                    "primary-fixed-dim": "#b4c5ff",
+                    "on-secondary-fixed": "#00174c",
+                    "on-surface": "#e1e2eb",
+                    "surface": "#101319",
+                    "surface-container-lowest": "#0b0e14",
+                    "tertiary-fixed": "#ffdbd0",
+                    "on-tertiary-fixed": "#390c00",
+                    "on-surface-variant": "#c3c6d8",
+                    "surface-container-highest": "#32353c",
+                    "on-background": "#e1e2eb",
+                    "on-primary-container": "#f3f3ff",
+                    "tertiary-fixed-dim": "#ffb59d",
+                    "surface-container": "#1d2026",
+                    "inverse-on-surface": "#2e3037",
+                    "primary-container": "#0f62fe",
+                    "surface-bright": "#363940",
+                    "on-error-container": "#ffdad6",
+                    "secondary-fixed": "#dbe1ff",
+                    "on-tertiary-fixed-variant": "#832700",
+                    "outline-variant": "#424656",
+                    "on-secondary-container": "#a0b6ff",
+                    "outline": "#8c90a2",
+                    "surface-variant": "#32353c",
+                    "primary-fixed": "#dbe1ff",
+                    "error-container": "#93000a",
+                    "on-primary": "#002979",
+                    "on-tertiary": "#5d1900",
+                    "tertiary": "#ffb59d",
+                    "inverse-primary": "#0052dd",
+                    "surface-tint": "#b4c5ff",
+                    "background": "#101319",
+                    "surface-dim": "#101319",
+                    "on-primary-fixed-variant": "#003da9",
+                    "on-secondary-fixed-variant": "#2a4387",
+                    "tertiary-container": "#c84000",
+                    "secondary": "#b4c5ff",
+                    "on-tertiary-container": "#fff1ed",
+                    "secondary-fixed-dim": "#b4c5ff",
+                    "inverse-surface": "#e1e2eb",
+                    "on-error": "#690005",
+                    "surface-container-high": "#272a31",
+                    "on-secondary": "#0e2b6f"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Manrope"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #0f62fe 0%, #b4c5ff 100%);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary/30 min-h-screen">
+<!-- Side Navigation Shell -->
+<nav class="h-screen w-72 flex flex-col fixed left-0 top-0 bg-[#101319] border-r border-outline-variant/10 z-40 hidden md:flex">
+<div class="px-8 py-8">
+<h1 class="text-blue-600 font-black tracking-widest text-xl">SENTINEL</h1>
+<p class="text-xs text-slate-500 font-label tracking-tighter uppercase mt-1">Precision Security</p>
+</div>
+<div class="flex-1 px-4 space-y-2 mt-4">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-slate-100 hover:bg-white/5 transition-all duration-300 rounded-xl group" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-medium text-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-slate-100 hover:bg-white/5 transition-all duration-300 rounded-xl group" href="#">
+<span class="material-symbols-outlined" data-icon="lock">lock</span>
+<span class="font-medium text-sm">Lock Registry</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-slate-100 hover:bg-white/5 transition-all duration-300 rounded-xl group" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span class="font-medium text-sm">Access Logs</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-slate-100 hover:bg-white/5 transition-all duration-300 rounded-xl group" href="#">
+<span class="material-symbols-outlined" data-icon="shield">shield</span>
+<span class="font-medium text-sm">Security Protocols</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-slate-100 hover:bg-white/5 transition-all duration-300 rounded-xl group" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-medium text-sm">System Health</span>
+</a>
+</div>
+<div class="px-4 py-8 space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 text-blue-600 dark:text-blue-400 bg-blue-500/10 border-r-4 border-blue-600 rounded-l-xl transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-medium text-sm">Settings</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-slate-100 hover:bg-white/5 transition-all duration-300 rounded-xl" href="#">
+<span class="material-symbols-outlined" data-icon="help_center">help_center</span>
+<span class="font-medium text-sm">Support</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-error hover:bg-error/5 transition-all duration-300 rounded-xl mt-4" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-medium text-sm">Logout</span>
+</a>
+</div>
+</nav>
+<!-- Top Navigation for Mobile -->
+<header class="sticky top-0 z-50 w-full bg-[#101319]/70 backdrop-blur-xl md:hidden px-6 py-4 flex justify-between items-center">
+<h1 class="text-2xl font-bold tracking-tighter text-slate-100">SENTINEL</h1>
+<button class="p-2 hover:bg-white/5 rounded-full transition-colors active:scale-90">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="md:ml-72 min-h-screen p-6 md:p-12 lg:p-16">
+<header class="mb-12 max-w-5xl mx-auto flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div>
+<h2 class="text-5xl font-extrabold tracking-tight text-on-surface mb-2 font-headline">System Settings</h2>
+<p class="text-on-surface-variant text-lg max-w-xl">Configure high-precision access parameters and security threshold logic for the Sentinel ecosystem.</p>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-3 bg-surface-container-high px-4 py-2 rounded-full border border-outline-variant/10">
+<div class="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+<span class="text-xs font-label text-on-surface-variant">NODE: SEC-01 ACTIVE</span>
+</div>
+</div>
+</header>
+<!-- Bento Grid Layout for Sections -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-6xl mx-auto">
+<!-- Section 1: Access Management (Large Featured Card) -->
+<section class="lg:col-span-8 bg-surface-container rounded-full p-8 md:p-12 relative overflow-hidden flex flex-col justify-between min-h-[400px]">
+<div class="relative z-10">
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="group_lock">lock</span>
+<h3 class="text-2xl font-semibold font-headline">Access Management</h3>
+</div>
+<p class="text-on-surface-variant mb-10 max-w-md leading-relaxed">Define hierarchy and administrative permissions for all linked biometric and digital keyholders.</p>
+<div class="space-y-6">
+<div class="flex items-center justify-between group cursor-pointer p-4 -mx-4 rounded-xl hover:bg-surface-container-high transition-colors">
+<div class="flex items-center gap-4">
+<img alt="Administrator" class="w-12 h-12 rounded-full bg-surface-variant" data-alt="minimalist professional portrait avatar for a system administrator in a dark tech UI context" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDN5ZvVYPI_ooTsIdRkHkq56J1DJuZSuTuiFZDGo3_mzOZgWnXGeGRMsTB9pESkIR5BUsT0KTsFN_Tk4tQs0cYNsGvu7zdDIMIrGeqCQK1-nZO5Ia_6fXhINwJEZxjimYWgnlvDsPr85_QyeAotavqgQSttwI4qwwtB-imMEAGt5bpLAq00UEX29GIMkwsgaECcaqrJFDi1xe0fGVf6XLOn6sX7mE3u42mTV-Sw-Oium-BlnNjGw6y-WgEz0fucSy9I-EebZC2YxeFi"/>
+<div>
+<h4 class="font-medium">Administrator Cluster</h4>
+<p class="text-xs font-label text-on-surface-variant">3 Active Profiles</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:translate-x-1 transition-transform" data-icon="chevron_right">chevron_right</span>
+</div>
+<div class="flex items-center justify-between group cursor-pointer p-4 -mx-4 rounded-xl hover:bg-surface-container-high transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-primary-container/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" data-icon="fingerprint">fingerprint</span>
+</div>
+<div>
+<h4 class="font-medium">Biometric Registry</h4>
+<p class="text-xs font-label text-on-surface-variant">12 Registered Patterns</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:translate-x-1 transition-transform" data-icon="chevron_right">chevron_right</span>
+</div>
+</div>
+</div>
+<div class="mt-10 flex gap-4">
+<button class="bg-gradient-primary text-on-primary-container px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:scale-[1.02] active:scale-95 transition-all">
+<span class="material-symbols-outlined" data-icon="person_add">person_add</span>
+                        Grant Access
+                    </button>
+<button class="bg-surface-container-highest px-6 py-3 rounded-xl font-medium hover:bg-surface-bright transition-colors">
+                        View Audit Path
+                    </button>
+</div>
+<!-- Abstract Decorative Element -->
+<div class="absolute -right-20 -bottom-20 w-80 h-80 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
+</section>
+<!-- Section 2: Threshold Config (Vertical Card) -->
+<section class="lg:col-span-4 bg-surface-container rounded-full p-8 relative overflow-hidden border-l-4 border-tertiary">
+<div class="flex flex-col h-full">
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-tertiary" data-icon="tune">tune</span>
+<h3 class="text-xl font-semibold font-headline">Threshold Config</h3>
+</div>
+<div class="space-y-8 flex-1">
+<div>
+<div class="flex justify-between mb-2">
+<label class="text-sm font-label text-on-surface-variant">Auto-Lock Delay</label>
+<span class="text-sm font-bold text-primary">30s</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 45%;"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between mb-2">
+<label class="text-sm font-label text-on-surface-variant">Force Sensitivity</label>
+<span class="text-sm font-bold text-tertiary">High</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-tertiary rounded-full" style="width: 85%;"></div>
+</div>
+</div>
+<div class="pt-4 space-y-4">
+<div class="flex items-center justify-between">
+<span class="text-sm">Two-Factor Reauth</span>
+<div class="w-12 h-6 bg-primary-container rounded-full relative p-1 cursor-pointer">
+<div class="w-4 h-4 bg-on-primary-container rounded-full absolute right-1"></div>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-sm">Silent Mode</span>
+<div class="w-12 h-6 bg-surface-container-highest rounded-full relative p-1 cursor-pointer">
+<div class="w-4 h-4 bg-outline rounded-full absolute left-1"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 3: Temporal Constraints (Horizontal Grid) -->
+<section class="lg:col-span-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Temporal Constraints Main -->
+<div class="md:col-span-2 bg-surface-container rounded-full p-8 md:p-10 flex flex-col md:flex-row gap-10 items-center">
+<div class="flex-1">
+<div class="flex items-center gap-3 mb-4">
+<span class="material-symbols-outlined text-secondary" data-icon="schedule">schedule</span>
+<h3 class="text-2xl font-semibold font-headline">Temporal Constraints</h3>
+</div>
+<p class="text-on-surface-variant mb-8 leading-relaxed">Establish active windows for maintenance personnel and recurring guest credentials.</p>
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-surface-container-high p-5 rounded-2xl border border-outline-variant/10">
+<p class="text-[10px] uppercase tracking-widest text-on-surface-variant mb-1">Morning Shift</p>
+<p class="text-xl font-bold">06:00 — 14:00</p>
+</div>
+<div class="bg-surface-container-high p-5 rounded-2xl border border-outline-variant/10">
+<p class="text-[10px] uppercase tracking-widest text-on-surface-variant mb-1">Night Watch</p>
+<p class="text-xl font-bold">22:00 — 05:00</p>
+</div>
+</div>
+</div>
+<div class="w-full md:w-1/3 aspect-square bg-surface-container-highest rounded-full flex items-center justify-center relative group">
+<div class="absolute inset-0 border-[12px] border-secondary/10 rounded-full"></div>
+<div class="absolute inset-0 border-[12px] border-secondary border-t-transparent border-l-transparent rounded-full rotate-45"></div>
+<div class="text-center">
+<span class="block text-4xl font-extrabold text-secondary">72%</span>
+<span class="text-[10px] uppercase tracking-tighter text-on-surface-variant">Active Coverage</span>
+</div>
+</div>
+</div>
+<!-- Notification Stream -->
+<div class="md:col-span-1 bg-surface-container rounded-full p-8">
+<div class="flex items-center justify-between mb-8">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="notifications_active">notifications_active</span>
+<h3 class="text-xl font-semibold font-headline">Alert Stream</h3>
+</div>
+<span class="bg-error/20 text-error px-2 py-1 rounded text-[10px] font-bold">LIVE</span>
+</div>
+<div class="space-y-6">
+<div class="flex gap-4">
+<div class="mt-1 w-2 h-2 rounded-full bg-tertiary"></div>
+<div>
+<p class="text-sm font-medium">Front Entry: Force Detection</p>
+<p class="text-xs text-on-surface-variant">02:14 PM · Threshold Alert</p>
+</div>
+</div>
+<div class="flex gap-4 opacity-60">
+<div class="mt-1 w-2 h-2 rounded-full bg-primary"></div>
+<div>
+<p class="text-sm font-medium">Admin Cluster: Rule Update</p>
+<p class="text-xs text-on-surface-variant">11:45 AM · System Sync</p>
+</div>
+</div>
+<div class="flex gap-4 opacity-40">
+<div class="mt-1 w-2 h-2 rounded-full bg-secondary"></div>
+<div>
+<p class="text-sm font-medium">Guest Key: Expired Access</p>
+<p class="text-xs text-on-surface-variant">Yesterday · Key Rotation</p>
+</div>
+</div>
+</div>
+<button class="w-full mt-10 py-4 border border-outline-variant/30 rounded-xl text-sm font-bold hover:bg-surface-container-high transition-colors">
+                        Configure Channels
+                    </button>
+</div>
+</section>
+</div>
+<footer class="mt-20 max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center text-on-surface-variant/40 border-t border-outline-variant/5 pt-12 pb-24">
+<div class="flex items-center gap-6 mb-8 md:mb-0">
+<span class="text-xs font-label">FIRMWARE V4.82.01</span>
+<span class="text-xs font-label">ENCRYPT: AES-256-GCM</span>
+<span class="text-xs font-label">LAST SYNC: 2 SEC AGO</span>
+</div>
+<p class="text-xs font-label">© 2024 SENTINEL PRECISION SECURITY SYSTEMS</p>
+</footer>
+</main>
+<!-- Global FAB -->
+<div class="fixed bottom-12 right-12 z-50 md:hidden">
+<button class="w-16 h-16 rounded-full bg-gradient-primary shadow-[0px_24px_48px_rgba(15,98,254,0.15)] flex items-center justify-center text-on-primary-container active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-3xl" data-icon="add">add</span>
+</button>
+</div>
+</body></html>

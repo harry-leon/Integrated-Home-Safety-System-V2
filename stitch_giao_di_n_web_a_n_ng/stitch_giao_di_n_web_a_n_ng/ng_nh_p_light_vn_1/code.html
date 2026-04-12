@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SENTINEL - Đăng nhập</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed": "#00174c",
+                        "secondary-fixed-dim": "#b4c5ff",
+                        "on-tertiary-fixed": "#390c00",
+                        "surface-container-high": "#272a31",
+                        "background": "#101319",
+                        "surface-tint": "#b4c5ff",
+                        "on-tertiary": "#5d1900",
+                        "on-error": "#690005",
+                        "on-primary": "#002979",
+                        "tertiary-fixed-dim": "#ffb59d",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "on-surface": "#e1e2eb",
+                        "on-secondary-fixed-variant": "#2a4387",
+                        "on-secondary": "#0e2b6f",
+                        "secondary": "#b4c5ff",
+                        "tertiary-container": "#c84000",
+                        "on-error-container": "#ffdad6",
+                        "on-surface-variant": "#c3c6d8",
+                        "inverse-surface": "#e1e2eb",
+                        "surface-variant": "#32353c",
+                        "error": "#ffb4ab",
+                        "tertiary": "#ffb59d",
+                        "on-background": "#e1e2eb",
+                        "tertiary-fixed": "#ffdbd0",
+                        "inverse-primary": "#0052dd",
+                        "surface-container-lowest": "#0b0e14",
+                        "on-tertiary-fixed-variant": "#832700",
+                        "on-primary-fixed-variant": "#003da9",
+                        "surface-container-low": "#191c22",
+                        "primary-container": "#0f62fe",
+                        "on-primary-container": "#f3f3ff",
+                        "surface": "#101319",
+                        "on-primary-fixed": "#00174c",
+                        "surface-dim": "#101319",
+                        "secondary-fixed": "#dbe1ff",
+                        "surface-container": "#1d2026",
+                        "on-tertiary-container": "#fff1ed",
+                        "primary-fixed": "#dbe1ff",
+                        "outline-variant": "#424656",
+                        "secondary-container": "#2d458a",
+                        "surface-bright": "#363940",
+                        "error-container": "#93000a",
+                        "outline": "#8c90a2",
+                        "primary": "#b4c5ff",
+                        "on-secondary-container": "#a0b6ff",
+                        "inverse-on-surface": "#2e3037",
+                        "surface-container-highest": "#32353c"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Manrope"],
+                        "label": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bg-login-gradient {
+            background: linear-gradient(135deg, #0f62fe 0%, #b4c5ff 100%);
+        }
+        .glass-panel {
+            background: rgba(16, 19, 25, 0.7);
+            backdrop-filter: blur(20px);
+        }
+    </style>
+</head>
+<body class="bg-background font-body text-on-background min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
+<!-- Background Accents (Editorial Tech Style) -->
+<div class="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-primary/5 blur-[120px]"></div>
+<div class="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] rounded-full bg-tertiary/5 blur-[100px]"></div>
+<main class="w-full max-w-[1200px] grid grid-cols-1 lg:grid-cols-12 gap-0 overflow-hidden rounded-full shadow-2xl bg-surface-container-low border border-outline-variant/10">
+<!-- Left Side: Visual/Editorial -->
+<div class="hidden lg:flex lg:col-span-7 flex-col justify-between p-16 relative overflow-hidden bg-surface-container">
+<div class="z-10">
+<div class="flex items-center gap-2 mb-12">
+<span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1;">shield_lock</span>
+<span class="font-headline font-bold text-2xl tracking-tighter text-white">SENTINEL</span>
+</div>
+<h1 class="font-headline text-6xl font-extrabold tracking-tighter leading-[1.1] text-white mb-8">
+                    PRECISION<br/>
+<span class="text-primary">SECURE</span> ACCESS.
+                </h1>
+<p class="text-on-surface-variant text-lg max-w-md font-light leading-relaxed">
+                    Hệ thống quản lý an ninh đa tầng với độ chính xác tuyệt đối. Chào mừng bạn trở lại với trung tâm điều khiển SENTINEL.
+                </p>
+</div>
+<div class="mt-auto z-10 flex gap-12">
+<div>
+<div class="font-label text-primary text-sm font-semibold mb-1">TRẠNG THÁI</div>
+<div class="font-headline text-white font-medium">Hệ thống sẵn sàng</div>
+</div>
+<div>
+<div class="font-label text-primary text-sm font-semibold mb-1">MÃ HÓA</div>
+<div class="font-headline text-white font-medium">AES-256 BIT</div>
+</div>
+</div>
+<!-- Decorative Image Layer -->
+<div class="absolute top-0 left-0 w-full h-full opacity-30 pointer-events-none">
+<img class="w-full h-full object-cover grayscale" data-alt="abstract high-tech server room with glowing blue digital data patterns and futuristic server racks in a dark environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDoI-0fHqw0JOpndgOK3RLaVqNV3VO6jQBGf2U-q-eyiV8nZn1LbfVggVURzAoDdm2BTFZ8axU-jhj1jwgDgmP0O9BVirCy16NEGZKKsyHJHm1CmFCb5g3QFGddiEj_TyuVqVdHDzkJ590e80QV17a4OJsvH7zhrUeDh4Ud7z2x8O5L-d_xGpIs_HBKjkKjvgq_bCZWnJid2ta3rpnuvGVdm2Pz0kr6N_tgmvymff8KzQvB5Kze9rQve8HuXijtVgU4lQwc7eWDU-Mj"/>
+</div>
+</div>
+<!-- Right Side: Login Form -->
+<div class="lg:col-span-5 flex flex-col justify-center p-8 md:p-16 bg-surface-container-lowest">
+<!-- Mobile Brand -->
+<div class="lg:hidden flex items-center gap-2 mb-12">
+<span class="material-symbols-outlined text-primary text-2xl" style="font-variation-settings: 'FILL' 1;">shield_lock</span>
+<span class="font-headline font-bold text-xl tracking-tighter text-white">SENTINEL</span>
+</div>
+<div class="mb-10">
+<h2 class="font-headline text-3xl font-bold text-white mb-2">Đăng nhập</h2>
+<p class="text-on-surface-variant font-light">Vui lòng nhập thông tin để truy cập hệ thống.</p>
+</div>
+<form class="space-y-6">
+<!-- Email Field -->
+<div class="space-y-2">
+<label class="font-label text-sm text-on-surface-variant font-medium ml-1" for="email">Email doanh nghiệp</label>
+<div class="relative group">
+<input class="w-full bg-surface-container-highest/50 border-none rounded-xl px-4 py-4 text-white placeholder:text-on-surface-variant/40 focus:ring-2 focus:ring-primary transition-all duration-300" id="email" placeholder="name@sentinel.com" type="email"/>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant/50">alternate_email</span>
+</div>
+</div>
+<!-- Password Field -->
+<div class="space-y-2">
+<label class="font-label text-sm text-on-surface-variant font-medium ml-1" for="password">Mật khẩu</label>
+<div class="relative group">
+<input class="w-full bg-surface-container-highest/50 border-none rounded-xl px-4 py-4 text-white placeholder:text-on-surface-variant/40 focus:ring-2 focus:ring-primary transition-all duration-300" id="password" placeholder="••••••••••••" type="password"/>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant/50">visibility_off</span>
+</div>
+</div>
+<!-- Remember & Forgot -->
+<div class="flex items-center justify-between">
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="relative flex items-center">
+<input class="peer appearance-none w-5 h-5 border-2 border-outline-variant rounded-md checked:bg-primary checked:border-primary transition-all duration-200" type="checkbox"/>
+<span class="material-symbols-outlined absolute text-on-primary text-base opacity-0 peer-checked:opacity-100 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">check</span>
+</div>
+<span class="text-sm text-on-surface-variant group-hover:text-on-surface transition-colors">Ghi nhớ đăng nhập</span>
+</label>
+<a class="text-sm font-medium text-primary hover:text-secondary transition-colors" href="#">Quên mật khẩu?</a>
+</div>
+<!-- Submit Button -->
+<button class="w-full bg-login-gradient text-on-primary font-headline font-bold py-4 rounded-xl shadow-[0px_24px_48px_rgba(15,98,254,0.15)] active:scale-[0.98] transition-all duration-300 mt-4 flex items-center justify-center gap-2" type="submit">
+                    Đăng nhập
+                    <span class="material-symbols-outlined text-xl">login</span>
+</button>
+<!-- Divider -->
+<div class="relative py-4 flex items-center gap-4">
+<div class="flex-grow h-[1px] bg-outline-variant/30"></div>
+<span class="text-xs font-label uppercase tracking-widest text-on-surface-variant/40">Hoặc tiếp tục với</span>
+<div class="flex-grow h-[1px] bg-outline-variant/30"></div>
+</div>
+<!-- SSO Options -->
+<div class="grid grid-cols-2 gap-4">
+<button class="flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-outline-variant/20 bg-surface hover:bg-surface-container-high transition-colors text-on-surface font-medium text-sm" type="button">
+<span class="material-symbols-outlined text-xl">key</span>
+                        SSO
+                    </button>
+<button class="flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-outline-variant/20 bg-surface hover:bg-surface-container-high transition-colors text-on-surface font-medium text-sm" type="button">
+<span class="material-symbols-outlined text-xl">fingerprint</span>
+                        Biometric
+                    </button>
+</div>
+</form>
+<div class="mt-12 text-center">
+<p class="text-on-surface-variant font-light">
+                    Chưa có tài khoản? 
+                    <a class="text-primary font-bold ml-1 hover:underline underline-offset-4 decoration-2" href="#">Đăng ký ngay</a>
+</p>
+</div>
+</div>
+</main>
+<!-- Footer Meta -->
+<footer class="absolute bottom-8 w-full text-center pointer-events-none opacity-40">
+<p class="text-xs font-label tracking-[0.2em] text-on-surface-variant uppercase">© 2024 SENTINEL GLOBAL SECURITY INFRASTRUCTURE</p>
+</footer>
+</body></html>

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-lowest": "#0b0e14",
+                        "on-tertiary-fixed-variant": "#832700",
+                        "on-primary-fixed-variant": "#003da9",
+                        "surface-container-low": "#191c22",
+                        "surface-variant": "#32353c",
+                        "error": "#ffb4ab",
+                        "tertiary": "#ffb59d",
+                        "on-background": "#e1e2eb",
+                        "tertiary-fixed": "#ffdbd0",
+                        "inverse-primary": "#0052dd",
+                        "tertiary-container": "#c84000",
+                        "on-error-container": "#ffdad6",
+                        "on-surface-variant": "#c3c6d8",
+                        "inverse-surface": "#e1e2eb",
+                        "tertiary-fixed-dim": "#ffb59d",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "on-surface": "#e1e2eb",
+                        "on-secondary-fixed-variant": "#2a4387",
+                        "on-secondary": "#0e2b6f",
+                        "secondary": "#b4c5ff",
+                        "on-primary": "#002979",
+                        "surface-container-high": "#272a31",
+                        "background": "#101319",
+                        "surface-tint": "#b4c5ff",
+                        "on-tertiary": "#5d1900",
+                        "on-error": "#690005",
+                        "secondary-fixed-dim": "#b4c5ff",
+                        "on-tertiary-fixed": "#390c00",
+                        "on-secondary-fixed": "#00174c",
+                        "surface-container-highest": "#32353c",
+                        "outline": "#8c90a2",
+                        "primary": "#b4c5ff",
+                        "on-secondary-container": "#a0b6ff",
+                        "inverse-on-surface": "#2e3037",
+                        "secondary-container": "#2d458a",
+                        "surface-bright": "#363940",
+                        "error-container": "#93000a",
+                        "on-tertiary-container": "#fff1ed",
+                        "primary-fixed": "#dbe1ff",
+                        "outline-variant": "#424656",
+                        "surface-container": "#1d2026",
+                        "surface": "#101319",
+                        "on-primary-fixed": "#00174c",
+                        "surface-dim": "#101319",
+                        "secondary-fixed": "#dbe1ff",
+                        "primary-container": "#0f62fe",
+                        "on-primary-container": "#f3f3ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Manrope"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .custom-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #0f62fe;
+            border: 2px solid #b4c5ff;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar -->
+<nav class="bg-[#101319]/70 backdrop-blur-xl fixed top-0 w-full z-50 flex justify-between items-center h-16 px-6 w-full font-['Manrope'] tracking-tight">
+<div class="flex items-center gap-8">
+<span class="text-xl font-black tracking-tighter text-blue-600 dark:text-blue-500">SENTINEL</span>
+<div class="hidden md:flex items-center gap-6">
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-500 transition-colors" href="#">Dashboard</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-500 transition-colors" href="#">Logs</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-500 transition-colors" href="#">Devices</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-500 transition-colors" href="#">Security</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-400 hover:bg-slate-100/10 transition-all rounded-full material-symbols-outlined" data-icon="notifications">notifications</button>
+<button class="p-2 text-blue-600 dark:text-blue-400 font-medium border-b-2 border-blue-600 material-symbols-outlined" data-icon="settings">settings</button>
+<img alt="User profile" class="w-8 h-8 rounded-full ml-2 border border-outline-variant/30" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2YPhBRS4KFIlJFlDtvm19X81XIZhQ6H0ObJ2cvyxl8yxLvg1IIlkylhJQ1OecjQh92M8DH6E93ltsTYHeZDf5o5vNyXZYvHGy2LonJQAkwWowCN_FSNVnZcH-DjDPM0WaOOdifapZUWPGsB8NVVSJ09pjJWxMytx2YMny8COe_4QTPLoT2jlrWTPfc1Mm7okfzJ9CW0zcKLOaLrycZ22EpVNpVDOG70KJWV8fIpAc8Yd2e79broi5Px_vujzI8tfioMsH316P3_pa"/>
+</div>
+</nav>
+<!-- SideNavBar (Desktop Only) -->
+<aside class="h-full w-64 fixed left-0 top-0 z-40 bg-[#101319] dark:bg-[#101319] flex flex-col py-8 px-4 border-r border-white/5 hidden md:flex font-['Manrope'] text-sm font-medium">
+<div class="mt-16 mb-8 px-2">
+<div class="flex items-center gap-3 mb-6">
+<div class="w-10 h-10 rounded-xl bg-primary-container/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-blue-500" data-icon="shield">shield</span>
+</div>
+<div>
+<p class="text-on-surface font-bold">System Armed</p>
+<p class="text-xs text-slate-500">All perimeters secure</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-slate-800/50 hover:text-white transition-colors duration-300 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span>Home</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-slate-800/50 hover:text-white transition-colors duration-300 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="lock">lock</span>
+<span>Smart Locks</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-slate-800/50 hover:text-white transition-colors duration-300 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="key">key</span>
+<span>Access Keys</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-slate-800/50 hover:text-white transition-colors duration-300 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span>History</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-slate-800/50 hover:text-white transition-colors duration-300 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="gpp_maybe">gpp_maybe</span>
+<span>Emergency</span>
+</a>
+</nav>
+<div class="pt-6 mt-6 border-t border-white/5 space-y-1">
+<a class="flex items-center gap-3 px-4 py-2 text-slate-400 hover:bg-white/5 transition-colors duration-300 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span>Support</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-slate-400 hover:bg-white/5 transition-colors duration-300 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span>Sign Out</span>
+</a>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="pt-24 pb-32 px-6 md:pl-72 md:pr-12 max-w-7xl mx-auto">
+<header class="mb-12">
+<h1 class="text-4xl font-extrabold tracking-tight text-on-surface font-headline uppercase">System Settings</h1>
+<p class="text-on-surface-variant mt-2 max-w-2xl font-body text-lg">Configure your perimeter protocols, hardware sensitivity, and notification preferences.</p>
+</header>
+<!-- Bento Grid Configuration -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+<!-- Access Management Section -->
+<section class="md:col-span-8 bg-surface-container rounded-xl p-8 shadow-[24px_0_48px_rgba(15,98,254,0.04)]">
+<div class="flex items-center gap-4 mb-8">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="fingerprint">fingerprint</span>
+<h2 class="text-2xl font-bold font-headline">Access Management</h2>
+</div>
+<div class="space-y-6">
+<div class="flex items-center justify-between p-6 bg-surface-container-high rounded-lg transition-all hover:bg-surface-container-highest">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary" data-icon="face">face</span>
+<div>
+<p class="font-bold text-on-surface">Biometric Authentication</p>
+<p class="text-sm text-on-surface-variant">Face and fingerprint ID for primary lock control</p>
+</div>
+</div>
+<div class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+</div>
+</div>
+<div class="flex items-center justify-between p-6 bg-surface-container-high rounded-lg transition-all hover:bg-surface-container-highest">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary" data-icon="vpn_key">vpn_key</span>
+<div>
+<p class="font-bold text-on-surface">Physical Access Keys</p>
+<p class="text-sm text-on-surface-variant">Manage encrypted NFC and RFID hardware keys</p>
+</div>
+</div>
+<button class="px-4 py-2 bg-surface-container-highest rounded-full text-sm font-medium border border-outline-variant/20 hover:bg-primary-container hover:text-white transition-all">Manage Keys</button>
+</div>
+</div>
+</section>
+<!-- Temporal Constraints -->
+<section class="md:col-span-4 bg-surface-container rounded-xl p-8 border-l-4 border-tertiary">
+<div class="flex items-center gap-4 mb-8">
+<span class="material-symbols-outlined text-tertiary text-3xl" data-icon="timer">timer</span>
+<h2 class="text-2xl font-bold font-headline">Temporal Constraints</h2>
+</div>
+<div class="space-y-8">
+<div>
+<label class="block text-sm font-bold text-on-surface mb-3 uppercase tracking-wider">Auto-Lock Delay</label>
+<select class="w-full bg-surface-container-highest border-none rounded-lg p-3 text-on-surface font-medium focus:ring-2 focus:ring-primary">
+<option>Immediate</option>
+<option selected="">30 Seconds</option>
+<option>1 Minute</option>
+<option>5 Minutes</option>
+</select>
+</div>
+<div>
+<label class="block text-sm font-bold text-on-surface mb-3 uppercase tracking-wider">Keypad Lockout</label>
+<select class="w-full bg-surface-container-highest border-none rounded-lg p-3 text-on-surface font-medium focus:ring-2 focus:ring-primary">
+<option>3 Failed Attempts</option>
+<option selected="">5 Failed Attempts</option>
+<option>10 Failed Attempts</option>
+</select>
+</div>
+</div>
+</section>
+<!-- Threshold Configuration -->
+<section class="md:col-span-6 bg-surface-container rounded-xl p-8">
+<div class="flex items-center gap-4 mb-8">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="tune">tune</span>
+<h2 class="text-2xl font-bold font-headline">Threshold Configuration</h2>
+</div>
+<div class="space-y-10">
+<div>
+<div class="flex justify-between mb-4">
+<label class="font-bold text-on-surface">Gas Sensitivity</label>
+<span class="text-primary font-mono text-sm">74 ppm</span>
+</div>
+<input class="w-full h-1.5 bg-surface-container-highest rounded-lg appearance-none cursor-pointer custom-slider" max="100" min="0" type="range" value="74"/>
+<div class="flex justify-between mt-2">
+<span class="text-xs text-on-surface-variant">Low</span>
+<span class="text-xs text-on-surface-variant">Critical</span>
+</div>
+</div>
+<div>
+<div class="flex justify-between mb-4">
+<label class="font-bold text-on-surface">Light Sensitivity</label>
+<span class="text-primary font-mono text-sm">420 lux</span>
+</div>
+<input class="w-full h-1.5 bg-surface-container-highest rounded-lg appearance-none cursor-pointer custom-slider" max="1000" min="0" type="range" value="420"/>
+<div class="flex justify-between mt-2">
+<span class="text-xs text-on-surface-variant">Moonlight</span>
+<span class="text-xs text-on-surface-variant">Bright Daylight</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Notification Stream -->
+<section class="md:col-span-6 bg-surface-container rounded-xl p-8">
+<div class="flex items-center gap-4 mb-8">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="hub">hub</span>
+<h2 class="text-2xl font-bold font-headline">Notification Stream</h2>
+</div>
+<div class="space-y-4">
+<div class="flex items-center justify-between py-3 border-b border-outline-variant/10">
+<span class="text-on-surface font-medium">Web Push Notifications</span>
+<div class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+</div>
+</div>
+<div class="flex items-center justify-between py-3 border-b border-outline-variant/10">
+<span class="text-on-surface font-medium">Email Security Alerts</span>
+<div class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+</div>
+</div>
+<div class="flex items-center justify-between py-3 border-b border-outline-variant/10">
+<span class="text-on-surface font-medium">SMS Emergency Broadcast</span>
+<div class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+</div>
+</div>
+<div class="flex items-center justify-between py-3">
+<span class="text-on-surface font-medium">System Update Alerts</span>
+<div class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Footer Actions -->
+<div class="fixed bottom-0 left-0 right-0 md:left-64 p-6 bg-[#101319]/90 backdrop-blur-md flex justify-end items-center gap-4 border-t border-white/5 z-50">
+<button class="px-8 py-3 rounded-full text-on-surface font-bold hover:bg-white/5 transition-all">Discard</button>
+<button class="px-10 py-3 rounded-full bg-gradient-to-br from-primary-container to-primary text-on-primary-container font-black tracking-wide shadow-[0_24px_48px_rgba(15,98,254,0.15)] active:scale-95 transition-all">SAVE CONFIGURATION</button>
+</div>
+</main>
+<!-- Mobile Navigation (Visible only on small screens) -->
+<div class="md:hidden fixed bottom-0 left-0 w-full h-16 bg-[#1d2026] flex items-center justify-around px-4 z-[60]">
+<button class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-symbols-outlined" data-icon="lock">lock</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-blue-500">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+</button>
+</div>
+</body></html>

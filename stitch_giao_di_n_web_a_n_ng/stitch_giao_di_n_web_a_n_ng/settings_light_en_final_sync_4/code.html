@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;400;500;600;700;800&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-low": "#f8fafc",
+                    "surface-container": "#f1f5f9",
+                    "on-tertiary": "#5d1900",
+                    "on-secondary": "#0e2b6f",
+                    "on-primary-fixed": "#00174c",
+                    "surface-bright": "#ffffff",
+                    "surface": "#ffffff",
+                    "primary": "#0f62fe",
+                    "on-primary": "#ffffff",
+                    "surface-dim": "#f1f5f9",
+                    "on-surface-variant": "#64748b",
+                    "on-secondary-container": "#0f62fe",
+                    "on-primary-fixed-variant": "#003da9",
+                    "on-background": "#0f172a",
+                    "secondary": "#334155",
+                    "on-primary-container": "#f3f3ff",
+                    "on-secondary-fixed": "#00174c",
+                    "inverse-primary": "#b4c5ff",
+                    "tertiary-fixed-dim": "#ffb59d",
+                    "secondary-fixed-dim": "#b4c5ff",
+                    "tertiary-container": "#c84000",
+                    "on-tertiary-container": "#fff1ed",
+                    "primary-fixed": "#dbe1ff",
+                    "surface-container-highest": "#e2e8f0",
+                    "on-error-container": "#410002",
+                    "primary-container": "#0f62fe",
+                    "on-error": "#ffffff",
+                    "inverse-surface": "#1e293b",
+                    "secondary-container": "#e2e8f0",
+                    "background": "#ffffff",
+                    "primary-fixed-dim": "#b4c5ff",
+                    "on-surface": "#0f172a",
+                    "outline-variant": "#cbd5e1",
+                    "outline": "#94a3b8",
+                    "error-container": "#fecaca",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-fixed": "#ffdbd0",
+                    "on-tertiary-fixed": "#390c00",
+                    "error": "#dc2626",
+                    "inverse-on-surface": "#f8fafc",
+                    "secondary-fixed": "#dbe1ff",
+                    "surface-tint": "#0f62fe",
+                    "surface-variant": "#f1f5f9",
+                    "surface-container-high": "#e2e8f0",
+                    "on-secondary-fixed-variant": "#2a4387",
+                    "tertiary": "#c84000",
+                    "on-tertiary-fixed-variant": "#832700"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Manrope"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Manrope', sans-serif; }
+        .label-font { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full w-64 z-50 bg-slate-100 flex flex-col py-8 gap-y-2 shadow-2xl shadow-blue-500/5">
+<div class="px-8 mb-10">
+<h1 class="text-xl font-bold text-slate-900 tracking-tighter">SENTINEL</h1>
+<p class="text-[10px] uppercase tracking-[0.2em] text-slate-500 font-bold">Precision Security</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="text-slate-600 mx-4 py-3 px-4 flex items-center gap-3 hover:bg-slate-200 rounded-lg transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="text-slate-600 mx-4 py-3 px-4 flex items-center gap-3 hover:bg-slate-200 rounded-lg transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+<span class="text-sm font-medium">Access Logs</span>
+</a>
+<a class="text-slate-600 mx-4 py-3 px-4 flex items-center gap-3 hover:bg-slate-200 rounded-lg transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="text-sm font-medium">User Management</span>
+</a>
+<a class="text-slate-600 mx-4 py-3 px-4 flex items-center gap-3 hover:bg-slate-200 rounded-lg transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="text-sm font-medium">Lock Analytics</span>
+</a>
+<a class="text-slate-600 mx-4 py-3 px-4 flex items-center gap-3 hover:bg-slate-200 rounded-lg transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="health_and_safety">health_and_safety</span>
+<span class="text-sm font-medium">System Health</span>
+</a>
+</nav>
+<div class="px-4 mt-auto pt-4">
+<button class="w-full bg-primary text-white py-4 rounded-xl font-bold text-sm shadow-lg shadow-primary/20 flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-sm" data-icon="lock">lock</span>
+                Lock All Units
+            </button>
+<a class="text-slate-600 mt-4 py-3 px-4 flex items-center gap-3 hover:bg-slate-200 rounded-lg transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="text-sm font-medium">Logout</span>
+</a>
+</div>
+</aside>
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-40 bg-slate-50/70 backdrop-blur-xl flex justify-between items-center px-8 h-20 ml-64 max-w-[calc(100%-16rem)]">
+<div class="flex items-center gap-8">
+<div class="relative group">
+<span class="absolute inset-y-0 left-3 flex items-center text-slate-400">
+<span class="material-symbols-outlined text-xl" data-icon="search">search</span>
+</span>
+<input class="bg-surface-container-highest border-none rounded-full pl-10 pr-4 py-2 text-sm w-64 focus:ring-2 focus:ring-primary/20 transition-all" placeholder="Search parameters..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex gap-4 text-slate-500">
+<button class="hover:text-primary transition-colors"><span class="material-symbols-outlined" data-icon="notifications">notifications</span></button>
+<button class="text-blue-600 font-bold border-b-2 border-blue-600 transition-colors"><span class="material-symbols-outlined" data-icon="settings">settings</span></button>
+</div>
+<button class="bg-primary/10 text-primary px-4 py-2 rounded-lg font-bold text-sm hover:bg-primary/20 transition-all">Support</button>
+<div class="flex items-center gap-3 pl-4 border-l border-slate-200">
+<div class="text-right">
+<p class="text-xs font-bold text-slate-900">Admin User</p>
+<p class="text-[10px] text-slate-500 label-font">System Supervisor</p>
+</div>
+<img class="w-10 h-10 rounded-full object-cover ring-2 ring-primary/10" data-alt="Portrait of a professional male system administrator with a confident expression in a brightly lit modern office setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-TIjr69H9V0Da6yN7vOFp2AQeEwOfOnA6vLY16xBNcooUzD6rwemNqpEPB7pf_fWQp-uW3f_R7BGHRPsQNKWl_bq2KEl7EVJ-oDGbguff0uKhpiVG89Sby3s9K8U0ZUgwsS9Er4Vxxz9l7rReXXg1nAKQUTmSpe1piuYCJXqu_4JxzRJN1NPjpcVGqSym2EB_GwPDtyYAdcl-T-0L-jXXsFOU952z7mXj3tWQ_CRgz9uE0uGJN6wv3zjWU_WJEVwFwknWKsV3STq9"/>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="ml-64 pt-24 min-h-screen bg-slate-50">
+<div class="max-w-6xl mx-auto p-12">
+<!-- Header Section -->
+<div class="flex justify-between items-end mb-12">
+<div>
+<h2 class="text-4xl font-extrabold tracking-tight text-slate-900 mb-2">System Configuration</h2>
+<p class="text-slate-500 font-medium">Fine-tune sentinel security parameters and administrative access.</p>
+</div>
+<button class="bg-gradient-to-br from-primary-container to-primary text-white px-10 py-4 rounded-xl font-bold shadow-xl shadow-primary/20 flex items-center gap-3 hover:scale-105 active:scale-95 transition-all">
+<span class="material-symbols-outlined" data-icon="save">save</span>
+                    Save Changes
+                </button>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-12 gap-6">
+<!-- Access Management (Admin/Member List) -->
+<div class="col-span-12 lg:col-span-8 bg-white rounded-[2rem] p-8 shadow-sm border border-slate-100">
+<div class="flex justify-between items-center mb-8">
+<h3 class="text-xl font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="admin_panel_settings">admin_panel_settings</span>
+                            Access Management
+                        </h3>
+<button class="text-primary font-bold text-sm flex items-center gap-1 hover:underline">
+<span class="material-symbols-outlined text-sm" data-icon="add">add</span>
+                            Invite Member
+                        </button>
+</div>
+<div class="space-y-4">
+<div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-colors group">
+<div class="flex items-center gap-4">
+<img class="w-12 h-12 rounded-full object-cover" data-alt="Close-up portrait of a smiling woman with glasses in a professional studio setting with soft lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC06AiQQ7eG0VqJfsOMuYI7U9PLvgCPHJOwLGvGG6-cUTvXAbgoKimjmdQcdl5mTfsn70ihIWSNLFjYbu9bCUgE6upglTe9FETiXyqmPLGmv1XnqyQXlJDvlGhbBb6EYtt_gLxwzlnPuun49bMLyJpSThdPCldYbqI60PVQXEjP9PX9lmylbBom5kQ71mIBFqpMlk0m59V9kFsa7B1EUwza9fpbfysrR8rz_dhQ9W2cq0XW_NMTmbH4JdSMDnw5tPDB7Stin2UI0_XR"/>
+<div>
+<h4 class="font-bold text-slate-900">Sarah Jenkins</h4>
+<p class="text-xs label-font text-slate-500">sarah.j@sentinel-security.com</p>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<span class="px-3 py-1 bg-blue-100 text-blue-700 text-[10px] font-black uppercase tracking-wider rounded-full">System Admin</span>
+<button class="text-slate-400 group-hover:text-slate-600 transition-colors"><span class="material-symbols-outlined" data-icon="more_vert">more_vert</span></button>
+</div>
+</div>
+<div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-colors group">
+<div class="flex items-center gap-4">
+<img class="w-12 h-12 rounded-full object-cover" data-alt="Portrait of a young man with a friendly smile, outdoor natural lighting with greenery in the blurred background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBqwuHYydIYDDnLsRqbIQBRbm1Xb8HCKRF1XFBJQgaqXSCQp-uqolm-Yr0GSYHD7N1jEvmEseW4JBgUkxoE_0gVpNFLYdoUQycJqCUJH7M8Z82oWxKuEF9LFtdM1HYv9khRfzzvj5Cy_ERww1QR4uCBEHmWa5--ckC5Vgn16JgLg5kX1ellE96AOkDm1HLkVhI_7XzHU7vwOoW5vhQxgkyLu3D1VOvbFCQ3WWqExQrUQyDSRjGXnRvkIx-ngX4N-14155yDWdit7w2d"/>
+<div>
+<h4 class="font-bold text-slate-900">Mark Thompson</h4>
+<p class="text-xs label-font text-slate-500">m.thompson@sentinel-security.com</p>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<span class="px-3 py-1 bg-slate-200 text-slate-700 text-[10px] font-black uppercase tracking-wider rounded-full">Member</span>
+<button class="text-slate-400 group-hover:text-slate-600 transition-colors"><span class="material-symbols-outlined" data-icon="more_vert">more_vert</span></button>
+</div>
+</div>
+<div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-colors group">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center text-slate-400">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+</div>
+<div>
+<h4 class="font-bold text-slate-900">Guest Access #02</h4>
+<p class="text-xs label-font text-slate-500 italic">Expires in 14 hours</p>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<span class="px-3 py-1 bg-amber-100 text-amber-700 text-[10px] font-black uppercase tracking-wider rounded-full">Temporal</span>
+<button class="text-slate-400 group-hover:text-slate-600 transition-colors"><span class="material-symbols-outlined" data-icon="more_vert">more_vert</span></button>
+</div>
+</div>
+</div>
+</div>
+<!-- Notification Stream Toggles -->
+<div class="col-span-12 lg:col-span-4 bg-white rounded-[2rem] p-8 shadow-sm border border-slate-100 flex flex-col">
+<h3 class="text-xl font-bold flex items-center gap-2 mb-8">
+<span class="material-symbols-outlined text-primary" data-icon="notifications_active">notifications_active</span>
+                        Stream Toggles
+                    </h3>
+<div class="space-y-6 flex-1">
+<div class="flex items-center justify-between">
+<div>
+<p class="font-bold text-slate-900">Critical Alerts</p>
+<p class="text-xs text-slate-500">Security breaches &amp; malfunctions</p>
+</div>
+<div class="w-12 h-6 bg-primary rounded-full relative cursor-pointer shadow-inner transition-colors">
+<div class="absolute right-1 top-1 w-4 h-4 bg-white rounded-full"></div>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div>
+<p class="font-bold text-slate-900">Activity Logs</p>
+<p class="text-xs text-slate-500">Unlock events &amp; member arrivals</p>
+</div>
+<div class="w-12 h-6 bg-primary rounded-full relative cursor-pointer shadow-inner transition-colors">
+<div class="absolute right-1 top-1 w-4 h-4 bg-white rounded-full"></div>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div>
+<p class="font-bold text-slate-900">Environmental</p>
+<p class="text-xs text-slate-500">CO2 &amp; Light sensitivity triggers</p>
+</div>
+<div class="w-12 h-6 bg-slate-200 rounded-full relative cursor-pointer shadow-inner transition-colors">
+<div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full"></div>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div>
+<p class="font-bold text-slate-900">System Health</p>
+<p class="text-xs text-slate-500">Battery levels &amp; connectivity</p>
+</div>
+<div class="w-12 h-6 bg-primary rounded-full relative cursor-pointer shadow-inner transition-colors">
+<div class="absolute right-1 top-1 w-4 h-4 bg-white rounded-full"></div>
+</div>
+</div>
+</div>
+<div class="mt-8 pt-8 border-t border-slate-100 text-center">
+<button class="text-slate-400 font-bold text-xs hover:text-primary transition-colors">RESET NOTIFICATION DEFAULTS</button>
+</div>
+</div>
+<!-- Sensor Configuration -->
+<div class="col-span-12 lg:col-span-6 bg-white rounded-[2rem] p-8 shadow-sm border border-slate-100">
+<h3 class="text-xl font-bold flex items-center gap-2 mb-8">
+<span class="material-symbols-outlined text-primary" data-icon="sensors">sensors</span>
+                        Sensor Configuration
+                    </h3>
+<div class="space-y-10">
+<div>
+<div class="flex justify-between mb-3">
+<label class="font-bold text-slate-900">CO2 Sensitivity</label>
+<span class="label-font text-xs font-bold text-primary">850 PPM Threshold</span>
+</div>
+<div class="relative w-full h-2 bg-slate-100 rounded-full">
+<div class="absolute left-0 top-0 h-full w-[65%] bg-primary rounded-full"></div>
+<div class="absolute left-[65%] top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-primary rounded-full shadow-md"></div>
+</div>
+<div class="flex justify-between mt-2 text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+<span>Low</span>
+<span>Optimal</span>
+<span>High Alert</span>
+</div>
+</div>
+<div>
+<div class="flex justify-between mb-3">
+<label class="font-bold text-slate-900">Light Lux Level</label>
+<span class="label-font text-xs font-bold text-primary">420 Lux</span>
+</div>
+<div class="relative w-full h-2 bg-slate-100 rounded-full">
+<div class="absolute left-0 top-0 h-full w-[40%] bg-primary rounded-full"></div>
+<div class="absolute left-[40%] top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-primary rounded-full shadow-md"></div>
+</div>
+<div class="flex justify-between mt-2 text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+<span>Dim</span>
+<span>Ambient</span>
+<span>Daylight</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Temporal Constraints -->
+<div class="col-span-12 lg:col-span-6 bg-white rounded-[2rem] p-8 shadow-sm border border-slate-100">
+<h3 class="text-xl font-bold flex items-center gap-2 mb-8">
+<span class="material-symbols-outlined text-primary" data-icon="timer">timer</span>
+                        Temporal Constraints
+                    </h3>
+<div class="grid grid-cols-2 gap-8">
+<div class="bg-slate-50 p-6 rounded-2xl">
+<label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4">Auto-Lock Timer</label>
+<div class="flex items-center gap-3">
+<span class="text-3xl font-extrabold text-slate-900">30</span>
+<span class="text-sm font-medium text-slate-500">Seconds</span>
+</div>
+<div class="mt-4 flex gap-2">
+<button class="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center hover:bg-primary hover:text-white transition-all"><span class="material-symbols-outlined text-sm" data-icon="remove">remove</span></button>
+<button class="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center hover:bg-primary hover:text-white transition-all"><span class="material-symbols-outlined text-sm" data-icon="add">add</span></button>
+</div>
+</div>
+<div class="bg-slate-50 p-6 rounded-2xl">
+<label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4">Keypad Lockout</label>
+<div class="flex items-center gap-3">
+<span class="text-3xl font-extrabold text-slate-900">5</span>
+<span class="text-sm font-medium text-slate-500">Attempts</span>
+</div>
+<div class="mt-4 flex gap-2">
+<button class="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center hover:bg-primary hover:text-white transition-all"><span class="material-symbols-outlined text-sm" data-icon="remove">remove</span></button>
+<button class="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center hover:bg-primary hover:text-white transition-all"><span class="material-symbols-outlined text-sm" data-icon="add">add</span></button>
+</div>
+</div>
+</div>
+<div class="mt-8 flex items-start gap-3 p-4 bg-blue-50 rounded-xl border border-blue-100">
+<span class="material-symbols-outlined text-blue-600" data-icon="info">info</span>
+<p class="text-xs text-blue-800 leading-relaxed font-medium">Tightening temporal constraints increases security but may affect user convenience. Recommended auto-lock is 15-45 seconds.</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

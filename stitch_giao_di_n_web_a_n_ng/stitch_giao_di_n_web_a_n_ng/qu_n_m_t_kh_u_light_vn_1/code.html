@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SENTINEL - Quên mật khẩu</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed": "#00174c",
+                    "secondary-fixed-dim": "#b4c5ff",
+                    "on-tertiary-fixed": "#390c00",
+                    "surface-container-high": "#272a31",
+                    "background": "#101319",
+                    "surface-tint": "#b4c5ff",
+                    "on-tertiary": "#5d1900",
+                    "on-error": "#690005",
+                    "on-primary": "#002979",
+                    "tertiary-fixed-dim": "#ffb59d",
+                    "primary-fixed-dim": "#b4c5ff",
+                    "on-surface": "#e1e2eb",
+                    "on-secondary-fixed-variant": "#2a4387",
+                    "on-secondary": "#0e2b6f",
+                    "secondary": "#b4c5ff",
+                    "tertiary-container": "#c84000",
+                    "on-error-container": "#ffdad6",
+                    "on-surface-variant": "#c3c6d8",
+                    "inverse-surface": "#e1e2eb",
+                    "surface-variant": "#32353c",
+                    "error": "#ffb4ab",
+                    "tertiary": "#ffb59d",
+                    "on-background": "#e1e2eb",
+                    "tertiary-fixed": "#ffdbd0",
+                    "inverse-primary": "#0052dd",
+                    "surface-container-lowest": "#0b0e14",
+                    "on-tertiary-fixed-variant": "#832700",
+                    "on-primary-fixed-variant": "#003da9",
+                    "surface-container-low": "#191c22",
+                    "primary-container": "#0f62fe",
+                    "on-primary-container": "#f3f3ff",
+                    "surface": "#101319",
+                    "on-primary-fixed": "#00174c",
+                    "surface-dim": "#101319",
+                    "secondary-fixed": "#dbe1ff",
+                    "surface-container": "#1d2026",
+                    "on-tertiary-container": "#fff1ed",
+                    "primary-fixed": "#dbe1ff",
+                    "outline-variant": "#424656",
+                    "secondary-container": "#2d458a",
+                    "surface-bright": "#363940",
+                    "error-container": "#93000a",
+                    "outline": "#8c90a2",
+                    "primary": "#b4c5ff",
+                    "on-secondary-container": "#a0b6ff",
+                    "inverse-on-surface": "#2e3037",
+                    "surface-container-highest": "#32353c"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Manrope"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #101319;
+            color: #e1e2eb;
+            font-family: 'Manrope', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bg-status-gradient {
+            background: linear-gradient(135deg, #0f62fe 0%, #b4c5ff 100%);
+        }
+        .glass-panel {
+            background-color: rgba(16, 19, 25, 0.7);
+            backdrop-filter: blur(20px);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-6 overflow-hidden">
+<!-- Suppress TopAppBar and SideNavBar for transactional/linear flow as per instructions -->
+<!-- Background Decoration -->
+<div class="fixed inset-0 z-0 pointer-events-none">
+<div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary-container/10 blur-[120px]"></div>
+<div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-tertiary/5 blur-[120px]"></div>
+</div>
+<!-- Main Content Canvas -->
+<main class="relative z-10 w-full max-w-[480px]">
+<div class="flex flex-col items-center">
+<!-- Branding Area -->
+<div class="mb-12 text-center">
+<div class="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-surface-container-high mb-6">
+<span class="material-symbols-outlined text-primary-container text-4xl" data-icon="shield_lock" style="font-variation-settings: 'FILL' 1;">shield_lock</span>
+</div>
+<h1 class="text-4xl font-extrabold tracking-tighter text-white mb-2 font-headline uppercase">SENTINEL</h1>
+<p class="text-on-surface-variant/70 font-label tracking-widest text-xs uppercase">PRECISION SECURE SYSTEMS</p>
+</div>
+<!-- Interaction Card -->
+<div class="w-full bg-surface-container p-10 rounded-xl shadow-2xl border border-white/5">
+<div class="mb-8">
+<h2 class="text-2xl font-semibold text-white mb-3">Quên mật khẩu</h2>
+<p class="text-on-surface-variant body-md leading-relaxed">
+                        Nhập email để nhận hướng dẫn khôi phục
+                    </p>
+</div>
+<form class="space-y-6">
+<!-- Email Input -->
+<div class="space-y-2">
+<label class="block text-xs font-medium uppercase tracking-wider text-on-surface-variant font-label" for="email">Địa chỉ Email</label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline text-lg" data-icon="mail">mail</span>
+</div>
+<input class="block w-full pl-12 pr-4 py-4 bg-surface-container-highest border-none rounded-sm text-on-surface placeholder:text-on-surface-variant/40 focus:ring-2 focus:ring-primary-container transition-all outline-none font-body" id="email" placeholder="name@company.com" type="email"/>
+</div>
+</div>
+<!-- Action Button -->
+<button class="w-full py-4 px-6 bg-status-gradient text-on-primary-container font-bold rounded-xl flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all duration-300 shadow-lg shadow-primary-container/20" type="submit">
+<span>Gửi link khôi phục</span>
+<span class="material-symbols-outlined text-xl" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</form>
+<!-- Footer Navigation -->
+<div class="mt-10 flex flex-col items-center">
+<a class="group flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors py-2" href="#">
+<span class="material-symbols-outlined text-lg group-hover:-translate-x-1 transition-transform" data-icon="arrow_back">arrow_back</span>
+<span class="font-medium">Quay lại Đăng nhập</span>
+</a>
+</div>
+</div>
+<!-- Aesthetic Footer / Compliance -->
+<div class="mt-12 text-center">
+<p class="text-xs text-on-surface-variant/40 font-label tracking-tight">
+                    © 2024 SENTINEL GLOBAL SECURITY. ALL RIGHTS RESERVED.
+                </p>
+</div>
+</div>
+</main>
+<!-- Decorative Image Panel (Hidden on Mobile) -->
+<div class="hidden lg:block fixed right-12 top-1/2 -translate-y-1/2 w-80 h-[500px] rounded-2xl overflow-hidden shadow-2xl opacity-40">
+<div class="absolute inset-0 bg-gradient-to-t from-background to-transparent z-10"></div>
+<img alt="Security Terminal" class="w-full h-full object-cover grayscale contrast-125" data-alt="close-up of a high-tech circuit board with blue glowing lights in a dark minimalist cybersecurity facility" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDm7XYXTVutwXt7aS1_egqIbdSht14qNk6gJ6Vi1ne18BQFhAzCNfD_PWdVA8ww9ActsJZSGQjz0ylfwbDOkoEyi0HvTBTLiS5T6nqMBVA2CYITlVksrAKgFSkOB7YcNWxkX2nAv_R94WDFZNragzfVJOPtDjzdeKiiaNFWLV5FQzXdcxZ0lXm8G8YzPfl2G_mj2SGapZqF0nC44T8JDmhRLwXhSfMuZovecyt8wECTNbzZpfJJU_hWrHtHtpzU-ITktkDXONWZBh3L"/>
+</div>
+</body></html>

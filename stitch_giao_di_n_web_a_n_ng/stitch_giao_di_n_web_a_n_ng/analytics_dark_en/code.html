@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SENTINEL | Analytics Precision</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed": "#390c00",
+                        "background": "#101319",
+                        "inverse-surface": "#e1e2eb",
+                        "secondary-container": "#2d458a",
+                        "tertiary-container": "#c84000",
+                        "surface": "#101319",
+                        "inverse-on-surface": "#2e3037",
+                        "primary-fixed": "#dbe1ff",
+                        "on-background": "#e1e2eb",
+                        "on-tertiary-container": "#fff1ed",
+                        "secondary-fixed-dim": "#b4c5ff",
+                        "surface-tint": "#b4c5ff",
+                        "surface-container": "#1d2026",
+                        "on-error-container": "#ffdad6",
+                        "outline-variant": "#424656",
+                        "outline": "#8c90a2",
+                        "tertiary-fixed-dim": "#ffb59d",
+                        "surface-container-highest": "#32353c",
+                        "on-tertiary-fixed-variant": "#832700",
+                        "tertiary": "#ffb59d",
+                        "tertiary-fixed": "#ffdbd0",
+                        "on-surface-variant": "#c3c6d8",
+                        "on-primary-fixed": "#00174c",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "on-secondary-fixed-variant": "#2a4387",
+                        "error-container": "#93000a",
+                        "surface-container-low": "#191c22",
+                        "surface-bright": "#363940",
+                        "surface-dim": "#101319",
+                        "secondary": "#b4c5ff",
+                        "surface-variant": "#32353c",
+                        "on-primary": "#002979",
+                        "surface-container-high": "#272a31",
+                        "surface-container-lowest": "#0b0e14",
+                        "on-error": "#690005",
+                        "on-secondary": "#0e2b6f",
+                        "on-primary-container": "#f3f3ff",
+                        "secondary-fixed": "#dbe1ff",
+                        "inverse-primary": "#0052dd",
+                        "primary": "#b4c5ff",
+                        "error": "#ffb4ab",
+                        "primary-container": "#0f62fe",
+                        "on-surface": "#e1e2eb",
+                        "on-tertiary": "#5d1900",
+                        "on-primary-fixed-variant": "#003da9",
+                        "on-secondary-fixed": "#00174c",
+                        "on-secondary-container": "#a0b6ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Manrope"],
+                        "label": ["Inter"]
+                    }
+                },
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #101319;
+            color: #e1e2eb;
+            font-family: 'Manrope', sans-serif;
+        }
+        .chart-gradient-primary {
+            background: linear-gradient(180deg, rgba(15, 98, 254, 0.2) 0%, rgba(15, 98, 254, 0) 100%);
+        }
+        .status-gradient {
+            background: linear-gradient(135deg, #0f62fe 0%, #b4c5ff 100%);
+        }
+        .bento-card {
+            transition: background-color 300ms ease-in-out;
+        }
+        .bento-card:hover {
+            background-color: #272a31;
+        }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+<!-- SideNavBar -->
+<aside class="h-screen w-64 fixed left-0 top-0 bg-[#101319] dark:bg-[#101319] flex flex-col py-6 px-4 z-50">
+<div class="mb-12 px-2">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg status-gradient flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container text-lg" data-icon="shield">shield</span>
+</div>
+<div>
+<h1 class="text-blue-600 font-bold font-headline tracking-tighter text-xl">SENTINEL</h1>
+<p class="text-slate-500 text-[10px] font-label uppercase tracking-widest">v2.4.0 Precision</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 dark:text-slate-500 hover:text-white hover:bg-[#1D2026] transition-all duration-300 font-manrope text-sm font-medium group" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 dark:text-slate-500 hover:text-white hover:bg-[#1D2026] transition-all duration-300 font-manrope text-sm font-medium group" href="#">
+<span class="material-symbols-outlined" data-icon="settings_remote">settings_remote</span>
+<span>Remote Control</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 dark:text-slate-500 hover:text-white hover:bg-[#1D2026] transition-all duration-300 font-manrope text-sm font-medium group" href="#">
+<span class="material-symbols-outlined" data-icon="fingerprint">fingerprint</span>
+<span>Fingerprints</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 dark:text-slate-500 hover:text-white hover:bg-[#1D2026] transition-all duration-300 font-manrope text-sm font-medium group" href="#">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+<span>Logs</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-blue-500 dark:text-blue-400 font-bold border-r-2 border-blue-600 bg-[#1D2026] font-manrope text-sm transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="insert_chart">insert_chart</span>
+<span>Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 dark:text-slate-500 hover:text-white hover:bg-[#1D2026] transition-all duration-300 font-manrope text-sm font-medium group" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span>Settings</span>
+</a>
+</nav>
+<div class="mt-auto space-y-4">
+<button class="w-full py-3 px-4 rounded-xl bg-error-container text-on-error-container font-headline font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
+                Emergency Lockout
+            </button>
+<div class="pt-4 border-t border-outline-variant/20 flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:text-white transition-colors font-label text-xs" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="help_outline">help_outline</span>
+<span>Support</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:text-white transition-colors font-label text-xs" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="logout">logout</span>
+<span>Sign Out</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- TopNavBar -->
+<header class="w-full sticky top-0 z-40 bg-[#101319]/70 backdrop-blur-xl flex items-center justify-between px-8 h-16 pl-72">
+<div class="flex items-center bg-surface-container rounded-full px-4 py-1.5 w-96">
+<span class="material-symbols-outlined text-outline text-lg" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm font-label w-full text-on-surface placeholder:text-outline/50" placeholder="Search analytics data..." type="text"/>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-800/50 transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-800/50 transition-colors">
+<span class="material-symbols-outlined" data-icon="language">language</span>
+</button>
+<button class="p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-800/50 transition-colors">
+<span class="material-symbols-outlined" data-icon="dark_mode">dark_mode</span>
+</button>
+<div class="h-8 w-px bg-outline-variant/30 mx-2"></div>
+<div class="flex items-center gap-3">
+<div class="text-right hidden sm:block">
+<p class="text-sm font-bold text-on-surface leading-none">Admin</p>
+<p class="text-[10px] text-outline font-label">Super User</p>
+</div>
+<img alt="Administrator Profile" class="w-8 h-8 rounded-full border border-primary/20" data-alt="Close up portrait of a professional male administrator in a high-tech office environment, soft focused blue lighting background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzu7M-8NaKOMCm_mxJ0txo18MKVbVCKrK3ob1zcOt7c5xhFyT8Jo9beXU0u3kAaJPgX5eRhqJCU8ZRhZeiroNTIJYTIGPWAyVtvnwVV3ZcJgW1w4DqM-mh_55GwXGCiczVSJblkPKeMd7O_1gCLGYO1io2rAIxUL2VBoZJI7_F5a7nTRpYHMHalP82Ffnj3fVWJ0iMr2UMpAqOJzOR0K7Xx0UMcfBFJvp517r0kRyG8jamOsTYhvVvY13NO0bS5l2niVSPfV1vf3OO"/>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="pl-64 min-h-screen">
+<div class="p-8 max-w-7xl mx-auto">
+<!-- Page Header -->
+<div class="mb-10">
+<h2 class="text-4xl font-headline font-bold tracking-tight mb-2 uppercase">System Analytics</h2>
+<p class="text-on-surface-variant font-body">Real-time performance metrics and security transparency.</p>
+</div>
+<!-- Bento Grid -->
+<div class="grid grid-cols-12 gap-6">
+<!-- Weekly Security Summary -->
+<div class="col-span-12 lg:col-span-8 bg-surface-container bento-card rounded-full p-8 relative overflow-hidden flex flex-col justify-between">
+<div class="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -mr-20 -mt-20"></div>
+<div>
+<div class="flex justify-between items-start mb-8">
+<div>
+<h3 class="text-on-surface-variant font-label text-xs uppercase tracking-[0.2em] mb-1">Weekly Summary</h3>
+<p class="text-2xl font-headline font-medium">Security Health: <span class="text-primary">Optimal</span></p>
+</div>
+<div class="flex items-center gap-2 bg-surface-container-high px-3 py-1 rounded-full text-xs font-label">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+                                Live Monitoring
+                            </div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<div class="space-y-1">
+<p class="text-4xl font-headline font-light">1,284</p>
+<p class="text-xs text-outline font-label uppercase">Total Events</p>
+<div class="flex items-center gap-1 text-primary text-xs mt-2">
+<span class="material-symbols-outlined text-sm" data-icon="trending_up">trending_up</span>
+<span>12% from last week</span>
+</div>
+</div>
+<div class="space-y-1">
+<p class="text-4xl font-headline font-light">0</p>
+<p class="text-xs text-outline font-label uppercase">Breaches Detected</p>
+<div class="flex items-center gap-1 text-primary text-xs mt-2">
+<span class="material-symbols-outlined text-sm" data-icon="check_circle">check_circle</span>
+<span>Maintaining 100%</span>
+</div>
+</div>
+<div class="space-y-1">
+<p class="text-4xl font-headline font-light">99.8%</p>
+<p class="text-xs text-outline font-label uppercase">System Uptime</p>
+<div class="flex items-center gap-1 text-primary text-xs mt-2">
+<span class="material-symbols-outlined text-sm" data-icon="bolt">bolt</span>
+<span>Precision Stable</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Quick Action Chart Toggle -->
+<div class="col-span-12 lg:col-span-4 bg-primary-container status-gradient rounded-full p-8 flex flex-col justify-between text-on-primary-container">
+<div>
+<span class="material-symbols-outlined text-4xl mb-4" data-icon="insights">insights</span>
+<h3 class="text-xl font-headline font-bold leading-tight">Generate Deep Insights Report</h3>
+<p class="text-sm opacity-80 mt-2 font-body">Leverage machine learning to identify unusual entry patterns.</p>
+</div>
+<button class="mt-8 bg-white/20 hover:bg-white/30 transition-colors py-3 rounded-xl font-headline font-bold text-xs uppercase tracking-widest backdrop-blur-md">
+                        Run Diagnostics
+                    </button>
+</div>
+<!-- Gas Levels & PIR Chart -->
+<div class="col-span-12 bg-surface-container bento-card rounded-full p-8">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
+<div>
+<h3 class="text-on-surface-variant font-label text-xs uppercase tracking-[0.2em] mb-1">Atmospheric &amp; Motion</h3>
+<p class="text-xl font-headline font-medium">Environmental Triggers</p>
+</div>
+<div class="flex gap-2">
+<button class="bg-primary-container text-on-primary-container px-4 py-1.5 rounded-full text-xs font-label">Weekly</button>
+<button class="bg-surface-container-high text-on-surface-variant px-4 py-1.5 rounded-full text-xs font-label hover:bg-surface-container-highest">Monthly</button>
+</div>
+</div>
+<div class="h-64 flex items-end gap-1.5 w-full relative group">
+<!-- Simulated Chart Bars (Gas Levels) -->
+<div class="flex-1 bg-surface-container-high rounded-t-lg h-[20%] relative group/bar">
+<div class="absolute inset-0 bg-primary/40 rounded-t-lg transition-all duration-500 h-[60%] bottom-0"></div>
+<div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-surface-bright p-2 rounded text-[10px] opacity-0 group-hover/bar:opacity-100 transition-opacity whitespace-nowrap z-10">Gas: 12ppm</div>
+</div>
+<div class="flex-1 bg-surface-container-high rounded-t-lg h-[40%] relative group/bar">
+<div class="absolute inset-0 bg-primary/40 rounded-t-lg h-[45%] bottom-0"></div>
+</div>
+<div class="flex-1 bg-surface-container-high rounded-t-lg h-[60%] relative group/bar">
+<div class="absolute inset-0 bg-primary/40 rounded-t-lg h-[80%] bottom-0"></div>
+</div>
+<div class="flex-1 bg-surface-container-high rounded-t-lg h-[30%] relative group/bar">
+<div class="absolute inset-0 bg-primary/40 rounded-t-lg h-[40%] bottom-0"></div>
+</div>
+<div class="flex-1 bg-surface-container-high rounded-t-lg h-[80%] relative group/bar">
+<div class="absolute inset-0 bg-primary/40 rounded-t-lg h-[95%] bottom-0"></div>
+</div>
+<div class="flex-1 bg-surface-container-high rounded-t-lg h-[50%] relative group/bar">
+<div class="absolute inset-0 bg-primary/40 rounded-t-lg h-[60%] bottom-0"></div>
+</div>
+<div class="flex-1 bg-surface-container-high rounded-t-lg h-[45%] relative group/bar">
+<div class="absolute inset-0 bg-primary/40 rounded-t-lg h-[55%] bottom-0"></div>
+</div>
+<!-- Grid Lines -->
+<div class="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-10">
+<div class="border-t border-on-surface w-full"></div>
+<div class="border-t border-on-surface w-full"></div>
+<div class="border-t border-on-surface w-full"></div>
+<div class="border-t border-on-surface w-full"></div>
+</div>
+</div>
+<div class="flex justify-between mt-4 px-2 text-[10px] text-outline font-label uppercase tracking-widest">
+<span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+</div>
+<div class="mt-8 flex gap-6">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-primary/40"></div>
+<span class="text-xs text-outline font-label">Gas Levels (ppm)</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-surface-container-high"></div>
+<span class="text-xs text-outline font-label">PIR Motion Triggers</span>
+</div>
+</div>
+</div>
+<!-- Access Statistics -->
+<div class="col-span-12 lg:col-span-5 bg-surface-container bento-card rounded-full p-8">
+<h3 class="text-on-surface-variant font-label text-xs uppercase tracking-[0.2em] mb-6">Access Statistics</h3>
+<div class="space-y-8">
+<div>
+<div class="flex justify-between items-end mb-2">
+<span class="text-sm font-headline">Success Rate</span>
+<span class="text-2xl font-headline text-primary">94.2%</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 94.2%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between items-end mb-2">
+<span class="text-sm font-headline">Auth Failures</span>
+<span class="text-2xl font-headline text-tertiary">5.8%</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-tertiary rounded-full" style="width: 5.8%"></div>
+</div>
+</div>
+</div>
+<div class="mt-12 p-6 bg-surface-container-low rounded-xl border-l-4 border-tertiary">
+<div class="flex items-start gap-4">
+<span class="material-symbols-outlined text-tertiary" data-icon="warning">warning</span>
+<div>
+<p class="text-sm font-bold text-on-surface mb-1">Anomalous Activity</p>
+<p class="text-xs text-outline leading-relaxed font-body">3 consecutive failed fingerprint attempts at Rear Entrance (Wed, 02:45 AM). Investigation recommended.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Security Incident Report -->
+<div class="col-span-12 lg:col-span-7 bg-surface-container bento-card rounded-full p-8">
+<div class="flex justify-between items-center mb-8">
+<h3 class="text-on-surface-variant font-label text-xs uppercase tracking-[0.2em]">Incident Report</h3>
+<button class="text-primary text-xs font-label hover:underline">Download CSV</button>
+</div>
+<div class="space-y-4">
+<div class="flex items-center justify-between p-4 bg-surface-container-high rounded-xl group cursor-pointer hover:bg-surface-container-highest transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-error-container/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-error text-lg" data-icon="gpp_maybe">gpp_maybe</span>
+</div>
+<div>
+<p class="text-sm font-bold">Unauthorized Key Entry</p>
+<p class="text-[10px] text-outline font-label uppercase">Front Gate • 14 Oct, 22:15</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-on-surface transition-colors" data-icon="chevron_right">chevron_right</span>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container-high rounded-xl group cursor-pointer hover:bg-surface-container-highest transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-lg" data-icon="bolt">bolt</span>
+</div>
+<div>
+<p class="text-sm font-bold">Power Surge Resolved</p>
+<p class="text-[10px] text-outline font-label uppercase">Main Panel • 12 Oct, 09:30</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-on-surface transition-colors" data-icon="chevron_right">chevron_right</span>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container-high rounded-xl group cursor-pointer hover:bg-surface-container-highest transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-outline text-lg" data-icon="wifi_off">wifi_off</span>
+</div>
+<div>
+<p class="text-sm font-bold">Gateway Connectivity Drop</p>
+<p class="text-[10px] text-outline font-label uppercase">Router Node B • 10 Oct, 18:12</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-on-surface transition-colors" data-icon="chevron_right">chevron_right</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<footer class="w-full py-8 pl-8 flex justify-between items-center px-12 mt-12 bg-[#101319] border-t border-outline-variant/10">
+<div class="text-slate-500 opacity-60 font-inter text-xs tracking-wide">
+                © 2024 Sentinel Security. Precision Transparency.
+            </div>
+<div class="flex gap-8 text-slate-500 opacity-60 font-inter text-xs tracking-wide">
+<a class="hover:opacity-100 transition-opacity" href="#">Privacy Policy</a>
+<a class="hover:opacity-100 transition-opacity" href="#">Terms of Service</a>
+<a class="hover:opacity-100 transition-opacity" href="#">API Docs</a>
+</div>
+</footer>
+</main>
+<!-- Floating Security Status Visual (Glassmorphism Modal-like detail) -->
+<div class="fixed bottom-10 right-10 z-50">
+<div class="bg-surface/70 backdrop-blur-xl border border-outline-variant/20 p-4 rounded-2xl shadow-[0px_24px_48px_rgba(15,98,254,0.08)] flex items-center gap-4">
+<div class="relative">
+<svg class="w-12 h-12 -rotate-90">
+<circle class="text-surface-container-highest" cx="24" cy="24" fill="transparent" r="20" stroke="currentColor" stroke-width="4"></circle>
+<circle class="text-primary" cx="24" cy="24" fill="transparent" r="20" stroke="currentColor" stroke-dasharray="125.6" stroke-dashoffset="25.12" stroke-width="4"></circle>
+</svg>
+<div class="absolute inset-0 flex items-center justify-center">
+<span class="text-[10px] font-bold">80%</span>
+</div>
+</div>
+<div>
+<p class="text-xs font-bold leading-none">AI Confidence</p>
+<p class="text-[10px] text-outline font-label mt-1">Normal Pattern Detection</p>
+</div>
+<button class="p-2 bg-surface-container-high rounded-lg hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="close">close</span>
+</button>
+</div>
+</div>
+</body></html>

@@ -1,0 +1,23 @@
+# Smart Lock IoT Web Dashboard - Software Requirements Specification v2.0
+
+## 1. Introduction
+The Smart Lock IoT Web Dashboard is a system to monitor, control, and manage an ESP32-based smart lock via Blynk or MQTT.
+
+## 2. Key Features
+- **Real-time Monitoring:** Door status, gas, PIR, LDR, temperature, and weather.
+- **Remote Control:** Secure door open/close, auto-lock toggles, alert management.
+- **Fingerprint Management:** Enrollment, deletion, renaming, and tracking usage.
+- **Logs & Alerts:** Detailed access history and sensor-triggered alert tracking.
+- **Settings:** Password changes, threshold adjustments, and device-level configs.
+- **Analytics:** Weekly reports and trend visualization.
+
+## 3. User Roles
+- **Admin:** Full control.
+- **Member:** Limited control/logs.
+- **Viewer:** Read-only access.
+
+## 4. Technical Stack
+- **Frontend:** Next.js
+- **Backend:** Spring Boot
+- **Database:** PostgreSQL
+- **Realtime:** WebSocket / MQTT / Blynk

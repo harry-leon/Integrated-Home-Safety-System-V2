@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SENTINEL - Phân tích</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container": "#1d2026",
+                    "secondary-fixed-dim": "#b4c5ff",
+                    "on-secondary-container": "#a0b6ff",
+                    "tertiary-container": "#c84000",
+                    "on-secondary": "#0e2b6f",
+                    "surface-container-lowest": "#0b0e14",
+                    "inverse-on-surface": "#2e3037",
+                    "secondary-container": "#2d458a",
+                    "surface-container-low": "#191c22",
+                    "surface-container-highest": "#32353c",
+                    "on-error": "#690005",
+                    "surface-container-high": "#272a31",
+                    "tertiary": "#ffb59d",
+                    "on-tertiary": "#5d1900",
+                    "outline-variant": "#424656",
+                    "on-primary": "#002979",
+                    "on-primary-fixed-variant": "#003da9",
+                    "surface-bright": "#363940",
+                    "tertiary-fixed": "#ffdbd0",
+                    "surface-tint": "#b4c5ff",
+                    "on-secondary-fixed-variant": "#2a4387",
+                    "secondary-fixed": "#dbe1ff",
+                    "primary-fixed-dim": "#b4c5ff",
+                    "surface-dim": "#101319",
+                    "on-primary-container": "#f3f3ff",
+                    "secondary": "#b4c5ff",
+                    "outline": "#8c90a2",
+                    "on-tertiary-container": "#fff1ed",
+                    "on-tertiary-fixed-variant": "#832700",
+                    "surface": "#101319",
+                    "error-container": "#93000a",
+                    "on-primary-fixed": "#00174c",
+                    "on-error-container": "#ffdad6",
+                    "surface-variant": "#32353c",
+                    "on-background": "#e1e2eb",
+                    "tertiary-fixed-dim": "#ffb59d",
+                    "on-tertiary-fixed": "#390c00",
+                    "inverse-primary": "#0052dd",
+                    "background": "#101319",
+                    "on-surface": "#e1e2eb",
+                    "on-surface-variant": "#c3c6d8",
+                    "primary": "#b4c5ff",
+                    "error": "#ffb4ab",
+                    "primary-fixed": "#dbe1ff",
+                    "on-secondary-fixed": "#00174c",
+                    "primary-container": "#0f62fe",
+                    "inverse-surface": "#e1e2eb"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Manrope"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bg-editorial-gradient {
+            background: linear-gradient(135deg, #0f62fe 0%, #b4c5ff 100%);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 font-body text-slate-900 antialiased overflow-x-hidden">
+<!-- TopNavBar Shell -->
+<header class="fixed top-0 w-full flex justify-between items-center px-8 h-20 bg-slate-100/70 backdrop-blur-xl z-50 shadow-[0px_24px_48px_rgba(15,98,254,0.08)]">
+<div class="flex items-center gap-8">
+<span class="text-2xl font-bold tracking-tighter text-slate-900 font-headline">SENTINEL</span>
+<nav class="hidden md:flex gap-6 items-center">
+<a class="text-slate-400 hover:text-blue-400 transition-colors duration-300 font-medium" href="#">Dashboard</a>
+<a class="text-slate-400 hover:text-blue-400 transition-colors duration-300 font-medium" href="#">Remote Control</a>
+<a class="text-blue-600 font-medium border-b-2 border-blue-600 h-20 flex items-center" href="#">Analytics</a>
+<a class="text-slate-400 hover:text-blue-400 transition-colors duration-300 font-medium" href="#">Logs</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-slate-500 hover:text-blue-600 transition-all scale-98 active:opacity-80" data-icon="notifications">notifications</button>
+<button class="material-symbols-outlined text-slate-500 hover:text-blue-600 transition-all scale-98 active:opacity-80" data-icon="admin_panel_settings">admin_panel_settings</button>
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-sm">
+<img alt="Security Administrator Profile" data-alt="professional security administrator portrait with modern glasses clean aesthetic soft office lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYhnF19GZPoRywgWYKrcAQLEkpwpsUsKI1uukvhS8m71bi1UVwYjCXBOP4UhFMPEXLUwNIO3sN8CP1_dAyV1Ew-91EWpqL_e21IEObk1-Lfb5j60GY5NfwA8E0rrTH3bVSKxsjvyHi-zYDSV2akaKV1aPepMAaf8znPudwrejWEhG2TmCCy5Ga0Esd5BhXvYilKAZHsh9Tkyljq7ttXl6QEMmcDNSLQYiRTZ4OdrX5iueafq6ImOB27VEwVxDXQzMt91NwvLjUJR3c"/>
+</div>
+</div>
+</header>
+<!-- SideNavBar Shell -->
+<aside class="fixed left-0 top-0 h-full w-72 bg-white flex flex-col py-8 z-40 hidden lg:flex border-r border-slate-100">
+<div class="px-8 mb-12">
+<div class="flex items-center gap-3 mb-2">
+<span class="material-symbols-outlined text-blue-600 text-3xl" data-icon="shield" data-weight="fill" style="font-variation-settings: 'FILL' 1;">shield</span>
+<span class="text-blue-600 font-bold font-headline">SENTINEL</span>
+</div>
+<p class="text-xs font-bold text-blue-600 uppercase tracking-widest">System Armed</p>
+<p class="text-[10px] text-slate-400 font-medium">Precision Security</p>
+</div>
+<nav class="flex-1 px-4 space-y-1">
+<a class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-all duration-200 font-medium text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-all duration-200 font-medium text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="settings_remote">settings_remote</span>
+                Remote Control
+            </a>
+<a class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-all duration-200 font-medium text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="fingerprint">fingerprint</span>
+                Fingerprints
+            </a>
+<a class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-all duration-200 font-medium text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="history_edu">history_edu</span>
+                Logs
+            </a>
+<a class="flex items-center gap-4 px-4 py-3 bg-blue-600/10 text-blue-600 border-r-4 border-blue-600 rounded-lg transition-all duration-200 font-medium text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="query_stats">query_stats</span>
+                Analytics
+            </a>
+<a class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-all duration-200 font-medium text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+                Settings
+            </a>
+</nav>
+<div class="px-4 mt-auto pt-8 border-t border-slate-100">
+<a class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl transition-all text-sm font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="contact_support">contact_support</span>
+                Support
+            </a>
+<a class="flex items-center gap-4 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl transition-all text-sm font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+                Sign Out
+            </a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="pt-24 lg:pl-72 min-h-screen px-8 pb-12">
+<!-- Hero Header Section -->
+<header class="mb-12">
+<h1 class="text-4xl md:text-5xl font-extrabold font-headline text-slate-900 tracking-tight mb-2">PHÂN TÍCH HỆ THỐNG</h1>
+<div class="flex items-center gap-4">
+<span class="flex items-center gap-2 bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-bold tracking-wide">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    TRỰC TUYẾN
+                </span>
+<span class="text-slate-400 text-sm font-label tracking-tight">Cập nhật lần cuối: 12:45 PM • 14/10/2023</span>
+</div>
+</header>
+<!-- Analytics Grid (Bento Style) -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+<!-- Health Summary - Main Action Card -->
+<section class="md:col-span-8 bg-white p-8 rounded-xl shadow-sm border-l-4 border-blue-600 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-8">
+<div>
+<h3 class="text-xl font-bold text-slate-900 font-headline mb-1">Tóm tắt sức khỏe hệ thống</h3>
+<p class="text-slate-500 text-sm">Tất cả các mô-đun an ninh đang hoạt động ổn định.</p>
+</div>
+<button class="bg-slate-100 p-2 rounded-lg hover:bg-slate-200 transition-colors">
+<span class="material-symbols-outlined text-slate-600" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="bg-slate-50 p-6 rounded-xl">
+<span class="text-blue-600 font-bold text-3xl font-headline">98.2%</span>
+<p class="text-slate-400 text-xs font-bold uppercase mt-2">Uptime</p>
+</div>
+<div class="bg-slate-50 p-6 rounded-xl">
+<span class="text-emerald-500 font-bold text-3xl font-headline">0</span>
+<p class="text-slate-400 text-xs font-bold uppercase mt-2">Lỗi Critical</p>
+</div>
+<div class="bg-slate-50 p-6 rounded-xl">
+<span class="text-slate-900 font-bold text-3xl font-headline">24</span>
+<p class="text-slate-400 text-xs font-bold uppercase mt-2">Node Connect</p>
+</div>
+<div class="bg-slate-50 p-6 rounded-xl">
+<span class="text-slate-900 font-bold text-3xl font-headline">12ms</span>
+<p class="text-slate-400 text-xs font-bold uppercase mt-2">Phản hồi</p>
+</div>
+</div>
+</div>
+<div class="mt-8 flex justify-end">
+<button class="bg-editorial-gradient text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg hover:scale-[1.02] transition-transform flex items-center gap-2">
+                        CHẨN ĐOÁN CHI TIẾT
+                        <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</section>
+<!-- Access Stats - Vertical Bento -->
+<section class="md:col-span-4 bg-slate-900 p-8 rounded-xl text-white flex flex-col">
+<h3 class="text-xl font-bold font-headline mb-6">Thống kê truy cập</h3>
+<div class="space-y-6 flex-1">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-blue-600/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-blue-500" data-icon="person">person</span>
+</div>
+<div>
+<p class="text-sm font-bold">Người dùng</p>
+<p class="text-xs text-slate-400">Hoạt động trong ngày</p>
+</div>
+</div>
+<span class="text-lg font-bold">1,240</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-emerald-600/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-emerald-500" data-icon="passkey">passkey</span>
+</div>
+<div>
+<p class="text-sm font-bold">Thẻ từ / NFC</p>
+<p class="text-xs text-slate-400">Xác thực hợp lệ</p>
+</div>
+</div>
+<span class="text-lg font-bold">856</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-amber-600/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-amber-500" data-icon="face">face</span>
+</div>
+<div>
+<p class="text-sm font-bold">Nhận diện mặt</p>
+<p class="text-xs text-slate-400">Camera thông minh</p>
+</div>
+</div>
+<span class="text-lg font-bold">412</span>
+</div>
+</div>
+<div class="mt-8 pt-6 border-t border-slate-800">
+<div class="flex justify-between items-center text-xs">
+<span class="text-slate-400 uppercase tracking-widest font-bold">Tổng lượt vào</span>
+<span class="text-blue-500 font-bold">2,508</span>
+</div>
+</div>
+</section>
+<!-- Gas & Smoke Analytics - Wide Visualization Simulation -->
+<section class="md:col-span-12 lg:col-span-7 bg-white p-8 rounded-xl shadow-sm">
+<div class="flex justify-between items-center mb-10">
+<div>
+<h3 class="text-xl font-bold text-slate-900 font-headline">Phân tích khí gas &amp; khói</h3>
+<p class="text-slate-500 text-sm">Giám sát chất lượng không khí &amp; rủi ro cháy nổ.</p>
+</div>
+<div class="flex gap-2">
+<span class="px-3 py-1 bg-slate-100 rounded-full text-[10px] font-bold text-slate-500">24H QUA</span>
+<span class="px-3 py-1 bg-blue-50 rounded-full text-[10px] font-bold text-blue-600">THỜI GIAN THỰC</span>
+</div>
+</div>
+<div class="h-64 flex items-end justify-between gap-2 px-4">
+<!-- Fake chart bars -->
+<div class="w-full bg-slate-100 rounded-t-lg transition-all hover:bg-blue-200" style="height: 45%;"></div>
+<div class="w-full bg-slate-100 rounded-t-lg transition-all hover:bg-blue-200" style="height: 38%;"></div>
+<div class="w-full bg-slate-100 rounded-t-lg transition-all hover:bg-blue-200" style="height: 52%;"></div>
+<div class="w-full bg-blue-600 rounded-t-lg transition-all" style="height: 85%;"></div>
+<div class="w-full bg-slate-100 rounded-t-lg transition-all hover:bg-blue-200" style="height: 60%;"></div>
+<div class="w-full bg-slate-100 rounded-t-lg transition-all hover:bg-blue-200" style="height: 48%;"></div>
+<div class="w-full bg-slate-100 rounded-t-lg transition-all hover:bg-blue-200" style="height: 35%;"></div>
+<div class="w-full bg-slate-100 rounded-t-lg transition-all hover:bg-blue-200" style="height: 42%;"></div>
+<div class="w-full bg-slate-100 rounded-t-lg transition-all hover:bg-blue-200" style="height: 55%;"></div>
+<div class="w-full bg-slate-100 rounded-t-lg transition-all hover:bg-blue-200" style="height: 68%;"></div>
+<div class="w-full bg-slate-100 rounded-t-lg transition-all hover:bg-blue-200" style="height: 50%;"></div>
+<div class="w-full bg-slate-100 rounded-t-lg transition-all hover:bg-blue-200" style="height: 40%;"></div>
+</div>
+<div class="flex justify-between text-[10px] font-bold text-slate-400 mt-4 px-2">
+<span>08:00</span>
+<span>10:00</span>
+<span>12:00</span>
+<span>14:00</span>
+<span>16:00</span>
+<span>18:00</span>
+<span>20:00</span>
+</div>
+<div class="mt-10 grid grid-cols-2 gap-4">
+<div class="p-4 rounded-xl border border-slate-100 flex items-center gap-4">
+<div class="w-2 h-12 bg-blue-600 rounded-full"></div>
+<div>
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Nồng độ CO2</p>
+<p class="text-xl font-bold text-slate-900">420 ppm</p>
+</div>
+</div>
+<div class="p-4 rounded-xl border border-slate-100 flex items-center gap-4">
+<div class="w-2 h-12 bg-emerald-500 rounded-full"></div>
+<div>
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">LPG / Khí Gas</p>
+<p class="text-xl font-bold text-slate-900">Ổn định</p>
+</div>
+</div>
+</div>
+</section>
+<!-- PIR Motion Activity - Vertical Stack -->
+<section class="md:col-span-12 lg:col-span-5 flex flex-col gap-8">
+<!-- Activity Heatmap Mockup -->
+<div class="bg-white p-8 rounded-xl shadow-sm flex-1">
+<h3 class="text-xl font-bold text-slate-900 font-headline mb-6">Hoạt động cảm biến PIR</h3>
+<div class="space-y-4">
+<div class="flex items-center gap-4">
+<span class="w-24 text-xs font-bold text-slate-400">Sảnh chính</span>
+<div class="flex-1 h-3 bg-slate-50 rounded-full overflow-hidden flex">
+<div class="bg-blue-600 h-full w-[70%]"></div>
+</div>
+<span class="text-xs font-bold text-slate-900">70%</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="w-24 text-xs font-bold text-slate-400">Hành lang A</span>
+<div class="flex-1 h-3 bg-slate-50 rounded-full overflow-hidden flex">
+<div class="bg-blue-400 h-full w-[45%]"></div>
+</div>
+<span class="text-xs font-bold text-slate-900">45%</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="w-24 text-xs font-bold text-slate-400">Phòng máy</span>
+<div class="flex-1 h-3 bg-slate-50 rounded-full overflow-hidden flex">
+<div class="bg-slate-200 h-full w-[12%]"></div>
+</div>
+<span class="text-xs font-bold text-slate-900">12%</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="w-24 text-xs font-bold text-slate-400">Kho hàng</span>
+<div class="flex-1 h-3 bg-slate-50 rounded-full overflow-hidden flex">
+<div class="bg-blue-500 h-full w-[30%]"></div>
+</div>
+<span class="text-xs font-bold text-slate-900">30%</span>
+</div>
+</div>
+<div class="mt-8 p-4 bg-blue-50 rounded-xl">
+<p class="text-xs text-blue-700 font-medium leading-relaxed">Phát hiện hoạt động tăng vọt tại <span class="font-bold">Sảnh chính</span> lúc 13:45. Có thể do thay đổi ca trực.</p>
+</div>
+</div>
+<!-- Báo cáo sự cố an ninh -->
+<div class="bg-tertiary-fixed p-8 rounded-xl shadow-[0px_24px_48px_rgba(255,181,157,0.1)] border-l-4 border-tertiary-container">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-xl font-bold text-on-tertiary-fixed font-headline">Báo cáo sự cố</h3>
+<span class="material-symbols-outlined text-on-tertiary-fixed" data-icon="warning" data-weight="fill" style="font-variation-settings: 'FILL' 1;">warning</span>
+</div>
+<p class="text-on-tertiary-fixed-variant text-sm mb-6">2 cảnh báo cần được xem xét và lưu trữ trong hồ sơ tuần này.</p>
+<div class="space-y-3">
+<div class="bg-white/40 p-3 rounded-lg flex items-center justify-between">
+<span class="text-xs font-bold">Xâm nhập vùng C</span>
+<span class="text-[10px] text-slate-500">14/10 02:24</span>
+</div>
+<div class="bg-white/40 p-3 rounded-lg flex items-center justify-between">
+<span class="text-xs font-bold">Pin cảm biến yếu</span>
+<span class="text-[10px] text-slate-500">13/10 18:10</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Footer Tonal Section -->
+<footer class="mt-16 pt-8 border-t border-slate-200">
+<div class="flex flex-col md:flex-row justify-between items-center gap-8 text-slate-400 text-sm">
+<p>© 2023 SENTINEL Security Systems. Tất cả quyền được bảo lưu.</p>
+<div class="flex gap-8">
+<a class="hover:text-blue-600 transition-colors" href="#">Điều khoản dịch vụ</a>
+<a class="hover:text-blue-600 transition-colors" href="#">Chính sách bảo mật</a>
+<a class="hover:text-blue-600 transition-colors" href="#">Tài liệu API</a>
+</div>
+</div>
+</footer>
+</main>
+</body></html>

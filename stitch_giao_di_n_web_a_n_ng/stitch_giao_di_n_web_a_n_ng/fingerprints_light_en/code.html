@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;family=Inter:wght@300..700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error-container": "#410002",
+                    "outline": "#74777f",
+                    "background": "#f9f9ff",
+                    "on-secondary": "#ffffff",
+                    "surface-container-low": "#f3f3fa",
+                    "on-primary-container": "#00174c",
+                    "on-secondary-container": "#00174c",
+                    "on-secondary-fixed-variant": "#2a4387",
+                    "inverse-on-surface": "#f1f0f7",
+                    "on-primary": "#ffffff",
+                    "outline-variant": "#c4c6d0",
+                    "secondary-fixed": "#dbe1ff",
+                    "on-primary-fixed": "#00174c",
+                    "on-surface": "#1a1c1e",
+                    "surface-dim": "#dad9e0",
+                    "on-surface-variant": "#44474e",
+                    "secondary-container": "#dbe1ff",
+                    "inverse-surface": "#2f3033",
+                    "surface": "#f9f9ff",
+                    "error-container": "#ffdad6",
+                    "primary-container": "#dbe1ff",
+                    "on-secondary-fixed": "#00174c",
+                    "surface-container": "#eeeef5",
+                    "tertiary-container": "#ffdbd0",
+                    "on-background": "#1a1c1e",
+                    "primary": "#0052dd",
+                    "on-primary-fixed-variant": "#003da9",
+                    "error": "#ba1a1a",
+                    "primary-fixed": "#dbe1ff",
+                    "on-tertiary": "#ffffff",
+                    "on-tertiary-container": "#390c00",
+                    "inverse-primary": "#b4c5ff",
+                    "secondary-fixed-dim": "#b4c5ff",
+                    "surface-bright": "#f9f9ff",
+                    "on-tertiary-fixed": "#390c00",
+                    "secondary": "#495d92",
+                    "surface-container-highest": "#e3e2e9",
+                    "tertiary": "#a43d1a",
+                    "surface-container-high": "#e8e8ef",
+                    "surface-tint": "#0052dd",
+                    "primary-fixed-dim": "#b4c5ff",
+                    "on-tertiary-fixed-variant": "#832700",
+                    "tertiary-fixed": "#ffdbd0",
+                    "on-error": "#ffffff",
+                    "surface-variant": "#e1e2ec",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-fixed-dim": "#ffb59d"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Manrope"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .tonal-sectioning-no-borders {
+            border: none !important;
+        }
+        .tonal-shift-bg-only {
+            border: none !important;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body antialiased selection:bg-primary-container selection:text-on-primary-container">
+<!-- SideNavBar Component -->
+<aside class="h-screen w-64 fixed left-0 top-0 bg-[#F9F9FF] border-r border-outline-variant/30 flex flex-col py-8 px-4 z-40 shadow-[4px_0_24px_rgba(0,0,0,0.02)] tonal-shift-bg-only">
+<div class="mb-10 px-4">
+<h1 class="text-xl font-bold tracking-tight text-primary font-headline">SENTINEL</h1>
+<p class="text-xs text-slate-400 font-label tracking-widest uppercase mt-1">Precision Security</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-primary hover:bg-primary/5 transition-all duration-300 rounded-xl group" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-['Manrope'] text-sm medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-primary hover:bg-primary/5 transition-all duration-300 rounded-xl group" href="#">
+<span class="material-symbols-outlined" data-icon="settings_remote">settings_remote</span>
+<span class="font-['Manrope'] text-sm medium">Remote Control</span>
+</a>
+<!-- Active Tab: Fingerprints -->
+<a class="flex items-center gap-3 px-4 py-3 bg-primary/10 text-primary border-l-4 border-primary font-['Manrope'] text-sm medium rounded-r-xl active:scale-[0.98] transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="fingerprint">fingerprint</span>
+<span>Fingerprints</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-primary hover:bg-primary/5 transition-all duration-300 rounded-xl group" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span class="font-['Manrope'] text-sm medium">Logs</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-primary hover:bg-primary/5 transition-all duration-300 rounded-xl group" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-['Manrope'] text-sm medium">Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-primary hover:bg-primary/5 transition-all duration-300 rounded-xl group" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-['Manrope'] text-sm medium">Settings</span>
+</a>
+</nav>
+<div class="mt-auto pt-8 border-t border-outline-variant/20 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-primary hover:bg-primary/5 transition-all duration-300 rounded-xl group" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="font-['Manrope'] text-sm medium">Support</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-primary hover:bg-primary/5 transition-all duration-300 rounded-xl group" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-['Manrope'] text-sm medium">Log Out</span>
+</a>
+</div>
+</aside>
+<!-- TopNavBar Component -->
+<header class="w-full sticky top-0 z-30 bg-background/80 backdrop-blur-xl flex justify-between items-center px-8 py-4 ml-64 w-[calc(100%-16rem)] font-['Manrope'] antialiased tracking-tight tonal-sectioning-no-borders border-b border-outline-variant/30">
+<div class="flex items-center gap-6">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm" data-icon="search">search</span>
+<input class="bg-surface-container-low border border-outline-variant/50 rounded-xl pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-primary w-64 text-on-surface placeholder:text-on-surface-variant/50" placeholder="Search registry..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-500 hover:bg-slate-100 transition-colors duration-300 rounded-full">
+<span class="material-symbols-outlined" data-icon="language">language</span>
+</button>
+<button class="p-2 text-slate-500 hover:bg-slate-100 transition-colors duration-300 rounded-full">
+<span class="material-symbols-outlined" data-icon="light_mode">light_mode</span>
+</button>
+<div class="flex items-center gap-3 ml-4 pl-4 border-l border-outline-variant/30">
+<span class="text-slate-600 font-medium text-sm">Profile</span>
+<img alt="User profile photo" class="w-10 h-10 rounded-full object-cover ring-2 ring-primary/20" data-alt="professional portrait of a security administrator in a bright studio setting with clean lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKYKJp5l1Hu99g1wuMR4mZ8vKZ8cDNpmyiiUxvz_N-uzt4KU9VWsY0iQtWqP1g9oUySg3Kb1Vg9R130ZHeDXxSGFD1O0ckuolOGMwg9xK0USAq-VXspV5_UryX6QmSp9jOlCJuekVTFbmxDx_zhFCCWAk2fFhs1rHbPWy2jwmlMVTfJs8LPv8QrGUTgiUF5wT5zv07zlSY-Zj99asRf2I5EN3VLJMTved1UMMEBfFh2zyjPoFvM4JnExR-tn6F_zzacQqA_1m8dHed"/>
+</div>
+</div>
+</header>
+<main class="ml-64 p-10 min-h-screen">
+<!-- Header Section -->
+<div class="flex justify-between items-end mb-12">
+<div>
+<h2 class="text-5xl font-black font-headline tracking-tighter text-on-surface mb-2">FINGERPRINT REGISTRY</h2>
+<p class="text-on-surface-variant max-w-xl leading-relaxed">Manage biometric enrollment, access tiers, and historical entry logs for all registered users within the Sentinel ecosystem.</p>
+</div>
+<button class="group relative px-8 py-4 bg-primary text-white font-bold rounded-xl flex items-center gap-2 hover:bg-primary/90 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-[0px_12px_24px_rgba(0,82,221,0.15)]">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+            Add New Fingerprint
+        </button>
+</div>
+<!-- Metrics Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+<div class="bg-white border border-outline-variant/30 p-8 rounded-xl flex flex-col justify-between hover:border-primary/50 transition-colors duration-300 group shadow-sm">
+<div class="flex justify-between items-start">
+<span class="text-on-surface-variant font-label text-xs tracking-widest uppercase">Total Enrolled</span>
+<span class="material-symbols-outlined text-primary" data-icon="group">group</span>
+</div>
+<div class="mt-4">
+<div class="text-4xl font-bold font-headline mb-1 text-on-surface">124</div>
+<div class="text-xs text-primary font-label flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="trending_up">trending_up</span>
+                    +12% this month
+                </div>
+</div>
+</div>
+<div class="bg-white border border-outline-variant/30 p-8 rounded-xl flex flex-col justify-between hover:border-tertiary/50 transition-colors duration-300 group shadow-sm">
+<div class="flex justify-between items-start">
+<span class="text-on-surface-variant font-label text-xs tracking-widest uppercase">Active Today</span>
+<span class="material-symbols-outlined text-tertiary" data-icon="bolt">bolt</span>
+</div>
+<div class="mt-4">
+<div class="text-4xl font-bold font-headline mb-1 text-on-surface">42</div>
+<div class="text-xs text-on-surface-variant font-label">Users currently logged</div>
+</div>
+</div>
+<div class="bg-white border border-outline-variant/30 p-8 rounded-xl flex flex-col justify-between hover:border-primary/50 transition-colors duration-300 group shadow-sm">
+<div class="flex justify-between items-start">
+<span class="text-on-surface-variant font-label text-xs tracking-widest uppercase">Security Level</span>
+<span class="material-symbols-outlined text-primary" data-icon="verified_user">verified_user</span>
+</div>
+<div class="mt-4">
+<div class="text-4xl font-bold font-headline mb-1 text-on-surface">ALPHA</div>
+<div class="text-xs text-tertiary font-label uppercase tracking-tighter font-bold">Biometric Encryption: Active</div>
+</div>
+</div>
+</div>
+<!-- Registry Table -->
+<div class="bg-white rounded-xl overflow-hidden shadow-sm border border-outline-variant/30">
+<div class="p-8 border-b border-outline-variant/30 flex justify-between items-center">
+<h3 class="font-headline font-bold text-xl text-on-surface">Enrolled Biometrics</h3>
+<div class="flex gap-2">
+<button class="bg-surface-container-low px-4 py-2 rounded-full text-xs font-label text-on-surface-variant hover:bg-surface-container-high transition-colors border border-outline-variant/30">Export Logs</button>
+<button class="bg-surface-container-low px-4 py-2 rounded-full text-xs font-label text-on-surface-variant hover:bg-surface-container-high transition-colors border border-outline-variant/30">Bulk Action</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="bg-surface-container-low/50">
+<th class="px-8 py-4 font-label text-xs uppercase tracking-widest text-on-surface font-bold">Slot ID</th>
+<th class="px-8 py-4 font-label text-xs uppercase tracking-widest text-on-surface font-bold">User Name</th>
+<th class="px-8 py-4 font-label text-xs uppercase tracking-widest text-on-surface font-bold">Access Level</th>
+<th class="px-8 py-4 font-label text-xs uppercase tracking-widest text-on-surface font-bold">Enrollment Metadata</th>
+<th class="px-8 py-4 font-label text-xs uppercase tracking-widest text-on-surface font-bold">Last Active</th>
+<th class="px-8 py-4"></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/20">
+<tr class="hover:bg-surface-container-low/50 transition-colors group">
+<td class="px-8 py-6 font-label text-on-surface font-medium">#001</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">JD</div>
+<div>
+<div class="font-headline font-bold text-sm text-on-surface">Jonathan Davis</div>
+<div class="text-xs text-on-surface-variant font-label">j.davis@sentinel.tech</div>
+</div>
+</div>
+</td>
+<td class="px-8 py-6">
+<span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-full tracking-widest uppercase">Administrator</span>
+</td>
+<td class="px-8 py-6">
+<div class="text-xs font-label text-on-surface-variant">
+<div class="font-medium text-on-surface">Type: Capacitive Scan</div>
+<div class="opacity-60 text-[10px]">SHA-256: 0x4f...92e1</div>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="text-xs font-label">
+<div class="text-on-surface font-medium">2 mins ago</div>
+<div class="text-primary text-[10px] font-bold">Main Entrance</div>
+</div>
+</td>
+<td class="px-8 py-6 text-right">
+<button class="p-2 text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/50 transition-colors group">
+<td class="px-8 py-6 font-label text-on-surface font-medium">#002</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-3">
+<img alt="User Profile" class="w-10 h-10 rounded-full object-cover" data-alt="portrait of a confident woman with professional attire in a modern tech office" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8Sq2u1-i3slpNMEjOuPIzUFP8-OePVU9_f9xDRGb5XG77ruMBUgHj2sRbJU3nnFlG3g6Dkseho86XhVxTxNeoy3AnQFdmUvTY9dyHCUJUevd4lRcU_iAYqnvIVdhotZhMNtdvTe1t93bGCkerXMs2PwRHCPEqAcoN_D94r2C17R1qVZYwXgY2_icMOMAFnLDhomDke3bRZb6IAyBxr9iSfbcM6fxTZv_lBCi3R3uN1X-skKJ0tIzpMCiWBRXxN4-Gt6hEwhYQ8C_i"/>
+<div>
+<div class="font-headline font-bold text-sm text-on-surface">Sarah Chen</div>
+<div class="text-xs text-on-surface-variant font-label">s.chen@sentinel.tech</div>
+</div>
+</div>
+</td>
+<td class="px-8 py-6">
+<span class="px-3 py-1 bg-secondary/10 text-secondary text-[10px] font-bold rounded-full tracking-widest uppercase">Security Staff</span>
+</td>
+<td class="px-8 py-6">
+<div class="text-xs font-label text-on-surface-variant">
+<div class="font-medium text-on-surface">Type: Ultrasonic Scan</div>
+<div class="opacity-60 text-[10px]">SHA-256: 0x82...11b0</div>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="text-xs font-label">
+<div class="text-on-surface font-medium">1 hour ago</div>
+<div class="text-primary text-[10px] font-bold">Server Room 4</div>
+</div>
+</td>
+<td class="px-8 py-6 text-right">
+<button class="p-2 text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/50 transition-colors group">
+<td class="px-8 py-6 font-label text-on-surface font-medium">#003</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-tertiary/10 flex items-center justify-center text-tertiary font-bold">MK</div>
+<div>
+<div class="font-headline font-bold text-sm text-on-surface">Marcus Kincaid</div>
+<div class="text-xs text-on-surface-variant font-label">m.kincaid@sentinel.tech</div>
+</div>
+</div>
+</td>
+<td class="px-8 py-6">
+<span class="px-3 py-1 bg-surface-container text-on-surface-variant text-[10px] font-bold rounded-full tracking-widest uppercase">Guest (Temp)</span>
+</td>
+<td class="px-8 py-6">
+<div class="text-xs font-label text-on-surface-variant">
+<div class="font-medium text-on-surface">Type: Optical Scan</div>
+<div class="opacity-60 text-[10px]">SHA-256: 0xa9...33d2</div>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="text-xs font-label">
+<div class="text-on-surface font-medium">Yesterday, 18:45</div>
+<div class="text-on-surface-variant text-[10px]">Front Desk</div>
+</div>
+</td>
+<td class="px-8 py-6 text-right">
+<button class="p-2 text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/50 transition-colors group">
+<td class="px-8 py-6 font-label text-on-surface font-medium">#004</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-3">
+<img alt="User Profile" class="w-10 h-10 rounded-full object-cover" data-alt="portrait of a young technician in a high-tech lab environment with soft blue lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpbFRWLYhsMI6DqhGK4rlrNe1YoLWngjjYgOVWUqJqdRPMWFyVY4yFwhboD7BKTEMKW_Qxm_hDxAYBU8CMt8FFDlk1scGCwWMwi8fCrLBG1uTaTxIyXUSqJOySfGvATymQR_njwFTvxBWSgWk3fpSZaZ6Ze9miGvEsTOTCtG9PU1tOCbehYowbionJAbfHQ5VEkSFMIfoyhaO_TUwwOwFYIbBN7baV3J56i_9PpTwPVgrC06ZzFHR-AHZfOQtf4phegTB6CmqZgZgG"/>
+<div>
+<div class="font-headline font-bold text-sm text-on-surface">Elena Rodriguez</div>
+<div class="text-xs text-on-surface-variant font-label">e.rodriguez@sentinel.tech</div>
+</div>
+</div>
+</td>
+<td class="px-8 py-6">
+<span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-full tracking-widest uppercase">Administrator</span>
+</td>
+<td class="px-8 py-6">
+<div class="text-xs font-label text-on-surface-variant">
+<div class="font-medium text-on-surface">Type: Capacitive Scan</div>
+<div class="opacity-60 text-[10px]">SHA-256: 0x3d...ef41</div>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="text-xs font-label">
+<div class="text-on-surface font-medium">Just now</div>
+<div class="text-primary text-[10px] font-bold">Lab Access A</div>
+</div>
+</td>
+<td class="px-8 py-6 text-right">
+<button class="p-2 text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-8 bg-surface-container-low/30 flex justify-between items-center text-xs font-label text-on-surface-variant border-t border-outline-variant/30">
+<span class="font-medium">Showing 1-4 of 124 enrolled fingerprints</span>
+<div class="flex gap-4">
+<button class="hover:text-primary transition-colors flex items-center gap-1 font-bold">
+<span class="material-symbols-outlined text-sm" data-icon="chevron_left">chevron_left</span>
+                    Previous
+                </button>
+<div class="flex gap-2">
+<span class="text-primary font-bold">1</span>
+<span class="opacity-60">2</span>
+<span class="opacity-60">3</span>
+<span class="opacity-60">...</span>
+<span class="opacity-60">12</span>
+</div>
+<button class="hover:text-primary transition-colors flex items-center gap-1 font-bold">
+                    Next
+                    <span class="material-symbols-outlined text-sm" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Security Status Banner (Subtle) -->
+<div class="mt-8 p-6 bg-white border border-tertiary/30 rounded-xl border-l-4 border-l-tertiary flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-tertiary" data-icon="warning">warning</span>
+<div>
+<h4 class="font-headline font-bold text-sm text-on-surface">Hardware Integrity Warning</h4>
+<p class="text-xs text-on-surface-variant">Entrance 2 capacitive sensor requires recalibration. Registry remains operational.</p>
+</div>
+</div>
+<button class="text-xs font-bold text-tertiary hover:underline uppercase tracking-tight">Recalibrate Now</button>
+</div>
+</main>
+</body></html>

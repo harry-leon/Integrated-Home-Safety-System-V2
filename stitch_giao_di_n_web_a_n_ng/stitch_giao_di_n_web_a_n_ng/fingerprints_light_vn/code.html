@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SENTINEL - Quản lý Vân tay</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error-container": "#410002",
+                    "outline": "#747785",
+                    "background": "#F9FAFB",
+                    "on-secondary": "#ffffff",
+                    "surface-container-low": "#F3F4F6",
+                    "on-primary-container": "#001d4d",
+                    "on-secondary-container": "#001d4d",
+                    "on-secondary-fixed-variant": "#0047b3",
+                    "inverse-on-surface": "#f1f0f4",
+                    "on-primary": "#ffffff",
+                    "outline-variant": "#c4c6d0",
+                    "secondary-fixed": "#dbe1ff",
+                    "on-primary-fixed": "#00174c",
+                    "on-surface": "#1a1c1e",
+                    "surface-dim": "#dedbe2",
+                    "on-surface-variant": "#44474e",
+                    "secondary-container": "#dbe1ff",
+                    "inverse-surface": "#2f3033",
+                    "surface": "#F9FAFB",
+                    "error-container": "#ffdad6",
+                    "primary-container": "#dbe1ff",
+                    "on-secondary-fixed": "#00174c",
+                    "surface-container": "#FFFFFF",
+                    "tertiary-container": "#ffdbd0",
+                    "on-background": "#1a1c1e",
+                    "primary": "#0052dd",
+                    "on-primary-fixed-variant": "#003da9",
+                    "error": "#ba1a1a",
+                    "primary-fixed": "#dbe1ff",
+                    "on-tertiary": "#ffffff",
+                    "on-tertiary-container": "#390c00",
+                    "inverse-primary": "#b4c5ff",
+                    "secondary-fixed-dim": "#b4c5ff",
+                    "surface-bright": "#fdfbff",
+                    "on-tertiary-fixed": "#390c00",
+                    "secondary": "#3f5f90",
+                    "surface-container-highest": "#e2e2e6",
+                    "tertiary": "#934b00",
+                    "surface-container-high": "#e8e7ec",
+                    "surface-tint": "#0052dd",
+                    "primary-fixed-dim": "#b4c5ff",
+                    "on-tertiary-fixed-variant": "#832700",
+                    "tertiary-fixed": "#ffdbd0",
+                    "on-error": "#ffffff",
+                    "surface-variant": "#e1e2ec",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-fixed-dim": "#ffb59d"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Manrope"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body antialiased">
+<aside class="h-screen w-64 fixed left-0 top-0 bg-white flex flex-col h-full py-8 px-4 z-50 border-r border-slate-200">
+<div class="mb-10 px-4">
+<h1 class="text-xl font-bold tracking-tight text-primary font-headline">SENTINEL</h1>
+<p class="text-xs text-slate-500 font-medium">Precision Security</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 hover:text-primary hover:bg-slate-50 transition-all duration-300 group" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-medium text-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 hover:text-primary hover:bg-slate-50 transition-all duration-300 group" href="#">
+<span class="material-symbols-outlined" data-icon="settings_remote">settings_remote</span>
+<span class="font-medium text-sm">Remote Control</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/5 text-primary border-l-4 border-primary transition-all duration-300 group" href="#">
+<span class="material-symbols-outlined" data-icon="fingerprint">fingerprint</span>
+<span class="font-medium text-sm">Fingerprints</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 hover:text-primary hover:bg-slate-50 transition-all duration-300 group" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span class="font-medium text-sm">Logs</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 hover:text-primary hover:bg-slate-50 transition-all duration-300 group" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-medium text-sm">Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 hover:text-primary hover:bg-slate-50 transition-all duration-300 group" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-medium text-sm">Settings</span>
+</a>
+</nav>
+<div class="mt-auto space-y-1 border-t border-slate-100 pt-6">
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 hover:text-primary hover:bg-slate-50 transition-all duration-300 group" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="font-medium text-sm">Support</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 hover:text-error hover:bg-error/5 transition-all duration-300 group" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-medium text-sm">Log Out</span>
+</a>
+</div>
+</aside>
+<main class="ml-64 min-h-screen">
+<header class="w-full sticky top-0 z-40 bg-white/80 backdrop-blur-xl flex justify-between items-center px-8 py-4 border-b border-slate-100">
+<div class="flex items-center gap-8">
+<h2 class="text-2xl font-black tracking-tighter text-primary font-headline">QUẢN LÝ VÂN TAY</h2>
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm" data-icon="search">search</span>
+<input class="bg-slate-100 border-none rounded-xl pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-primary w-64 text-on-surface" placeholder="Tìm kiếm người dùng..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-xl hover:bg-slate-100 transition-colors duration-300 text-slate-500">
+<span class="material-symbols-outlined" data-icon="language">language</span>
+</button>
+<button class="p-2 rounded-xl hover:bg-slate-100 transition-colors duration-300 text-slate-500">
+<span class="material-symbols-outlined" data-icon="light_mode">light_mode</span>
+</button>
+</div>
+<div class="h-8 w-px bg-slate-200"></div>
+<div class="flex items-center gap-3">
+<div class="text-right">
+<p class="text-sm font-bold text-on-surface">Admin</p>
+<p class="text-[10px] text-slate-500 uppercase tracking-widest font-label">Security Lead</p>
+</div>
+<div class="w-10 h-10 rounded-full overflow-hidden bg-slate-200 ring-2 ring-white">
+<img alt="User profile photo" class="w-full h-full object-cover" data-alt="Professional portrait of a male security administrator in a dark studio setting with cinematic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBysKhvsdekQqhGTCkfctJN-7lt0rOMmSXYsUPM4c-jePni3Ekh8Cj_XGZosp6IUt6kKabDmJhkRgoHkGB6Ha3ZB13IsAG324M1vtxatRGHAbAb10-PXG6lM4cyxZItXNtANCNbRrQ0iYkSIqwqPHNH_tut9bcR7a5qkiLNDWmG5gklYNoYiU5EJdslWe3WKkeoOOXceUUmmhmlUj43XMu9yXAsRVsz4ac7ea7AfFbHf7AA3OVsM3Qy9hXFiZpHxK1yfinZxjzkwd0l"/>
+</div>
+</div>
+</div>
+</header>
+<div class="p-8 max-w-7xl mx-auto">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+<div class="bg-white border border-slate-100 p-6 rounded-2xl flex items-center justify-between group hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 cursor-default">
+<div>
+<p class="text-slate-500 text-sm font-medium mb-1 font-label">Tổng số vân tay</p>
+<h3 class="text-4xl font-bold text-slate-900 tracking-tight font-headline">128</h3>
+</div>
+<div class="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-3xl" data-icon="fingerprint">fingerprint</span>
+</div>
+</div>
+<div class="bg-white border border-slate-100 p-6 rounded-2xl flex items-center justify-between group hover:shadow-lg hover:shadow-tertiary/5 transition-all duration-300 cursor-default">
+<div>
+<p class="text-slate-500 text-sm font-medium mb-1 font-label">Hoạt động trong ngày</p>
+<h3 class="text-4xl font-bold text-slate-900 tracking-tight font-headline">42</h3>
+</div>
+<div class="w-14 h-14 bg-amber-500/10 rounded-full flex items-center justify-center text-amber-600">
+<span class="material-symbols-outlined text-3xl" data-icon="bolt">bolt</span>
+</div>
+</div>
+<div class="bg-white border border-slate-100 p-6 rounded-2xl flex items-center justify-between group hover:shadow-lg hover:shadow-emerald-500/5 transition-all duration-300 cursor-default">
+<div>
+<p class="text-slate-500 text-sm font-medium mb-1 font-label">Mức độ bảo mật</p>
+<h3 class="text-4xl font-bold text-slate-900 tracking-tight font-headline">Cao</h3>
+</div>
+<div class="w-14 h-14 bg-emerald-500/10 rounded-full flex items-center justify-center text-emerald-600">
+<span class="material-symbols-outlined text-3xl" data-icon="verified_user">verified_user</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-8">
+<div>
+<h2 class="text-3xl font-bold tracking-tight text-slate-900 mb-2 font-headline">Danh sách Đăng ký</h2>
+<p class="text-slate-500">Quản lý và giám sát quyền truy cập sinh trắc học thời gian thực.</p>
+</div>
+<button class="bg-primary text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/20 active:scale-95 transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+                    Thêm vân tay mới
+                </button>
+</div>
+<div class="bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-slate-50 text-slate-500 uppercase text-[11px] tracking-widest font-bold font-label">
+<th class="px-8 py-5">Slot ID</th>
+<th class="px-8 py-5">Tên người dùng</th>
+<th class="px-8 py-5">Cấp độ truy cập</th>
+<th class="px-8 py-5">Metadata đăng ký</th>
+<th class="px-8 py-5">Hoạt động lần cuối</th>
+<th class="px-8 py-5 text-right">Thao tác</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100">
+<tr class="hover:bg-slate-50/50 transition-colors duration-200">
+<td class="px-8 py-5 text-primary font-mono font-bold">#001</td>
+<td class="px-8 py-5">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold">NH</div>
+<span class="font-bold text-slate-900">Nguyễn Hoàng</span>
+</div>
+</td>
+<td class="px-8 py-5">
+<span class="bg-primary/10 text-primary text-[10px] px-3 py-1.5 rounded-full font-bold uppercase tracking-wider">Quản trị viên</span>
+</td>
+<td class="px-8 py-5 text-slate-600 text-sm font-label">ID: 8829 | 256-bit AES</td>
+<td class="px-8 py-5">
+<div class="flex flex-col">
+<span class="text-slate-900 text-sm font-medium">Hôm nay, 08:42 AM</span>
+<span class="text-[10px] text-emerald-600 font-bold uppercase tracking-tighter">Thành công</span>
+</div>
+</td>
+<td class="px-8 py-5 text-right">
+<button class="p-2 text-slate-400 hover:text-slate-900 transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50/50 transition-colors duration-200">
+<td class="px-8 py-5 text-primary font-mono font-bold">#002</td>
+<td class="px-8 py-5">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-xs font-bold">MT</div>
+<span class="font-bold text-slate-900">Minh Tú</span>
+</div>
+</td>
+<td class="px-8 py-5">
+<span class="bg-slate-100 text-slate-700 text-[10px] px-3 py-1.5 rounded-full font-bold uppercase tracking-wider">Nhân viên</span>
+</td>
+<td class="px-8 py-5 text-slate-600 text-sm font-label">ID: 7712 | 256-bit AES</td>
+<td class="px-8 py-5">
+<div class="flex flex-col">
+<span class="text-slate-900 text-sm font-medium">Hôm qua, 18:15 PM</span>
+<span class="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">Truy cập</span>
+</div>
+</td>
+<td class="px-8 py-5 text-right">
+<button class="p-2 text-slate-400 hover:text-slate-900 transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50/50 transition-colors duration-200">
+<td class="px-8 py-5 text-primary font-mono font-bold">#003</td>
+<td class="px-8 py-5">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center text-xs font-bold">KH</div>
+<span class="font-bold text-slate-900">Khánh Huyền</span>
+</div>
+</td>
+<td class="px-8 py-5">
+<span class="bg-amber-100 text-amber-700 text-[10px] px-3 py-1.5 rounded-full font-bold uppercase tracking-wider">Khách</span>
+</td>
+<td class="px-8 py-5 text-slate-600 text-sm font-label">ID: 9021 | 256-bit AES</td>
+<td class="px-8 py-5">
+<div class="flex flex-col">
+<span class="text-slate-900 text-sm font-medium">12/10/2023, 09:20 AM</span>
+<span class="text-[10px] text-error font-bold uppercase tracking-tighter">Từ chối</span>
+</div>
+</td>
+<td class="px-8 py-5 text-right">
+<button class="p-2 text-slate-400 hover:text-slate-900 transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50/50 transition-colors duration-200">
+<td class="px-8 py-5 text-primary font-mono font-bold">#004</td>
+<td class="px-8 py-5">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-bold">AN</div>
+<span class="font-bold text-slate-900">Anh Ngọc</span>
+</div>
+</td>
+<td class="px-8 py-5">
+<span class="bg-blue-100 text-blue-700 text-[10px] px-3 py-1.5 rounded-full font-bold uppercase tracking-wider">Kỹ thuật</span>
+</td>
+<td class="px-8 py-5 text-slate-600 text-sm font-label">ID: 6652 | 256-bit AES</td>
+<td class="px-8 py-5">
+<div class="flex flex-col">
+<span class="text-slate-900 text-sm font-medium">05/10/2023, 14:33 PM</span>
+<span class="text-[10px] text-emerald-600 font-bold uppercase tracking-tighter">Bảo trì</span>
+</div>
+</td>
+<td class="px-8 py-5 text-right">
+<button class="p-2 text-slate-400 hover:text-slate-900 transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-6 bg-slate-50 border-t border-slate-100 flex justify-between items-center">
+<p class="text-xs text-slate-500 font-bold font-label">Hiển thị 4 trong số 128 kết quả</p>
+<div class="flex gap-2">
+<button class="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-500 hover:bg-slate-50 transition-colors">
+<span class="material-symbols-outlined text-lg" data-icon="chevron_left">chevron_left</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-xl bg-primary text-white hover:bg-primary/90 shadow-md shadow-primary/10 transition-colors">
+<span class="material-symbols-outlined text-lg" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<div class="fixed bottom-12 right-12 z-50">
+<div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-xl max-w-sm">
+<div class="flex items-start gap-4">
+<div class="bg-emerald-500/10 p-2 rounded-xl text-emerald-600">
+<span class="material-symbols-outlined" data-icon="security">security</span>
+</div>
+<div>
+<h4 class="text-sm font-bold text-slate-900 mb-1">Trạng thái Hệ thống</h4>
+<p class="text-xs text-slate-500 leading-relaxed">Tất cả cảm biến vân tay đang hoạt động bình thường. Mã hóa đầu cuối đã được kích hoạt.</p>
+</div>
+</div>
+</div>
+</div>
+</body></html>

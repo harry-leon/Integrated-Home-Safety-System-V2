@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Sentinel - Secure Infrastructure Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "on-primary-fixed-variant": "#003da9",
+                "on-secondary": "#303030",
+                "on-primary-container": "#f3f3ff",
+                "error": "#ffb4ab",
+                "on-primary-fixed": "#00174c",
+                "on-tertiary": "#003919",
+                "inverse-on-surface": "#313030",
+                "surface-container-high": "#2a2a2a",
+                "secondary-fixed-dim": "#c8c6c6",
+                "surface-container-low": "#1c1b1b",
+                "tertiary": "#71dc8e",
+                "on-background": "#e5e2e1",
+                "primary-fixed-dim": "#b4c5ff",
+                "surface-variant": "#353534",
+                "surface": "#131313",
+                "inverse-primary": "#0052dd",
+                "error-container": "#93000a",
+                "on-secondary-fixed": "#1b1c1c",
+                "surface-bright": "#393939",
+                "surface-dim": "#131313",
+                "secondary-container": "#474747",
+                "tertiary-fixed": "#8df9a8",
+                "inverse-surface": "#e5e2e1",
+                "outline-variant": "#424656",
+                "on-tertiary-container": "#d6ffd9",
+                "secondary": "#c8c6c6",
+                "surface-tint": "#b4c5ff",
+                "outline": "#8c90a2",
+                "on-tertiary-fixed": "#00210c",
+                "on-tertiary-fixed-variant": "#005226",
+                "surface-container-lowest": "#0e0e0e",
+                "on-error": "#690005",
+                "primary-fixed": "#dbe1ff",
+                "on-secondary-fixed-variant": "#474747",
+                "secondary-fixed": "#e4e2e1",
+                "tertiary-fixed-dim": "#71dc8e",
+                "tertiary-container": "#008140",
+                "on-error-container": "#ffdad6",
+                "primary-container": "#0f62fe",
+                "primary": "#b4c5ff",
+                "surface-container": "#201f1f",
+                "on-primary": "#002979",
+                "surface-container-highest": "#353534",
+                "background": "#131313",
+                "on-surface-variant": "#c3c6d8",
+                "on-secondary-container": "#b6b5b4",
+                "on-surface": "#e5e2e1"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+            },
+            "fontFamily": {
+                "headline": ["Manrope"],
+                "body": ["Inter"],
+                "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #b4c5ff 0%, #0f62fe 100%);
+        }
+        .glass-panel {
+            background: rgba(180, 197, 255, 0.1);
+            backdrop-filter: blur(20px);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container">
+<!-- SideNavBar -->
+<aside class="bg-[#1c1b1b] dark:bg-[#1c1b1b] h-screen w-64 fixed left-0 top-0 flex flex-col z-50">
+<div class="flex flex-col h-full py-6">
+<div class="px-6 mb-10">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-gradient-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-surface" style="font-variation-settings: 'FILL' 1;">shield</span>
+</div>
+<div>
+<h1 class="text-xl font-bold tracking-tighter text-[#b4c5ff]">The Sentinel</h1>
+<p class="text-[10px] font-headline uppercase tracking-widest text-on-surface-variant/60">Secure Infrastructure</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="text-[#b4c5ff] bg-[#353534] rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 font-semibold transition-transform scale-95 active:scale-98" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-['Manrope'] font-medium text-sm tracking-wide">Dashboard</span>
+</a>
+<a class="text-[#c3c6d8] hover:bg-[#353534]/50 rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="settings_remote">settings_remote</span>
+<span class="font-['Manrope'] font-medium text-sm tracking-wide">Remote Control</span>
+</a>
+<a class="text-[#c3c6d8] hover:bg-[#353534]/50 rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="fingerprint">fingerprint</span>
+<span class="font-['Manrope'] font-medium text-sm tracking-wide">Fingerprints</span>
+</a>
+<a class="text-[#c3c6d8] hover:bg-[#353534]/50 rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="list_alt">list_alt</span>
+<span class="font-['Manrope'] font-medium text-sm tracking-wide">Logs</span>
+</a>
+<a class="text-[#c3c6d8] hover:bg-[#353534]/50 rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-['Manrope'] font-medium text-sm tracking-wide">Analytics</span>
+</a>
+<a class="text-[#c3c6d8] hover:bg-[#353534]/50 rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-['Manrope'] font-medium text-sm tracking-wide">Settings</span>
+</a>
+</nav>
+<div class="mt-auto pt-6 border-t border-outline-variant/10">
+<a class="text-[#c3c6d8] hover:bg-[#353534]/50 rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+<span class="font-['Manrope'] font-medium text-sm tracking-wide">Support</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- TopNavBar -->
+<header class="fixed top-0 right-0 w-[calc(100%-16rem)] h-16 z-40 bg-[#131313]/80 backdrop-blur-md flex justify-between items-center px-8">
+<div class="flex items-center gap-4">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">search</span>
+<input class="bg-surface-container-low border-none rounded-full pl-10 pr-4 py-2 text-sm focus:ring-1 focus:ring-primary w-64 transition-all" placeholder="Tìm kiếm thiết bị / Search devices..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-4 text-[#c3c6d8]">
+<span class="material-symbols-outlined cursor-pointer hover:text-white transition-colors" data-icon="language">language</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-white transition-colors" data-icon="dark_mode">dark_mode</span>
+<div class="relative">
+<span class="material-symbols-outlined cursor-pointer hover:text-white transition-colors" data-icon="notifications">notifications</span>
+<span class="absolute -top-1 -right-1 w-2 h-2 bg-error rounded-full"></span>
+</div>
+</div>
+<div class="flex items-center gap-3 pl-6 border-l border-outline-variant/20">
+<div class="text-right">
+<p class="text-sm font-bold text-on-surface">Admin Ethos</p>
+<p class="text-[10px] text-on-surface-variant">System Manager</p>
+</div>
+<img alt="Administrator Profile" class="w-10 h-10 rounded-full object-cover ring-2 ring-primary/20" data-alt="Close-up portrait of a professional system administrator in a high-tech server room environment with soft blue accent lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlRqAs_m5PGe1MNJ7sk9veAPIabWG66qBcNyS3osjcwbkQVj-AlZCwZxREJ5DVQMVo77WwNrN_Gg93iin3Y4ef3MKozHZSkrDUMrSziHe6GdPoMUhJ2aOwu5lxJMR8Ala6R6anmeJlmBXEt-WLR0DEz6L8gbGA738PwbGcNfLyL_djTxoWwd5xnGBbJwuHJlOlQn8537lUueQrMLT3WQ4Hs6hApyj6vuO8sRpWcPgf_peg3JT7tdSV71g8tv7BP4ynqu5G6hdlZp8B"/>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="ml-64 pt-24 pb-16 px-8 min-h-screen">
+<div class="max-w-7xl mx-auto">
+<!-- Hero Grid Section -->
+<div class="grid grid-cols-12 gap-6 mb-8">
+<!-- Main Control Card -->
+<section class="col-span-12 lg:col-span-5 bg-surface-container-low rounded-xl p-8 relative overflow-hidden group">
+<div class="absolute -right-10 -bottom-10 opacity-10 scale-150 transition-transform group-hover:scale-125 duration-700">
+<span class="material-symbols-outlined text-[200px]" style="font-variation-settings: 'FILL' 1;">lock_open</span>
+</div>
+<div class="relative z-10">
+<div class="mb-8">
+<h2 class="text-on-surface-variant font-label text-sm uppercase tracking-[0.2em] mb-1">Trạng thái Cửa / Door Status</h2>
+<p class="font-headline text-5xl font-extrabold text-primary tracking-tighter">SECURE</p>
+<p class="text-tertiary flex items-center gap-2 mt-2 font-medium">
+<span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span>
+                                Locked Since 08:42 AM
+                            </p>
+</div>
+<div class="flex items-end justify-between">
+<button class="bg-gradient-primary text-on-primary-container px-10 py-5 rounded-xl font-bold flex items-center gap-3 shadow-lg active:scale-95 transition-transform">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">lock_open</span>
+<span>Mở khóa Ngay / Unlock All</span>
+</button>
+<div class="text-right">
+<p class="text-on-surface-variant text-[10px] uppercase font-bold tracking-widest mb-1">Last Action</p>
+<p class="text-sm">Admin Manual Entry</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Health Summary Bento -->
+<section class="col-span-12 lg:col-span-7 grid grid-cols-2 gap-4">
+<div class="bg-surface-container-highest rounded-xl p-6 flex flex-col justify-between border border-outline-variant/10">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-primary" data-icon="wifi_tethering">wifi_tethering</span>
+<span class="bg-tertiary-container text-on-tertiary-container text-[10px] px-2 py-1 rounded-full font-bold uppercase">Online</span>
+</div>
+<div>
+<p class="text-on-surface-variant text-xs font-medium">Sóng / Signal</p>
+<p class="text-2xl font-bold font-headline">94<span class="text-sm ml-1 font-normal text-on-surface-variant">dBm</span></p>
+</div>
+</div>
+<div class="bg-surface-container-highest rounded-xl p-6 flex flex-col justify-between border border-outline-variant/10">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-primary" data-icon="battery_charging_90">battery_charging_90</span>
+<span class="text-on-surface-variant text-[10px] font-bold uppercase">Charging</span>
+</div>
+<div>
+<p class="text-on-surface-variant text-xs font-medium">Dung lượng / Battery</p>
+<p class="text-2xl font-bold font-headline">88<span class="text-sm ml-1 font-normal text-on-surface-variant">%</span></p>
+</div>
+</div>
+<div class="col-span-2 bg-surface-container-low rounded-xl p-6 border border-outline-variant/5">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg bg-surface-bright flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">update</span>
+</div>
+<div class="flex-1">
+<p class="text-on-surface-variant text-xs font-medium">Lần cuối thấy / Last Seen</p>
+<p class="text-lg font-semibold font-headline">Hôm nay, 10:24:15 AM</p>
+</div>
+<div class="text-right">
+<button class="text-primary text-xs font-bold uppercase tracking-widest hover:underline">Ping System</button>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Sensor Grid & Alerts -->
+<div class="grid grid-cols-12 gap-6">
+<!-- Sensor Grid -->
+<section class="col-span-12 lg:col-span-8">
+<div class="flex items-center justify-between mb-4 px-2">
+<h3 class="font-headline font-bold text-lg">Hệ thống Cảm biến / Sensor Matrix</h3>
+<span class="text-xs text-on-surface-variant">4 Active Nodes</span>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+<!-- Gas -->
+<div class="bg-surface-container-highest p-5 rounded-xl border border-outline-variant/10 group hover:border-primary/30 transition-colors">
+<div class="flex items-center justify-between mb-4">
+<div class="w-8 h-8 rounded bg-surface-bright flex items-center justify-center group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-sm text-on-surface-variant" data-icon="gas_meter">gas_meter</span>
+</div>
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+</div>
+<p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-tighter">Gas Level</p>
+<p class="text-xl font-bold">120 <span class="text-[10px] font-normal opacity-50">ppm</span></p>
+</div>
+<!-- Temperature -->
+<div class="bg-surface-container-highest p-5 rounded-xl border border-outline-variant/10 group hover:border-primary/30 transition-colors">
+<div class="flex items-center justify-between mb-4">
+<div class="w-8 h-8 rounded bg-surface-bright flex items-center justify-center group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-sm text-on-surface-variant" data-icon="thermostat">thermostat</span>
+</div>
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+</div>
+<p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-tighter">Temperature</p>
+<p class="text-xl font-bold">24.5 <span class="text-[10px] font-normal opacity-50">°C</span></p>
+</div>
+<!-- Light -->
+<div class="bg-surface-container-highest p-5 rounded-xl border border-outline-variant/10 group hover:border-primary/30 transition-colors">
+<div class="flex items-center justify-between mb-4">
+<div class="w-8 h-8 rounded bg-surface-bright flex items-center justify-center group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-sm text-on-surface-variant" data-icon="light_mode">light_mode</span>
+</div>
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+</div>
+<p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-tighter">LDR Index</p>
+<p class="text-xl font-bold">65 <span class="text-[10px] font-normal opacity-50">Lux</span></p>
+</div>
+<!-- Weather -->
+<div class="bg-surface-container-highest p-5 rounded-xl border border-outline-variant/10 group hover:border-primary/30 transition-colors">
+<div class="flex items-center justify-between mb-4">
+<div class="w-8 h-8 rounded bg-surface-bright flex items-center justify-center group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-sm text-on-surface-variant" data-icon="cloud">cloud</span>
+</div>
+<span class="text-[10px] text-tertiary font-bold">Cloudy</span>
+</div>
+<p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-tighter">Weather</p>
+<p class="text-xl font-bold">Partly</p>
+</div>
+</div>
+<!-- PIR Status Section -->
+<div class="mt-6 bg-surface-container-low p-6 rounded-xl border border-outline-variant/10">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full glass-panel flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="motion_sensor">motion_sensor_active</span>
+</div>
+<div>
+<h4 class="font-bold text-sm">Cảm biến Chuyển động / PIR Sensor</h4>
+<p class="text-xs text-on-surface-variant">Monitoring Front Corridor Zone A</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-[10px] font-bold uppercase text-on-surface-variant">Status</span>
+<div class="px-3 py-1 rounded-full bg-tertiary-container text-on-tertiary-container text-[10px] font-bold">CLEAR</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Recent Alerts -->
+<section class="col-span-12 lg:col-span-4">
+<div class="flex items-center justify-between mb-4 px-2">
+<h3 class="font-headline font-bold text-lg">Cảnh báo Gần đây / Alerts</h3>
+<a class="text-xs text-primary font-bold hover:underline" href="#">View All</a>
+</div>
+<div class="space-y-3">
+<!-- Critical Alert -->
+<div class="bg-surface-container-low p-4 rounded-xl border-l-4 border-error">
+<div class="flex justify-between items-start mb-2">
+<span class="text-error font-bold text-[10px] uppercase tracking-widest">Critical</span>
+<span class="text-[10px] text-on-surface-variant">2m ago</span>
+</div>
+<h4 class="text-sm font-bold mb-1">Unauthorized Access Attempt</h4>
+<p class="text-xs text-on-surface-variant leading-relaxed">Failed biometric scan at Secondary Entry. IP: 192.168.1.45</p>
+</div>
+<!-- Warning Alert -->
+<div class="bg-surface-container-low p-4 rounded-xl border-l-4 border-primary">
+<div class="flex justify-between items-start mb-2">
+<span class="text-primary font-bold text-[10px] uppercase tracking-widest">Warning</span>
+<span class="text-[10px] text-on-surface-variant">45m ago</span>
+</div>
+<h4 class="text-sm font-bold mb-1">Battery Level Low</h4>
+<p class="text-xs text-on-surface-variant leading-relaxed">System UPS battery at 15%. Recommend AC check.</p>
+</div>
+<!-- Info Alert -->
+<div class="bg-surface-container-low p-4 rounded-xl border-l-4 border-outline-variant">
+<div class="flex justify-between items-start mb-2">
+<span class="text-on-surface-variant font-bold text-[10px] uppercase tracking-widest">System</span>
+<span class="text-[10px] text-on-surface-variant">2h ago</span>
+</div>
+<h4 class="text-sm font-bold mb-1">Auto-Lock Executed</h4>
+<p class="text-xs text-on-surface-variant leading-relaxed">Timed lock successful. All perimeters secure.</p>
+</div>
+</div>
+</section>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="fixed bottom-0 right-0 w-[calc(100%-16rem)] py-3 px-8 bg-[#131313] border-t border-[#424656]/15 flex justify-between items-center z-40">
+<div class="flex items-center gap-4">
+<p class="font-['Inter'] text-[10px] uppercase tracking-[0.05em] text-[#71dc8e]">System Online | Last Sync: 2 mins ago</p>
+<span class="w-1.5 h-1.5 rounded-full bg-[#71dc8e] animate-pulse"></span>
+</div>
+<div class="flex gap-6">
+<a class="font-['Inter'] text-[10px] uppercase tracking-[0.05em] text-[#c3c6d8] hover:underline" href="#">Terms of Service</a>
+<a class="font-['Inter'] text-[10px] uppercase tracking-[0.05em] text-[#c3c6d8] hover:underline" href="#">Privacy Policy</a>
+</div>
+</footer>
+</body></html>

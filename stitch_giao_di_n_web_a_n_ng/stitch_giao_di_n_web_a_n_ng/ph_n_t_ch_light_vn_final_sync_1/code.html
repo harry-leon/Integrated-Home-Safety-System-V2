@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;family=Inter:wght@300..700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-low": "#f8fafc",
+                        "surface-container": "#f1f5f9",
+                        "on-tertiary": "#5d1900",
+                        "on-secondary": "#0e2b6f",
+                        "on-primary-fixed": "#00174c",
+                        "surface-bright": "#ffffff",
+                        "surface": "#ffffff",
+                        "primary": "#0f62fe",
+                        "on-primary": "#ffffff",
+                        "surface-dim": "#f1f5f9",
+                        "on-surface-variant": "#64748b",
+                        "on-secondary-container": "#0f62fe",
+                        "on-primary-fixed-variant": "#003da9",
+                        "on-background": "#0f172a",
+                        "secondary": "#334155",
+                        "on-primary-container": "#ffffff",
+                        "on-secondary-fixed": "#00174c",
+                        "inverse-primary": "#b4c5ff",
+                        "tertiary-fixed-dim": "#ffb59d",
+                        "secondary-fixed-dim": "#94a3b8",
+                        "tertiary-container": "#c84000",
+                        "on-tertiary-container": "#fff1ed",
+                        "primary-fixed": "#dbe1ff",
+                        "surface-container-highest": "#e2e8f0",
+                        "on-error-container": "#450a0a",
+                        "primary-container": "#0f62fe",
+                        "on-error": "#ffffff",
+                        "inverse-surface": "#1e293b",
+                        "secondary-container": "#e2e8f0",
+                        "background": "#f8fafc",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "on-surface": "#0f172a",
+                        "outline-variant": "#cbd5e1",
+                        "outline": "#94a3b8",
+                        "error-container": "#fee2e2",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed": "#ffdbd0",
+                        "on-tertiary-fixed": "#390c00",
+                        "error": "#ef4444",
+                        "inverse-on-surface": "#f8fafc",
+                        "secondary-fixed": "#dbe1ff",
+                        "surface-tint": "#0f62fe",
+                        "surface-variant": "#f1f5f9",
+                        "surface-container-high": "#e2e8f0",
+                        "on-secondary-fixed-variant": "#2a4387",
+                        "tertiary": "#c84000",
+                        "on-tertiary-fixed-variant": "#832700"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Manrope"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Manrope', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-surface">
+<!-- SideNavBar (Authority: JSON) -->
+<aside class="fixed left-0 top-0 h-full w-64 z-50 bg-slate-100 flex flex-col py-8 gap-y-2 shadow-2xl shadow-blue-500/5">
+<div class="px-8 mb-10">
+<h1 class="text-xl font-bold text-slate-900 tracking-tighter">SENTINEL</h1>
+<p class="text-[10px] uppercase tracking-[0.2em] text-slate-500 font-bold">Precision Security</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="text-slate-600 mx-4 py-3 px-4 flex items-center gap-3 hover:bg-slate-200 rounded-lg transition-all duration-300 font-['Manrope'] font-medium text-sm" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                Dashboard
+            </a>
+<a class="text-slate-600 mx-4 py-3 px-4 flex items-center gap-3 hover:bg-slate-200 rounded-lg transition-all duration-300 font-['Manrope'] font-medium text-sm" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+                Access Logs
+            </a>
+<a class="text-slate-600 mx-4 py-3 px-4 flex items-center gap-3 hover:bg-slate-200 rounded-lg transition-all duration-300 font-['Manrope'] font-medium text-sm" href="#">
+<span class="material-symbols-outlined">group</span>
+                User Management
+            </a>
+<!-- Active Tab: Lock Analytics (Mapped from "Phân Tích Hệ Thống") -->
+<a class="bg-white text-blue-600 rounded-lg mx-4 py-3 px-4 shadow-sm flex items-center gap-3 font-['Manrope'] font-medium text-sm" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">analytics</span>
+                Lock Analytics
+            </a>
+<a class="text-slate-600 mx-4 py-3 px-4 flex items-center gap-3 hover:bg-slate-200 rounded-lg transition-all duration-300 font-['Manrope'] font-medium text-sm" href="#">
+<span class="material-symbols-outlined">health_and_safety</span>
+                System Health
+            </a>
+</nav>
+<div class="mt-auto px-4 space-y-4">
+<button class="w-full py-4 bg-gradient-to-br from-primary-container to-primary text-white rounded-full font-bold shadow-lg shadow-blue-500/20 active:scale-95 transition-transform">
+                Lock All Units
+            </button>
+<a class="text-slate-600 mx-4 py-3 px-4 flex items-center gap-3 hover:bg-slate-200 rounded-lg transition-all duration-300 font-['Manrope'] font-medium text-sm" href="#">
+<span class="material-symbols-outlined">logout</span>
+                Logout
+            </a>
+</div>
+</aside>
+<!-- TopNavBar (Authority: JSON) -->
+<header class="fixed top-0 w-full z-40 bg-slate-50/70 backdrop-blur-xl flex justify-between items-center px-8 h-20 ml-64 max-w-[calc(100%-16rem)] font-['Manrope'] tracking-tight">
+<div class="flex items-center gap-4">
+<h2 class="text-2xl font-black tracking-tighter text-slate-900">Phân Tích Hệ Thống</h2>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-4 text-slate-500">
+<button class="hover:text-blue-500 transition-colors duration-300"><span class="material-symbols-outlined">notifications</span></button>
+<button class="hover:text-blue-500 transition-colors duration-300"><span class="material-symbols-outlined">settings</span></button>
+</div>
+<button class="px-6 py-2 border-2 border-blue-600 text-blue-600 font-bold rounded-full hover:bg-blue-600 hover:text-white transition-all">
+                Support
+            </button>
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-sm">
+<img alt="User profile" data-alt="professional male headshot for user profile, clean white background, soft studio lighting, modern tech professional aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCf7480daT9Tkk7xi-nExM7absUFepZr98ys9a9v4rDlcpEpy6hZOzgzInagaSm1pXsvpUWtqtf6WZqSGOgp_NFhTi2TWEC1zNtAfkWZo6AaHr6csIjs2Zv9MBTd6iG8bVNXJGe14ukZ6MhyFc-GiyauZ8sJ2KX8WbtmgksH_CkuQw4KnRsEF6V7CnndkuTjoSX79VdIWuFJzRrJeYuD1L0FGLrTfRoXXrBzEGIVGFRmq3PuM-P8SHCA_9kFQn5SbGOCY_OeZubH3IK"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-64 pt-28 px-10 pb-12 min-h-screen">
+<!-- Header Section: High Precision Insight -->
+<section class="mb-12">
+<div class="flex items-end justify-between">
+<div>
+<span class="text-primary font-bold tracking-widest text-xs uppercase mb-2 block">Real-time Performance</span>
+<h3 class="text-6xl font-extrabold tracking-tighter text-slate-900 leading-none">98.2%</h3>
+<p class="text-slate-500 mt-2 font-medium">Uptime hệ thống hiện tại — <span class="text-emerald-600">Hoạt động ổn định</span></p>
+</div>
+<div class="flex gap-4">
+<div class="p-6 bg-white rounded-xl shadow-sm border-l-4 border-primary">
+<p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Kết nối</p>
+<p class="text-xl font-bold">142 Thiết bị</p>
+</div>
+<div class="p-6 bg-white rounded-xl shadow-sm border-l-4 border-tertiary">
+<p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Cảnh báo</p>
+<p class="text-xl font-bold">03 Hiện tại</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-12 gap-6">
+<!-- Heatmap: PIR Activity (Editorial Style) -->
+<div class="col-span-8 bg-white rounded-full p-8 shadow-sm">
+<div class="flex justify-between items-start mb-8">
+<div>
+<h4 class="text-xl font-bold text-slate-900">Bản Đồ Nhiệt PIR</h4>
+<p class="text-slate-500 text-sm">Mật độ chuyển động trong 24 giờ qua</p>
+</div>
+<select class="bg-slate-50 border-none text-sm font-bold rounded-lg focus:ring-primary">
+<option>Tầng Trệt</option>
+<option>Hầm Gửi Xe</option>
+</select>
+</div>
+<div class="relative aspect-[21/9] bg-slate-50 rounded-xl overflow-hidden group">
+<img class="w-full h-full object-cover opacity-80 mix-blend-multiply" data-alt="abstract top-down architectural floor plan with vibrant purple and orange heatmap overlays showing high activity areas" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDB4qCGbAJke1f1EmKpsg-l_d4_keoAUjIfsk8q3BvcLGRDle7nHfxqULGxTXb-x9RT8T9ltghQlvToZo2fd9hFsxXZ_92LPj6lOS_ci3hs6yIjLwiCIDejSB7usfyJUZ62laCcTdtkpbrIiMF62XTc1jhQpC8YybA-lIALmLMDwwNYrJQwcwGOw_2YIhp-5QV5erq3pD5UPOy9UM1HyA2qI0tR9BCLL8uyAwsN_51go0bBdIW-I2HKIqtxPG4WDjFcxoQMbJcrCk53"/>
+<div class="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent"></div>
+<!-- Mock Pulse Points -->
+<div class="absolute top-1/4 left-1/3 w-12 h-12 bg-primary/40 rounded-full blur-xl animate-pulse"></div>
+<div class="absolute bottom-1/2 right-1/4 w-16 h-16 bg-tertiary/30 rounded-full blur-xl animate-pulse"></div>
+</div>
+</div>
+<!-- Side Card: Ambient Analysis -->
+<div class="col-span-4 flex flex-col gap-6">
+<!-- CO2 Card -->
+<div class="flex-1 bg-white p-6 rounded-full shadow-sm">
+<div class="flex justify-between items-center mb-4">
+<span class="material-symbols-outlined text-primary">co2</span>
+<span class="text-[10px] font-black text-slate-300 uppercase">Ambient</span>
+</div>
+<div class="flex items-baseline gap-2">
+<h5 class="text-4xl font-bold">420</h5>
+<span class="text-slate-400 font-bold">ppm</span>
+</div>
+<p class="text-sm text-slate-500 mt-1">Nồng độ CO2: An toàn</p>
+<div class="mt-6 h-1 w-full bg-slate-100 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[42%]"></div>
+</div>
+</div>
+<!-- Gas Card -->
+<div class="flex-1 bg-white p-6 rounded-full shadow-sm">
+<div class="flex justify-between items-center mb-4">
+<span class="material-symbols-outlined text-tertiary">gas_meter</span>
+<span class="text-[10px] font-black text-slate-300 uppercase">Safety</span>
+</div>
+<div class="flex items-baseline gap-2">
+<h5 class="text-4xl font-bold">0.02</h5>
+<span class="text-slate-400 font-bold">%</span>
+</div>
+<p class="text-sm text-slate-500 mt-1">Rò rỉ khí gas: Không phát hiện</p>
+<div class="mt-6 h-1 w-full bg-slate-100 rounded-full overflow-hidden">
+<div class="h-full bg-emerald-500 w-[5%]"></div>
+</div>
+</div>
+</div>
+<!-- Recent Incidents (List) -->
+<div class="col-span-12 bg-white rounded-full p-8 shadow-sm">
+<div class="flex justify-between items-center mb-10">
+<h4 class="text-xl font-bold text-slate-900">Báo Cáo Sự Cố Gần Đây</h4>
+<button class="text-primary font-bold text-sm hover:underline">Xem Tất Cả</button>
+</div>
+<div class="space-y-2">
+<!-- Incident Row 1 -->
+<div class="flex items-center justify-between py-5 px-6 hover:bg-slate-50 transition-colors rounded-xl">
+<div class="flex items-center gap-6">
+<div class="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center text-red-600">
+<span class="material-symbols-outlined">security_update_warning</span>
+</div>
+<div>
+<h5 class="font-bold text-slate-900">Brute Force Attack</h5>
+<p class="text-sm text-slate-500 font-['Inter']">Cửa chính - 3 lần thử sai liên tiếp</p>
+</div>
+</div>
+<div class="text-right">
+<span class="px-3 py-1 bg-red-100 text-red-700 text-xs font-black rounded-full uppercase tracking-wider">Nghiêm Trọng</span>
+<p class="text-xs text-slate-400 mt-1 font-['Inter']">10:42 PM • Hôm nay</p>
+</div>
+</div>
+<!-- Incident Row 2 -->
+<div class="flex items-center justify-between py-5 px-6 hover:bg-slate-50 transition-colors rounded-xl">
+<div class="flex items-center gap-6">
+<div class="w-12 h-12 rounded-full bg-amber-50 flex items-center justify-center text-amber-600">
+<span class="material-symbols-outlined">person_search</span>
+</div>
+<div>
+<h5 class="font-bold text-slate-900">Unrecognized Face</h5>
+<p class="text-sm text-slate-500 font-['Inter']">Camera hành lang tầng 2</p>
+</div>
+</div>
+<div class="text-right">
+<span class="px-3 py-1 bg-amber-100 text-amber-700 text-xs font-black rounded-full uppercase tracking-wider">Cảnh Báo</span>
+<p class="text-xs text-slate-400 mt-1 font-['Inter']">08:15 AM • Hôm nay</p>
+</div>
+</div>
+<!-- Incident Row 3 -->
+<div class="flex items-center justify-between py-5 px-6 hover:bg-slate-50 transition-colors rounded-xl">
+<div class="flex items-center gap-6">
+<div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-600">
+<span class="material-symbols-outlined">power_off</span>
+</div>
+<div>
+<h5 class="font-bold text-slate-900">Mất Kết Nối Cảm Biến</h5>
+<p class="text-sm text-slate-500 font-['Inter']">Cảm biến khói - Nhà kho</p>
+</div>
+</div>
+<div class="text-right">
+<span class="px-3 py-1 bg-slate-200 text-slate-700 text-xs font-black rounded-full uppercase tracking-wider">Thông Tin</span>
+<p class="text-xs text-slate-400 mt-1 font-['Inter']">02:30 PM • Hôm qua</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Floating Action Button (Contextual Suppression Logic: Hidden on Analytics per rules) -->
+<!-- The FAB is suppressed on Analytics/Details/Settings screens to prioritize the Canvas -->
+</body></html>

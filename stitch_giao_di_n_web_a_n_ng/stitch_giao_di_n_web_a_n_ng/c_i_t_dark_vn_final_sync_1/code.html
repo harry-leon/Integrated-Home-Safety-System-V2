@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SENTINEL - Cài đặt hệ thống</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed-dim": "#b4c5ff",
+                        "on-secondary-fixed-variant": "#2a4387",
+                        "error": "#ffb4ab",
+                        "primary-fixed": "#dbe1ff",
+                        "on-secondary-container": "#a0b6ff",
+                        "on-secondary-fixed": "#00174c",
+                        "on-primary-container": "#f3f3ff",
+                        "surface-container-high": "#272a31",
+                        "inverse-surface": "#e1e2eb",
+                        "outline-variant": "#424656",
+                        "on-error-container": "#ffdad6",
+                        "background": "#101319",
+                        "primary-container": "#0f62fe",
+                        "tertiary-fixed": "#ffdbd0",
+                        "primary": "#b4c5ff",
+                        "on-secondary": "#0e2b6f",
+                        "surface-container-lowest": "#0b0e14",
+                        "on-surface-variant": "#c3c6d8",
+                        "inverse-on-surface": "#2e3037",
+                        "outline": "#8c90a2",
+                        "error-container": "#93000a",
+                        "on-background": "#e1e2eb",
+                        "tertiary-fixed-dim": "#ffb59d",
+                        "on-tertiary-fixed": "#390c00",
+                        "on-tertiary-container": "#fff1ed",
+                        "on-primary-fixed-variant": "#003da9",
+                        "on-primary": "#002979",
+                        "tertiary": "#ffb59d",
+                        "surface-dim": "#101319",
+                        "on-tertiary-fixed-variant": "#832700",
+                        "on-tertiary": "#5d1900",
+                        "on-surface": "#e1e2eb",
+                        "surface-container-highest": "#32353c",
+                        "secondary-fixed": "#dbe1ff",
+                        "surface-bright": "#363940",
+                        "secondary": "#b4c5ff",
+                        "secondary-container": "#2d458a",
+                        "on-primary-fixed": "#00174c",
+                        "inverse-primary": "#0052dd",
+                        "surface-variant": "#32353c",
+                        "surface-container": "#1d2026",
+                        "surface": "#101319",
+                        "on-error": "#690005",
+                        "surface-container-low": "#191c22",
+                        "secondary-fixed-dim": "#b4c5ff",
+                        "tertiary-container": "#c84000",
+                        "surface-tint": "#b4c5ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Manrope"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #101319;
+            color: #e1e2eb;
+            font-family: 'Manrope', sans-serif;
+        }
+        .glass-panel {
+            background: rgba(16, 19, 25, 0.7);
+            backdrop-filter: blur(20px);
+        }
+    </style>
+</head>
+<body class="bg-background min-h-screen">
+<!-- SideNavBar -->
+<aside class="h-screen w-72 fixed left-0 top-0 z-40 bg-[#101319] flex flex-col py-8 gap-y-2 font-['Manrope'] text-sm font-medium">
+<div class="px-8 mb-10">
+<h1 class="text-blue-500 font-black text-2xl tracking-tighter">SENTINEL</h1>
+<div class="mt-4 flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">security</span>
+</div>
+<div>
+<p class="text-on-surface font-bold">System Armed</p>
+<p class="text-slate-500 text-xs">Precision Security</p>
+</div>
+</div>
+</div>
+<nav class="flex-1">
+<a class="flex items-center gap-4 py-3 px-4 text-slate-500 hover:text-slate-200 mx-4 transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-4 py-3 px-4 text-slate-500 hover:text-slate-200 mx-4 transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="settings_remote">settings_remote</span>
+                Remote Control
+            </a>
+<a class="flex items-center gap-4 py-3 px-4 text-slate-500 hover:text-slate-200 mx-4 transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="fingerprint">fingerprint</span>
+                Fingerprints
+            </a>
+<a class="flex items-center gap-4 py-3 px-4 text-slate-500 hover:text-slate-200 mx-4 transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="list_alt">list_alt</span>
+                Logs
+            </a>
+<a class="flex items-center gap-4 py-3 px-4 text-slate-500 hover:text-slate-200 mx-4 transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+                Analytics
+            </a>
+<a class="flex items-center gap-4 py-3 bg-[#272A31] text-blue-400 rounded-lg mx-4 px-4 scale-95 transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="settings" style="font-variation-settings: 'FILL' 1;">settings</span>
+                Settings
+            </a>
+</nav>
+<div class="px-8 mt-auto flex flex-col gap-4">
+<button class="bg-gradient-to-br from-primary-container to-primary text-on-primary-container py-3 rounded-xl font-bold text-sm active:scale-95 transition-all">
+                Lock All Entries
+            </button>
+<div class="flex flex-col gap-2 border-t border-outline-variant/10 pt-4">
+<a class="flex items-center gap-4 py-2 text-slate-500 hover:text-slate-200 text-xs" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="help">help</span>
+                    Help Center
+                </a>
+<a class="flex items-center gap-4 py-2 text-slate-500 hover:text-slate-200 text-xs" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="logout">logout</span>
+                    Logout
+                </a>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-72 min-h-screen pb-20">
+<!-- TopAppBar -->
+<header class="fixed top-0 right-0 left-72 z-50 bg-[#101319]/70 backdrop-blur-xl h-20 flex justify-between items-center px-12 font-['Manrope']">
+<div>
+<h2 class="text-2xl font-bold tracking-tight text-on-surface">Cài đặt hệ thống</h2>
+<p class="text-xs text-slate-500 font-medium font-['Inter']">SENTINEL / SYSTEM / CONFIGURATION</p>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center bg-surface-container px-4 py-2 rounded-full border border-outline-variant/20">
+<span class="material-symbols-outlined text-slate-400 mr-2" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-48 text-on-surface" placeholder="Tìm kiếm cài đặt..." type="text"/>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-full hover:bg-blue-500/10 text-slate-400 transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 rounded-full hover:bg-blue-500/10 text-slate-400 transition-colors">
+<span class="material-symbols-outlined" data-icon="settings_suggest">settings_suggest</span>
+</button>
+<div class="w-10 h-10 rounded-full bg-surface-container-high border-2 border-primary/20 overflow-hidden">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="Close up portrait of a professional man in a dark tech environment with subtle blue backlighting and sharp features" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYeYHMnR3XquSz8G0AMg19hYUc75kenPOGsEehs3TGvME3-RFUXzND9vNL5k6rhJb80hdKBG2F6_bGWmxQ7UzOJ7lPNY872NqAY5Dy2jempIt8bg6K4G6V35OSNbe4ipUTOBG7psqg-aMmqDuZ-PVNwmmAQ728TAaKJBrgjQFvDtwQIVq7jiGZzXTPo1H3R581i3rJasmWKBjqYqIu9T0L_optm5t_jHz_7-E8APCVfZ-lng18FrgGXw1oIhPw3F0TBHYFaF5qLY8D"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Scrollable Content -->
+<div class="pt-32 px-12 max-w-7xl mx-auto">
+<div class="grid grid-cols-12 gap-8">
+<!-- Quản lý truy cập (Access Management) -->
+<section class="col-span-12 lg:col-span-8 bg-surface-container rounded-xl p-8 border border-outline-variant/10">
+<div class="flex justify-between items-center mb-8">
+<div>
+<h3 class="text-xl font-semibold text-primary">Quản lý truy cập</h3>
+<p class="text-on-surface-variant text-sm mt-1">Quản lý người dùng và phương thức xác thực</p>
+</div>
+<button class="flex items-center gap-2 px-6 py-2 bg-surface-container-highest rounded-full text-sm font-bold text-on-surface hover:bg-surface-bright transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="add">add</span>
+                            Thêm người dùng
+                        </button>
+</div>
+<div class="space-y-4">
+<div class="group flex items-center justify-between p-4 bg-surface-container-low rounded-xl hover:bg-surface-container-high transition-all">
+<div class="flex items-center gap-4">
+<img alt="Admin Avatar" class="w-12 h-12 rounded-full object-cover grayscale group-hover:grayscale-0 transition-all" data-alt="Portrait of a young executive male with glasses and a smart casual look in a modern minimalist office setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDO1u7hoYWICCF_TDBbJ66Wne1COTZR300Zh_8WBhsuTioweeDxXKdc6VNkkkMX_VNO0t3-NRW0QfHWLtJZxIotRNZuWDQyUEi5DfC0A45bteC-pbh0BqKJHsqkde-5aWdMOOcKluvTPT_jEQOWMjwkl86ZqMzpTiFVEvU_7L4X26kNFkABQpMZpZVOyQNxBbTXdfQtgBvx1Zqiu5B_7HPG522lX7u86U9HxuQGuDEpeYbbUtiPXV5CDqI0MC8Wlv8H09j5r5o1OhCU"/>
+<div>
+<p class="font-bold text-on-surface">Nguyễn Văn A</p>
+<p class="text-xs text-slate-500">Quản trị viên • Vân tay, Mã PIN</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="px-3 py-1 bg-primary-container/20 text-primary-fixed-dim text-[10px] font-bold rounded-full tracking-widest">ACTIVE</span>
+<button class="p-2 text-slate-500 hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</div>
+<div class="group flex items-center justify-between p-4 bg-surface-container-low rounded-xl hover:bg-surface-container-high transition-all">
+<div class="flex items-center gap-4">
+<img alt="User Avatar" class="w-12 h-12 rounded-full object-cover grayscale group-hover:grayscale-0 transition-all" data-alt="Professional woman with a confident expression, neutral studio background with soft cinematic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA60D00k6r7ITKwU0X4VLDJTorRe12HdNH5sW432BHF0S4KBlUzF5ict9u0MFmyqaqlBY4KPGPfOpJ92qTKdRetYrRnvk7FTVq6xuX0zQPCv74tnU_3MdEY1iY5gb3ZRm479vIeIJmOXcKV29C0tHae7WE_IKyWVqd6-kcGgN499idsd_2bb_Y-3QS2uCYmOT1DKT0zsTihE-hTZzyygwfFe2IDbi4oqm4idUUivxO18_0vMGEHwaR6zCSoHrK5iRHhBnigUCRpUWEx"/>
+<div>
+<p class="font-bold text-on-surface">Trần Thị B</p>
+<p class="text-xs text-slate-500">Người dùng tiêu chuẩn • Thẻ từ RFID</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="px-3 py-1 bg-surface-container-highest text-slate-400 text-[10px] font-bold rounded-full tracking-widest">LIMITED</span>
+<button class="p-2 text-slate-500 hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Cấu hình ngưỡng cảm biến (Sensor Thresholds) -->
+<section class="col-span-12 lg:col-span-4 bg-surface-container rounded-xl p-8 border border-outline-variant/10 relative overflow-hidden">
+<div class="absolute -right-10 -top-10 w-40 h-40 bg-tertiary/10 rounded-full blur-3xl"></div>
+<div class="mb-8">
+<h3 class="text-xl font-semibold text-tertiary">Ngưỡng cảm biến</h3>
+<p class="text-on-surface-variant text-sm mt-1">Điều chỉnh độ nhạy phần cứng</p>
+</div>
+<div class="space-y-8">
+<div>
+<div class="flex justify-between items-center mb-4">
+<span class="text-sm font-medium text-on-surface">Độ trễ đóng cửa</span>
+<span class="text-xs font-bold text-tertiary">5 giây</span>
+</div>
+<div class="h-2 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-tertiary w-1/4 rounded-full"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between items-center mb-4">
+<span class="text-sm font-medium text-on-surface">Độ nhạy rung động</span>
+<span class="text-xs font-bold text-tertiary">Mức 7/10</span>
+</div>
+<div class="h-2 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-tertiary w-3/4 rounded-full"></div>
+</div>
+</div>
+<div class="pt-4 flex items-center justify-between">
+<span class="text-sm font-medium text-on-surface">Cảnh báo nhiệt độ</span>
+<div class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-tertiary"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Ràng buộc thời gian (Time Constraints) -->
+<section class="col-span-12 lg:col-span-5 bg-surface-container-low rounded-xl p-8 relative overflow-hidden">
+<div class="flex items-center gap-4 mb-8">
+<div class="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" data-icon="schedule">schedule</span>
+</div>
+<div>
+<h3 class="text-xl font-semibold text-on-surface">Ràng buộc thời gian</h3>
+<p class="text-on-surface-variant text-sm mt-1">Lịch trình tự động và giới hạn truy cập</p>
+</div>
+</div>
+<div class="space-y-3">
+<div class="flex items-center justify-between p-4 bg-surface-container-high rounded-xl">
+<div>
+<p class="text-sm font-bold text-on-surface">Khóa tự động ban đêm</p>
+<p class="text-xs text-slate-500 italic">22:00 - 05:00 • Hàng ngày</p>
+</div>
+<span class="material-symbols-outlined text-primary" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container rounded-xl">
+<div>
+<p class="text-sm font-bold text-on-surface">Chế độ khách</p>
+<p class="text-xs text-slate-500 italic">Chưa kích hoạt</p>
+</div>
+<span class="material-symbols-outlined text-slate-600" data-icon="radio_button_unchecked">radio_button_unchecked</span>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container rounded-xl">
+<div>
+<p class="text-sm font-bold text-on-surface">Giờ vệ sinh</p>
+<p class="text-xs text-slate-500 italic">Thứ 3 &amp; Thứ 5 • 09:00 - 11:00</p>
+</div>
+<span class="material-symbols-outlined text-primary" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</div>
+</section>
+<!-- Luồng thông báo (Notification Streams) -->
+<section class="col-span-12 lg:col-span-7 bg-surface-container rounded-xl p-8 border border-outline-variant/10">
+<div class="flex items-center gap-4 mb-8">
+<div class="w-12 h-12 rounded-xl bg-tertiary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary" data-icon="hub">hub</span>
+</div>
+<div>
+<h3 class="text-xl font-semibold text-on-surface">Luồng thông báo</h3>
+<p class="text-on-surface-variant text-sm mt-1">Tùy chỉnh kênh nhận tin tức và cảnh báo</p>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="p-5 bg-surface-container-low rounded-xl border border-outline-variant/5">
+<div class="flex justify-between items-start mb-4">
+<span class="material-symbols-outlined text-primary" data-icon="smartphone">smartphone</span>
+<input checked="" class="rounded bg-surface-container-highest border-none text-primary focus:ring-0" type="checkbox"/>
+</div>
+<p class="font-bold text-sm text-on-surface">Push Notification</p>
+<p class="text-xs text-slate-500 mt-1">Cảnh báo tức thời trên thiết bị di động</p>
+</div>
+<div class="p-5 bg-surface-container-low rounded-xl border border-outline-variant/5">
+<div class="flex justify-between items-start mb-4">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="mail">mail</span>
+<input class="rounded bg-surface-container-highest border-none text-primary focus:ring-0" type="checkbox"/>
+</div>
+<p class="font-bold text-sm text-on-surface">Email Report</p>
+<p class="text-xs text-slate-500 mt-1">Báo cáo hoạt động hàng tuần qua email</p>
+</div>
+<div class="p-5 bg-surface-container-low rounded-xl border border-outline-variant/5">
+<div class="flex justify-between items-start mb-4">
+<span class="material-symbols-outlined text-error" data-icon="emergency_home">emergency_home</span>
+<input checked="" class="rounded bg-surface-container-highest border-none text-error focus:ring-0" type="checkbox"/>
+</div>
+<p class="font-bold text-sm text-on-surface">Emergency Siren</p>
+<p class="text-xs text-slate-500 mt-1">Kích hoạt còi báo động khi có xâm nhập</p>
+</div>
+<div class="p-5 bg-surface-container-low rounded-xl border border-outline-variant/5">
+<div class="flex justify-between items-start mb-4">
+<span class="material-symbols-outlined text-primary-fixed-dim" data-icon="forum">forum</span>
+<input checked="" class="rounded bg-surface-container-highest border-none text-primary focus:ring-0" type="checkbox"/>
+</div>
+<p class="font-bold text-sm text-on-surface">Telegram Bot</p>
+<p class="text-xs text-slate-500 mt-1">Gửi log chi tiết qua kênh Telegram riêng</p>
+</div>
+</div>
+</section>
+<!-- System Status Footer Widget -->
+<div class="col-span-12 mt-4 p-8 bg-surface-container-highest rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6 border-l-4 border-primary">
+<div class="flex items-center gap-6">
+<div class="relative">
+<svg class="w-16 h-16 transform -rotate-90">
+<circle class="text-surface-container" cx="32" cy="32" fill="transparent" r="28" stroke="currentColor" stroke-width="4"></circle>
+<circle class="text-primary" cx="32" cy="32" fill="transparent" r="28" stroke="currentColor" stroke-dasharray="175" stroke-dashoffset="15" stroke-width="4"></circle>
+</svg>
+<span class="absolute inset-0 flex items-center justify-center text-[10px] font-bold">92%</span>
+</div>
+<div>
+<h4 class="font-bold text-on-surface uppercase tracking-wider text-xs">Tình trạng phần cứng</h4>
+<p class="text-slate-400 text-sm font-['Inter']">Hoạt động tối ưu. Kiểm tra định kỳ lần cuối: 2 giờ trước.</p>
+</div>
+</div>
+<div class="flex gap-4">
+<button class="px-8 py-3 bg-surface-container-low text-on-surface rounded-xl font-bold text-sm hover:bg-surface-bright transition-all">Sao lưu dữ liệu</button>
+<button class="px-8 py-3 bg-gradient-to-r from-primary-container to-primary text-white rounded-xl font-bold text-sm active:scale-95 transition-all shadow-lg shadow-primary/10">Lưu cấu hình</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-fixed": "#390c00",
+                    "tertiary": "#ffb59d",
+                    "primary-fixed": "#dbe1ff",
+                    "on-tertiary": "#5d1900",
+                    "inverse-primary": "#0052dd",
+                    "secondary-fixed-dim": "#b4c5ff",
+                    "secondary-fixed": "#dbe1ff",
+                    "on-secondary-fixed-variant": "#2a4387",
+                    "surface-variant": "#32353c",
+                    "on-secondary-container": "#a0b6ff",
+                    "on-error": "#690005",
+                    "primary-fixed-dim": "#b4c5ff",
+                    "surface-container-high": "#272a31",
+                    "tertiary-container": "#c84000",
+                    "on-surface-variant": "#c3c6d8",
+                    "on-error-container": "#ffdad6",
+                    "on-primary-fixed-variant": "#003da9",
+                    "background": "#F8F9FC",
+                    "on-secondary-fixed": "#00174c",
+                    "on-primary-container": "#0F62FE",
+                    "tertiary-fixed-dim": "#ffb59d",
+                    "tertiary-fixed": "#ffdbd0",
+                    "primary-container": "#0f62fe",
+                    "on-tertiary-fixed-variant": "#832700",
+                    "surface-tint": "#b4c5ff",
+                    "inverse-surface": "#101319",
+                    "surface-container-highest": "#E1E4ED",
+                    "outline-variant": "#C3C6D8",
+                    "on-secondary": "#0e2b6f",
+                    "surface-container": "#FFFFFF",
+                    "error-container": "#FEE2E2",
+                    "surface": "#F8F9FC",
+                    "outline": "#8c90a2",
+                    "on-surface": "#101319",
+                    "secondary-container": "#D1DBFF",
+                    "error": "#B91C1C",
+                    "on-primary": "#FFFFFF",
+                    "surface-container-low": "#F1F3F9",
+                    "surface-dim": "#EDF0F7",
+                    "on-background": "#101319",
+                    "surface-bright": "#FFFFFF",
+                    "secondary": "#0F62FE",
+                    "surface-container-lowest": "#FFFFFF",
+                    "on-primary-fixed": "#00174c",
+                    "on-tertiary-container": "#451a03",
+                    "inverse-on-surface": "#F8F9FC",
+                    "primary": "#0F62FE"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Manrope"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .tonal-sectioning {
+            transition: background-color 300ms ease;
+        }
+        .scale-98-on-click:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-surface-container border-r border-outline-variant/30 flex flex-col py-8 px-4 z-50">
+<div class="mb-10 px-4">
+<h1 class="text-xl font-black text-primary tracking-tighter">SENTINEL</h1>
+<p class="text-[10px] font-bold text-outline uppercase tracking-widest">Precision Security</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-outline hover:bg-surface-container-low rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-outline hover:bg-surface-container-low rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span class="text-sm font-medium">Access Logs</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-outline hover:bg-surface-container-low rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="text-sm font-medium">User Management</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary/10 text-primary font-semibold border-r-4 border-primary rounded-r-none rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="text-sm">Lock Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-outline hover:bg-surface-container-low rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="health_and_safety">health_and_safety</span>
+<span class="text-sm font-medium">System Health</span>
+</a>
+</nav>
+<div class="mt-auto space-y-1 border-t border-outline-variant/20 pt-6">
+<button class="w-full bg-primary text-on-primary py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-tight scale-98-on-click transition-all mb-4">
+                Deploy Firmware Update
+            </button>
+<a class="flex items-center gap-3 px-4 py-2 text-outline hover:text-on-surface transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="text-sm">Help Center</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-error hover:opacity-80 transition-opacity" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="text-sm font-semibold">Log Out</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-64 min-h-screen">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center px-8 py-4 w-full h-16 bg-surface-container/80 backdrop-blur-md sticky top-0 z-40">
+<div class="flex items-center gap-4 flex-1">
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-lg">search</span>
+<input class="w-full bg-surface-container-low border-none rounded-full py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary/20" placeholder="Tìm kiếm dữ liệu phân tích..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline hover:text-primary cursor-pointer transition-colors" data-icon="notifications">notifications</span>
+<span class="material-symbols-outlined text-outline hover:text-primary cursor-pointer transition-colors" data-icon="settings">settings</span>
+</div>
+<div class="h-8 w-8 rounded-full overflow-hidden border border-primary/20">
+<img alt="Admin Profile" class="w-full h-full object-cover" data-alt="Close-up portrait of a professional security administrator in a minimalist office setting, clean lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDeLPmVzf8PSqh0pn3toO4TN-5vAkZ6Vw0n8vn_8N9dFcVGNpkPVPPWxsD63DWsnbCqgo2I8EEy2giopAwJ0g_RyTN15rP2ODavOWgd2FWUT7VAqFXDBxXeF_7Y9cahxv5d9nVzHofggrwhTQpEFbZlhCIeMw6H04krYGqsGQhTStkE0Oew-MUXXQFom96UF_ZcONupE_nFHFnu2xf80LeB5WznsVAyhuFOZDptUMPG1hlp8fB3QGkCu18hSzdd-pTUcoXiWU12L7j6"/>
+</div>
+</div>
+</header>
+<!-- Page Content -->
+<div class="p-8 space-y-8 max-w-7xl mx-auto">
+<!-- Header Section -->
+<div class="flex justify-between items-end">
+<div>
+<p class="text-primary font-bold text-xs uppercase tracking-[0.2em] mb-1">Dữ liệu thời gian thực</p>
+<h2 class="text-4xl font-extrabold text-on-surface tracking-tight font-headline">Phân Tích Hệ Thống</h2>
+</div>
+<div class="flex gap-2">
+<button class="bg-surface-container-highest px-4 py-2 rounded-full text-xs font-bold text-on-surface-variant hover:bg-outline-variant transition-all">7 NGÀY QUA</button>
+<button class="bg-primary px-4 py-2 rounded-full text-xs font-bold text-on-primary shadow-lg shadow-primary/20 hover:scale-105 transition-all">XUẤT BÁO CÁO</button>
+</div>
+</div>
+<!-- Bento Grid Section -->
+<div class="grid grid-cols-12 gap-6">
+<!-- System Health Summary Card -->
+<div class="col-span-12 md:col-span-4 bg-surface-container p-8 rounded-[2rem] border border-outline-variant/10 relative overflow-hidden flex flex-col justify-between min-h-[320px]">
+<div class="relative z-10">
+<div class="flex justify-between items-start mb-6">
+<span class="p-3 bg-primary/10 rounded-2xl">
+<span class="material-symbols-outlined text-primary" data-icon="health_and_safety" style="font-variation-settings: 'FILL' 1;">health_and_safety</span>
+</span>
+<span class="text-[10px] font-bold text-primary px-2 py-1 bg-primary/5 rounded-full border border-primary/20">LIVE</span>
+</div>
+<h3 class="text-outline font-semibold text-sm mb-1 uppercase tracking-widest">Trạng thái hệ thống</h3>
+<div class="flex items-baseline gap-2">
+<span class="text-6xl font-black text-on-surface tracking-tighter">98.2%</span>
+<span class="text-primary font-bold text-sm">UPTIME</span>
+</div>
+</div>
+<div class="relative z-10 pt-4 border-t border-outline-variant/20">
+<p class="text-sm text-outline font-medium leading-relaxed">Hệ thống đang hoạt động ổn định. Đã ghi nhận 4 đợt bảo trì tự động trong 24 giờ qua.</p>
+</div>
+<!-- Decorative background curve -->
+<div class="absolute -bottom-10 -right-10 w-48 h-48 bg-primary/5 rounded-full blur-3xl"></div>
+</div>
+<!-- PIR Heatmap Card -->
+<div class="col-span-12 md:col-span-8 bg-surface-container p-8 rounded-[2rem] border border-outline-variant/10">
+<div class="flex justify-between items-center mb-8">
+<div>
+<h3 class="text-lg font-bold text-on-surface font-headline">Mật độ chuyển động (PIR Sensor)</h3>
+<p class="text-sm text-outline">Phân tích hoạt động phát hiện được theo khung giờ</p>
+</div>
+<div class="flex gap-1">
+<div class="w-3 h-3 rounded-sm bg-primary/10"></div>
+<div class="w-3 h-3 rounded-sm bg-primary/30"></div>
+<div class="w-3 h-3 rounded-sm bg-primary/60"></div>
+<div class="w-3 h-3 rounded-sm bg-primary"></div>
+</div>
+</div>
+<div class="grid grid-cols-7 gap-3 h-40">
+<!-- Monday -->
+<div class="flex flex-col gap-2">
+<div class="flex-1 bg-primary/20 rounded-lg"></div>
+<span class="text-[10px] font-bold text-center text-outline">T2</span>
+</div>
+<!-- Tuesday -->
+<div class="flex flex-col gap-2">
+<div class="flex-1 bg-primary/40 rounded-lg"></div>
+<span class="text-[10px] font-bold text-center text-outline">T3</span>
+</div>
+<!-- Wednesday -->
+<div class="flex flex-col gap-2">
+<div class="flex-1 bg-primary rounded-lg shadow-md shadow-primary/20"></div>
+<span class="text-[10px] font-bold text-center text-on-surface">T4</span>
+</div>
+<!-- Thursday -->
+<div class="flex flex-col gap-2">
+<div class="flex-1 bg-primary/60 rounded-lg"></div>
+<span class="text-[10px] font-bold text-center text-outline">T5</span>
+</div>
+<!-- Friday -->
+<div class="flex flex-col gap-2">
+<div class="flex-1 bg-primary/80 rounded-lg"></div>
+<span class="text-[10px] font-bold text-center text-outline">T6</span>
+</div>
+<!-- Saturday -->
+<div class="flex flex-col gap-2">
+<div class="flex-1 bg-primary/10 rounded-lg"></div>
+<span class="text-[10px] font-bold text-center text-outline">T7</span>
+</div>
+<!-- Sunday -->
+<div class="flex flex-col gap-2">
+<div class="flex-1 bg-primary/5 rounded-lg"></div>
+<span class="text-[10px] font-bold text-center text-outline">CN</span>
+</div>
+</div>
+</div>
+<!-- Ambient Analysis Cards -->
+<div class="col-span-12 md:col-span-6 bg-surface-container p-8 rounded-[2rem] border-l-4 border-l-tertiary">
+<div class="flex items-center justify-between mb-6">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-tertiary" data-icon="co2">co2</span>
+<h3 class="font-bold text-on-surface">Chỉ số CO2 &amp; Không khí</h3>
+</div>
+<span class="text-sm font-label font-bold text-on-surface">420 PPM</span>
+</div>
+<div class="w-full bg-surface-container-low h-2 rounded-full overflow-hidden">
+<div class="bg-tertiary h-full w-[42%]"></div>
+</div>
+<p class="mt-4 text-xs text-outline font-medium">Chất lượng không khí ở mức tốt. Không phát hiện nồng độ nguy hiểm.</p>
+</div>
+<div class="col-span-12 md:col-span-6 bg-surface-container p-8 rounded-[2rem] border-l-4 border-l-error">
+<div class="flex items-center justify-between mb-6">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-error" data-icon="gas_meter">gas_meter</span>
+<h3 class="font-bold text-on-surface">Phân tích Khí Gas &amp; Khói</h3>
+</div>
+<span class="text-sm font-label font-bold text-error">0.02% LPG</span>
+</div>
+<div class="w-full bg-surface-container-low h-2 rounded-full overflow-hidden">
+<div class="bg-error h-full w-[5%]"></div>
+</div>
+<p class="mt-4 text-xs text-outline font-medium">Cảm biến nhạy bén. Trạng thái an toàn tuyệt đối được duy trì.</p>
+</div>
+<!-- Incident Report Table -->
+<div class="col-span-12 bg-surface-container rounded-[2.5rem] overflow-hidden border border-outline-variant/10">
+<div class="p-8 border-b border-outline-variant/10 flex justify-between items-center">
+<h3 class="text-xl font-extrabold text-on-surface tracking-tight">Báo Cáo Sự Cố Gần Đây</h3>
+<button class="text-primary text-xs font-bold hover:underline">XEM TẤT CẢ</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="bg-surface-container-low/50">
+<th class="px-8 py-4 text-[10px] font-black text-outline uppercase tracking-widest">Thời gian</th>
+<th class="px-8 py-4 text-[10px] font-black text-outline uppercase tracking-widest">Loại sự cố</th>
+<th class="px-8 py-4 text-[10px] font-black text-outline uppercase tracking-widest">Vị trí</th>
+<th class="px-8 py-4 text-[10px] font-black text-outline uppercase tracking-widest">Mức độ</th>
+<th class="px-8 py-4 text-[10px] font-black text-outline uppercase tracking-widest">Hành động</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/5">
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-8 py-6">
+<div class="text-sm font-bold text-on-surface">14:22:05</div>
+<div class="text-[10px] text-outline">Hôm nay</div>
+</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-error"></span>
+<span class="text-sm font-medium">Nhập sai mã 5 lần</span>
+</div>
+</td>
+<td class="px-8 py-6 text-sm text-outline">Cổng chính - Khu A</td>
+<td class="px-8 py-6">
+<span class="px-3 py-1 bg-error-container text-error text-[10px] font-bold rounded-full">CAO</span>
+</td>
+<td class="px-8 py-6">
+<button class="text-xs font-bold text-primary group-hover:underline">Chi tiết</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-8 py-6">
+<div class="text-sm font-bold text-on-surface">09:15:30</div>
+<div class="text-[10px] text-outline">Hôm nay</div>
+</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+<span class="text-sm font-medium">Phát hiện khói nhẹ</span>
+</div>
+</td>
+<td class="px-8 py-6 text-sm text-outline">Phòng Server 02</td>
+<td class="px-8 py-6">
+<span class="px-3 py-1 bg-tertiary/20 text-on-tertiary-fixed text-[10px] font-bold rounded-full">TRUNG BÌNH</span>
+</td>
+<td class="px-8 py-6">
+<button class="text-xs font-bold text-primary group-hover:underline">Chi tiết</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-8 py-6">
+<div class="text-sm font-bold text-on-surface">23:45:11</div>
+<div class="text-[10px] text-outline">Hôm qua</div>
+</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="text-sm font-medium">Mở khóa cưỡng ép</span>
+</div>
+</td>
+<td class="px-8 py-6 text-sm text-outline">Cửa thoát hiểm Nam</td>
+<td class="px-8 py-6">
+<span class="px-3 py-1 bg-secondary-container text-on-secondary-fixed-variant text-[10px] font-bold rounded-full">THẤP</span>
+</td>
+<td class="px-8 py-6">
+<button class="text-xs font-bold text-primary group-hover:underline">Chi tiết</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Margin -->
+<div class="h-20"></div>
+</main>
+<!-- FAB Tooltip Logic (Suppressed as per rules for Details/Analytics pages) -->
+</body></html>

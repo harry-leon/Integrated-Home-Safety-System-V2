@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SENTINEL | Analytics Engine</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-fixed": "#390c00",
+                    "background": "#F9FAFB",
+                    "inverse-surface": "#2e3037",
+                    "secondary-container": "#dbe1ff",
+                    "tertiary-container": "#ffdbd0",
+                    "surface": "#FFFFFF",
+                    "inverse-on-surface": "#f1f0f4",
+                    "primary-fixed": "#dbe1ff",
+                    "on-background": "#191c22",
+                    "on-tertiary-container": "#390c00",
+                    "secondary-fixed-dim": "#b4c5ff",
+                    "surface-tint": "#0052dd",
+                    "surface-container": "#F3F4F6",
+                    "on-error-container": "#410002",
+                    "outline-variant": "#c3c6d8",
+                    "outline": "#737785",
+                    "tertiary-fixed-dim": "#ffb59d",
+                    "surface-container-highest": "#E5E7EB",
+                    "on-tertiary-fixed-variant": "#832700",
+                    "tertiary": "#832700",
+                    "tertiary-fixed": "#ffdbd0",
+                    "on-surface-variant": "#424656",
+                    "on-primary-fixed": "#00174c",
+                    "primary-fixed-dim": "#b4c5ff",
+                    "on-secondary-fixed-variant": "#2a4387",
+                    "error-container": "#ffdad6",
+                    "surface-container-low": "#F9FAFB",
+                    "surface-bright": "#f9f9ff",
+                    "surface-dim": "#d9d9e0",
+                    "secondary": "#465d91",
+                    "surface-variant": "#dee1f1",
+                    "on-primary": "#ffffff",
+                    "surface-container-high": "#E5E7EB",
+                    "surface-container-lowest": "#ffffff",
+                    "on-error": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "on-primary-container": "#00174c",
+                    "secondary-fixed": "#dbe1ff",
+                    "inverse-primary": "#b4c5ff",
+                    "primary": "#0052dd",
+                    "error": "#ba1a1a",
+                    "primary-container": "#dbe1ff",
+                    "on-surface": "#191c22",
+                    "on-tertiary": "#ffffff",
+                    "on-primary-fixed-variant": "#003da9",
+                    "on-secondary-fixed": "#00174c",
+                    "on-secondary-container": "#00174c"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "1rem"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Manrope"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #F9FAFB;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body selection:bg-primary-container selection:text-on-primary-container">
+<!-- SideNavBar -->
+<aside class="h-screen w-64 fixed left-0 top-0 bg-white border-r border-outline-variant flex flex-col py-6 px-4 z-50">
+<div class="mb-10 px-4">
+<h1 class="text-primary font-bold font-headline tracking-tighter text-2xl">SENTINEL</h1>
+<p class="text-outline text-[10px] font-label tracking-widest uppercase">v2.4.0 Precision</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-outline hover:bg-surface-container hover:text-on-surface transition-all duration-300 group" href="#">
+<span class="material-symbols-outlined text-xl">dashboard</span>
+<span class="font-manrope text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-outline hover:bg-surface-container hover:text-on-surface transition-all duration-300 group" href="#">
+<span class="material-symbols-outlined text-xl">settings_remote</span>
+<span class="font-manrope text-sm font-medium">Remote Control</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-outline hover:bg-surface-container hover:text-on-surface transition-all duration-300 group" href="#">
+<span class="material-symbols-outlined text-xl">fingerprint</span>
+<span class="font-manrope text-sm font-medium">Fingerprints</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-outline hover:bg-surface-container hover:text-on-surface transition-all duration-300 group" href="#">
+<span class="material-symbols-outlined text-xl">receipt_long</span>
+<span class="font-manrope text-sm font-medium">Logs</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-primary bg-primary-container/30 font-bold border-r-4 border-primary transition-all duration-300" href="#">
+<span class="material-symbols-outlined text-xl">insert_chart</span>
+<span class="font-manrope text-sm font-medium">Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-outline hover:bg-surface-container hover:text-on-surface transition-all duration-300 group" href="#">
+<span class="material-symbols-outlined text-xl">settings</span>
+<span class="font-manrope text-sm font-medium">Settings</span>
+</a>
+</nav>
+<div class="mt-auto space-y-4 px-4">
+<button class="w-full py-3 px-4 bg-error text-on-error rounded-xl font-bold text-xs flex items-center justify-center gap-2 hover:brightness-110 transition-all active:scale-95 shadow-sm">
+<span class="material-symbols-outlined text-sm">lock_person</span>
+                Emergency Lockout
+            </button>
+<div class="pt-6 space-y-2 border-t border-outline-variant">
+<a class="flex items-center gap-3 text-outline text-xs hover:text-on-surface transition-colors" href="#">
+<span class="material-symbols-outlined text-lg">help_outline</span>
+                    Support
+                </a>
+<a class="flex items-center gap-3 text-outline text-xs hover:text-on-surface transition-colors" href="#">
+<span class="material-symbols-outlined text-lg">logout</span>
+                    Sign Out
+                </a>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<header class="w-full sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-outline-variant flex items-center justify-between px-8 h-16">
+<div class="flex items-center gap-6">
+<div class="relative group">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-lg group-focus-within:text-primary transition-colors">search</span>
+<input class="bg-surface-container border-none rounded-full pl-10 pr-6 py-2 text-sm text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary/20 w-80 transition-all" placeholder="Search analytics..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-outline hover:bg-surface-container rounded-full transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="p-2 text-outline hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined">language</span>
+</button>
+<button class="p-2 text-outline hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined">dark_mode</span>
+</button>
+<div class="h-8 w-[1px] bg-outline-variant mx-2"></div>
+<div class="flex items-center gap-3">
+<div class="text-right">
+<p class="text-xs font-bold text-on-surface">Admin Panel</p>
+<p class="text-[10px] text-outline uppercase tracking-widest">Administrator</p>
+</div>
+<img alt="Admin Profile" class="w-10 h-10 rounded-full border-2 border-primary-container object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD4oENuBVG5HvMV6Y2mI92bq2gMVdcrjw36Jf-SOTbNKQCrTP06sjBg8YjfUkehr6oCj5kGxn42F_c5V3p5o7Qv0eEmEV38svN9Yp3TRF0yCTLaChN5ZXTnnzaCanASI4h-PQhzrc_omaU5_2O8Knx4sK28WZ3m2DnD8ELqX8QlA22R8j9Tpre4EnBYQ80nltsJS1VyaOSn5pCeY6oyE-hSEKPfvCzWHR-szlj8agrEMf1dpZB9KUb0b6ipTzGX8u5ib5PZ6b5KxFqa"/>
+</div>
+</div>
+</header>
+<!-- Dashboard Content -->
+<div class="p-8 space-y-8 flex-1">
+<!-- Hero Header Section -->
+<div class="flex items-end justify-between">
+<div class="space-y-1">
+<h2 class="text-outline uppercase tracking-[0.2em] font-label text-[10px] font-semibold">Security Performance</h2>
+<h3 class="text-4xl font-headline font-extrabold tracking-tight text-on-surface">Analytics Engine</h3>
+</div>
+<div class="flex gap-3">
+<div class="bg-white border border-outline-variant rounded-full px-4 py-2 flex items-center gap-2 cursor-pointer hover:bg-surface-container transition-colors">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="text-xs font-label text-on-surface font-medium">Last 7 Days</span>
+<span class="material-symbols-outlined text-sm text-outline">expand_more</span>
+</div>
+<button class="bg-primary text-on-primary rounded-xl px-6 py-2 text-sm font-bold flex items-center gap-2 hover:shadow-lg hover:shadow-primary/20 transition-all active:scale-95">
+<span class="material-symbols-outlined text-sm">download</span>
+                        Export Report
+                    </button>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-12 gap-6">
+<!-- System Health (Large Card) -->
+<div class="col-span-8 bg-white border border-outline-variant rounded-[2.5rem] p-8 shadow-sm">
+<div class="flex justify-between items-start mb-10">
+<div>
+<h4 class="text-xl font-headline font-bold text-on-surface">System Health Overview</h4>
+<p class="text-outline text-sm">Aggregated security metrics for current perimeter.</p>
+</div>
+<span class="bg-primary-container text-primary px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase">Live Sync</span>
+</div>
+<div class="grid grid-cols-3 gap-12">
+<div class="space-y-3">
+<p class="text-outline text-xs font-label font-semibold uppercase tracking-wider">Access Uptime</p>
+<p class="text-5xl font-headline font-extrabold text-primary">99.98%</p>
+<div class="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[99.98%] rounded-full"></div>
+</div>
+</div>
+<div class="space-y-3 border-l border-outline-variant/30 pl-8">
+<p class="text-outline text-xs font-label font-semibold uppercase tracking-wider">Threats Blocked</p>
+<p class="text-5xl font-headline font-extrabold text-on-surface">1,248</p>
+<p class="text-tertiary text-[10px] font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">trending_up</span>
+                                12% increase
+                            </p>
+</div>
+<div class="space-y-3 border-l border-outline-variant/30 pl-8">
+<p class="text-outline text-xs font-label font-semibold uppercase tracking-wider">Avg Response</p>
+<p class="text-5xl font-headline font-extrabold text-on-surface">0.4s</p>
+<p class="text-primary text-[10px] font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">trending_down</span>
+                                -0.1s improvement
+                            </p>
+</div>
+</div>
+</div>
+<!-- Entry Statistics (Circular Progress) -->
+<div class="col-span-4 bg-white border border-outline-variant rounded-[2.5rem] p-8 shadow-sm flex flex-col justify-between">
+<div>
+<h4 class="text-xl font-headline font-bold text-on-surface mb-6">Entry Statistics</h4>
+<div class="relative w-40 h-40 mx-auto">
+<svg class="w-full h-full transform -rotate-90">
+<circle class="text-surface-container-highest" cx="80" cy="80" fill="transparent" r="70" stroke="currentColor" stroke-width="12"></circle>
+<circle class="text-primary transition-all duration-1000" cx="80" cy="80" fill="transparent" r="70" stroke="currentColor" stroke-dasharray="439.8" stroke-dashoffset="52.7" stroke-linecap="round" stroke-width="12"></circle>
+</svg>
+<div class="absolute inset-0 flex items-center justify-center flex-col">
+<span class="text-3xl font-headline font-extrabold text-on-surface">88%</span>
+<span class="text-[9px] text-outline font-bold uppercase tracking-widest">Confidence</span>
+</div>
+</div>
+</div>
+<div class="space-y-3 mt-4">
+<div class="flex items-center justify-between p-3 bg-surface-container-low rounded-2xl">
+<div class="flex items-center gap-3">
+<span class="w-3 h-3 rounded-full bg-primary"></span>
+<span class="text-xs font-medium text-on-surface-variant">Authorized Entry</span>
+</div>
+<span class="text-xs font-bold text-on-surface">4,102</span>
+</div>
+<div class="flex items-center justify-between p-3 bg-surface-container-low rounded-2xl">
+<div class="flex items-center gap-3">
+<span class="w-3 h-3 rounded-full bg-outline-variant"></span>
+<span class="text-xs font-medium text-on-surface-variant">Failed Attempts</span>
+</div>
+<span class="text-xs font-bold text-on-surface">542</span>
+</div>
+</div>
+</div>
+<!-- Environmental Triggers (Bar Chart) -->
+<div class="col-span-6 bg-white border border-outline-variant rounded-[2.5rem] p-8 shadow-sm">
+<div class="flex justify-between items-center mb-12">
+<div>
+<h4 class="text-xl font-headline font-bold text-on-surface">Ambient Gas Analysis</h4>
+<p class="text-outline text-xs">PPM tracking for volatile organic compounds.</p>
+</div>
+<div class="text-right">
+<p class="text-3xl font-headline font-extrabold text-on-surface">320 <span class="text-xs text-outline font-normal uppercase">ppm</span></p>
+<span class="text-[10px] text-primary font-bold uppercase tracking-widest">Normal Range</span>
+</div>
+</div>
+<!-- Data Vis: Modern Bar Chart -->
+<div class="relative h-44 w-full flex items-end gap-3 px-2">
+<div class="flex-1 bg-surface-container-highest rounded-full h-[40%] group relative cursor-pointer">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-on-surface text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">128</div>
+</div>
+<div class="flex-1 bg-surface-container-highest rounded-full h-[45%] group relative cursor-pointer"></div>
+<div class="flex-1 bg-primary/40 rounded-full h-[55%] group relative cursor-pointer"></div>
+<div class="flex-1 bg-primary/60 rounded-full h-[85%] group relative cursor-pointer">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-on-surface text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">320</div>
+</div>
+<div class="flex-1 bg-primary rounded-full h-[70%] group relative cursor-pointer"></div>
+<div class="flex-1 bg-primary/80 rounded-full h-[75%] group relative cursor-pointer"></div>
+<div class="flex-1 bg-primary/90 rounded-full h-[60%] group relative cursor-pointer"></div>
+<div class="flex-1 bg-surface-container-highest rounded-full h-[50%] group relative cursor-pointer"></div>
+<div class="flex-1 bg-surface-container-highest rounded-full h-[40%] group relative cursor-pointer"></div>
+<div class="flex-1 bg-surface-container-highest rounded-full h-[35%] group relative cursor-pointer"></div>
+</div>
+<div class="flex justify-between mt-6 text-[10px] text-outline font-bold uppercase tracking-widest border-t border-outline-variant/30 pt-4">
+<span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+</div>
+</div>
+<!-- PIR Sensor Heatmap -->
+<div class="col-span-6 bg-white border border-outline-variant rounded-[2.5rem] p-8 shadow-sm">
+<div class="flex justify-between items-center mb-12">
+<div>
+<h4 class="text-xl font-headline font-bold text-on-surface">PIR Sensor Activity</h4>
+<p class="text-outline text-xs">Infrared motion detection density triggers.</p>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="text-[10px] text-outline font-bold uppercase mr-1">Intensity</span>
+<span class="w-3.5 h-3.5 bg-surface-container-highest rounded-sm"></span>
+<span class="w-3.5 h-3.5 bg-primary/30 rounded-sm"></span>
+<span class="w-3.5 h-3.5 bg-primary/60 rounded-sm"></span>
+<span class="w-3.5 h-3.5 bg-primary rounded-sm"></span>
+</div>
+</div>
+<div class="grid grid-cols-7 gap-2.5">
+<!-- Heatmap Tiles -->
+<div class="aspect-square bg-primary/10 rounded-lg hover:ring-2 ring-primary/20 cursor-pointer transition-all"></div>
+<div class="aspect-square bg-primary/40 rounded-lg hover:ring-2 ring-primary/20 cursor-pointer transition-all"></div>
+<div class="aspect-square bg-primary/20 rounded-lg hover:ring-2 ring-primary/20 cursor-pointer transition-all"></div>
+<div class="aspect-square bg-primary/80 rounded-lg hover:ring-2 ring-primary/20 cursor-pointer transition-all"></div>
+<div class="aspect-square bg-primary/30 rounded-lg hover:ring-2 ring-primary/20 cursor-pointer transition-all"></div>
+<div class="aspect-square bg-primary/50 rounded-lg hover:ring-2 ring-primary/20 cursor-pointer transition-all"></div>
+<div class="aspect-square bg-primary rounded-lg hover:ring-2 ring-primary/20 cursor-pointer transition-all"></div>
+<div class="aspect-square bg-primary/60 rounded-lg hover:ring-2 ring-primary/20 cursor-pointer transition-all"></div>
+<div class="aspect-square bg-primary/20 rounded-lg hover:ring-2 ring-primary/20 cursor-pointer transition-all"></div>
+<div class="aspect-square bg-primary/10 rounded-lg hover:ring-2 ring-primary/20 cursor-pointer transition-all"></div>
+<div class="aspect-square bg-primary/90 rounded-lg hover:ring-2 ring-primary/20 cursor-pointer transition-all"></div>
+<div class="aspect-square bg-primary/30 rounded-lg hover:ring-2 ring-primary/20 cursor-pointer transition-all"></div>
+<div class="aspect-square bg-primary/40 rounded-lg hover:ring-2 ring-primary/20 cursor-pointer transition-all"></div>
+<div class="aspect-square bg-primary/10 rounded-lg hover:ring-2 ring-primary/20 cursor-pointer transition-all"></div>
+<div class="aspect-square bg-primary/10 rounded-lg hover:ring-2 ring-primary/20 cursor-pointer transition-all"></div>
+<div class="aspect-square bg-primary/20 rounded-lg hover:ring-2 ring-primary/20 cursor-pointer transition-all"></div>
+<div class="aspect-square bg-primary/40 rounded-lg hover:ring-2 ring-primary/20 cursor-pointer transition-all"></div>
+<div class="aspect-square bg-primary/10 rounded-lg hover:ring-2 ring-primary/20 cursor-pointer transition-all"></div>
+<div class="aspect-square bg-primary/10 rounded-lg hover:ring-2 ring-primary/20 cursor-pointer transition-all"></div>
+<div class="aspect-square bg-primary/10 rounded-lg hover:ring-2 ring-primary/20 cursor-pointer transition-all"></div>
+<div class="aspect-square bg-primary/10 rounded-lg hover:ring-2 ring-primary/20 cursor-pointer transition-all"></div>
+</div>
+<p class="mt-8 text-[10px] text-outline font-bold uppercase tracking-[0.2em] text-center border-t border-outline-variant/30 pt-4">Sensor Activity Logs (Last 21 Days)</p>
+</div>
+<!-- Incident Report (Bottom List) -->
+<div class="col-span-12 bg-white border border-outline-variant rounded-[2.5rem] p-8 shadow-sm">
+<div class="flex justify-between items-center mb-10">
+<h4 class="text-xl font-headline font-bold text-on-surface">Security Incident Report</h4>
+<button class="text-xs font-bold text-primary flex items-center gap-1.5 group hover:underline">
+                            View All Incidents
+                            <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+<div class="space-y-4">
+<div class="flex items-center justify-between p-5 bg-surface-container-low border border-outline-variant/30 rounded-[1.5rem] hover:border-primary/50 transition-all group">
+<div class="flex items-center gap-6">
+<div class="w-14 h-14 rounded-2xl bg-error-container/50 flex items-center justify-center text-error">
+<span class="material-symbols-outlined text-2xl">report</span>
+</div>
+<div>
+<h5 class="text-base font-bold text-on-surface">Multiple Failed Pin Attempts</h5>
+<p class="text-xs text-outline font-medium">Main Gate • Panel #8421</p>
+</div>
+</div>
+<div class="flex items-center gap-12">
+<div class="text-right">
+<p class="text-xs font-bold text-on-surface">Oct 24, 2023</p>
+<p class="text-[10px] text-outline uppercase font-semibold">03:14 AM</p>
+</div>
+<span class="bg-error text-on-error px-4 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase">Critical</span>
+<button class="p-2 text-outline-variant hover:text-on-surface hover:bg-surface-container rounded-lg transition-colors">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</div>
+</div>
+<div class="flex items-center justify-between p-5 bg-surface-container-low border border-outline-variant/30 rounded-[1.5rem] hover:border-primary/50 transition-all group">
+<div class="flex items-center gap-6">
+<div class="w-14 h-14 rounded-2xl bg-primary-container/50 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-2xl">gas_meter</span>
+</div>
+<div>
+<h5 class="text-base font-bold text-on-surface">Abnormal Gas Spike</h5>
+<p class="text-xs text-outline font-medium">HVAC Vent 4 • Sensor #1109</p>
+</div>
+</div>
+<div class="flex items-center gap-12">
+<div class="text-right">
+<p class="text-xs font-bold text-on-surface">Oct 23, 2023</p>
+<p class="text-[10px] text-outline uppercase font-semibold">11:55 PM</p>
+</div>
+<span class="bg-surface-container-highest text-on-surface-variant px-4 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase">Resolved</span>
+<button class="p-2 text-outline-variant hover:text-on-surface hover:bg-surface-container rounded-lg transition-colors">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</div>
+</div>
+<div class="flex items-center justify-between p-5 bg-surface-container-low border border-outline-variant/30 rounded-[1.5rem] hover:border-primary/50 transition-all group">
+<div class="flex items-center gap-6">
+<div class="w-14 h-14 rounded-2xl bg-primary-container/50 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-2xl">access_time</span>
+</div>
+<div>
+<h5 class="text-base font-bold text-on-surface">Unexpected Late Access</h5>
+<p class="text-xs text-outline font-medium">North Wing • User: John D.</p>
+</div>
+</div>
+<div class="flex items-center gap-12">
+<div class="text-right">
+<p class="text-xs font-bold text-on-surface">Oct 22, 2023</p>
+<p class="text-[10px] text-outline uppercase font-semibold">01:20 AM</p>
+</div>
+<span class="bg-surface-container-highest text-on-surface-variant px-4 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase">Logged</span>
+<button class="p-2 text-outline-variant hover:text-on-surface hover:bg-surface-container rounded-lg transition-colors">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<footer class="w-full py-8 mt-auto border-t border-outline-variant bg-white flex justify-between items-center px-12">
+<p class="font-inter text-xs font-medium tracking-wide text-outline">© 2024 Sentinel Security. Precision Transparency.</p>
+<div class="flex gap-8">
+<a class="font-inter text-xs font-semibold tracking-wide text-outline hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="font-inter text-xs font-semibold tracking-wide text-outline hover:text-primary transition-colors" href="#">Terms of Service</a>
+<a class="font-inter text-xs font-semibold tracking-wide text-outline hover:text-primary transition-colors" href="#">API Docs</a>
+</div>
+</footer>
+</main>
+</body></html>

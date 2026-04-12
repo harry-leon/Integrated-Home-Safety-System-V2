@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SENTINEL | Account Recovery</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed": "#00174c",
+                    "secondary-fixed-dim": "#b4c5ff",
+                    "on-tertiary-fixed": "#390c00",
+                    "surface-container-high": "#272a31",
+                    "background": "#101319",
+                    "surface-tint": "#b4c5ff",
+                    "on-tertiary": "#5d1900",
+                    "on-error": "#690005",
+                    "on-primary": "#002979",
+                    "tertiary-fixed-dim": "#ffb59d",
+                    "primary-fixed-dim": "#b4c5ff",
+                    "on-surface": "#e1e2eb",
+                    "on-secondary-fixed-variant": "#2a4387",
+                    "on-secondary": "#0e2b6f",
+                    "secondary": "#b4c5ff",
+                    "tertiary-container": "#c84000",
+                    "on-error-container": "#ffdad6",
+                    "on-surface-variant": "#c3c6d8",
+                    "inverse-surface": "#e1e2eb",
+                    "surface-variant": "#32353c",
+                    "error": "#ffb4ab",
+                    "tertiary": "#ffb59d",
+                    "on-background": "#e1e2eb",
+                    "tertiary-fixed": "#ffdbd0",
+                    "inverse-primary": "#0052dd",
+                    "surface-container-lowest": "#0b0e14",
+                    "on-tertiary-fixed-variant": "#832700",
+                    "on-primary-fixed-variant": "#003da9",
+                    "surface-container-low": "#191c22",
+                    "primary-container": "#0f62fe",
+                    "on-primary-container": "#f3f3ff",
+                    "surface": "#101319",
+                    "on-primary-fixed": "#00174c",
+                    "surface-dim": "#101319",
+                    "secondary-fixed": "#dbe1ff",
+                    "surface-container": "#1d2026",
+                    "on-tertiary-container": "#fff1ed",
+                    "primary-fixed": "#dbe1ff",
+                    "outline-variant": "#424656",
+                    "secondary-container": "#2d458a",
+                    "surface-bright": "#363940",
+                    "error-container": "#93000a",
+                    "outline": "#8c90a2",
+                    "primary": "#b4c5ff",
+                    "on-secondary-container": "#a0b6ff",
+                    "inverse-on-surface": "#2e3037",
+                    "surface-container-highest": "#32353c"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Manrope"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bg-primary-gradient {
+            background: linear-gradient(135deg, #0f62fe 0%, #b4c5ff 100%);
+        }
+        .glass-panel {
+            background: rgba(16, 19, 25, 0.7);
+            backdrop-filter: blur(20px);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body min-h-screen flex flex-col items-center justify-center overflow-hidden">
+<!-- Ambient Security Glow (Background decoration) -->
+<div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary-container/10 blur-[120px]"></div>
+<div class="absolute bottom-[-10%] right-[-10%] w-[30%] h-[30%] rounded-full bg-tertiary/5 blur-[100px]"></div>
+<main class="relative z-10 w-full max-w-[480px] px-6">
+<!-- Brand Header Section -->
+<div class="text-center mb-12">
+<div class="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-surface-container-high mb-6">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="shield_lock" style="font-variation-settings: 'FILL' 1;">shield_lock</span>
+</div>
+<h1 class="text-4xl font-headline font-extrabold tracking-[-0.03em] text-white mb-2 uppercase">
+                SENTINEL
+            </h1>
+<p class="text-on-surface-variant font-medium tracking-tight opacity-70">
+                PRECISION SECURE ACCESS
+            </p>
+</div>
+<!-- Recovery Card -->
+<div class="glass-panel border border-outline-variant/10 rounded-[2rem] p-10 shadow-2xl">
+<div class="mb-8">
+<h2 class="text-2xl font-headline font-bold text-white mb-3">Recover Access</h2>
+<p class="text-on-surface-variant/80 font-body leading-relaxed">
+                    Enter email to receive reset instructions. A secure link will be sent to your verified inbox.
+                </p>
+</div>
+<form class="space-y-6">
+<!-- Input Field -->
+<div class="space-y-2">
+<label class="font-label text-xs font-semibold text-primary uppercase tracking-widest ml-1" for="email">
+                        Corporate Email
+                    </label>
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline text-xl group-focus-within:text-primary transition-colors" data-icon="mail">mail</span>
+</div>
+<input class="block w-full bg-surface-container-highest border-none rounded-xl py-4 pl-12 pr-4 text-white font-body placeholder:text-on-surface-variant/30 focus:ring-2 focus:ring-primary/40 transition-all outline-none" id="email" name="email" placeholder="operator@sentinel.security" type="email"/>
+</div>
+</div>
+<!-- Primary Action -->
+<button class="w-full bg-primary-gradient py-4 rounded-xl text-on-primary font-headline font-bold text-lg shadow-[0px_24px_48px_rgba(15,98,254,0.15)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2" type="submit">
+<span>Send Reset Link</span>
+<span class="material-symbols-outlined text-2xl" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</form>
+<!-- Secondary Actions -->
+<div class="mt-10 flex flex-col items-center gap-4">
+<a class="group flex items-center gap-2 text-on-surface-variant hover:text-white transition-colors py-2 px-4 rounded-full hover:bg-surface-container-high" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="arrow_back">arrow_back</span>
+<span class="font-label text-sm font-medium">Back to Login</span>
+</a>
+</div>
+</div>
+<!-- System Footer -->
+<div class="mt-12 text-center">
+<div class="flex items-center justify-center gap-6 text-[10px] font-label font-bold text-outline uppercase tracking-[0.2em]">
+<div class="flex items-center gap-1.5">
+<div class="w-1.5 h-1.5 rounded-full bg-primary"></div>
+<span>ENCRYPTED</span>
+</div>
+<div class="flex items-center gap-1.5">
+<div class="w-1.5 h-1.5 rounded-full bg-tertiary"></div>
+<span>LEVEL 4 CLEARANCE</span>
+</div>
+</div>
+</div>
+</main>
+<!-- Side Graphic for Editorial Feel (Screen right edge) -->
+<div class="hidden lg:block absolute right-0 top-0 h-full w-[20%] opacity-20 pointer-events-none">
+<div class="h-full w-full border-l border-outline-variant/10 flex flex-col justify-center items-center gap-20 select-none">
+<div class="rotate-90 whitespace-nowrap text-[8vw] font-headline font-black text-outline/5 tracking-tighter">AUTHENTICATION</div>
+<div class="rotate-90 whitespace-nowrap text-[8vw] font-headline font-black text-outline/5 tracking-tighter">RECOVERY</div>
+<div class="rotate-90 whitespace-nowrap text-[8vw] font-headline font-black text-outline/5 tracking-tighter">SENTINEL</div>
+</div>
+</div>
+<!-- Image for Visual Context (Decorative Modal Background) -->
+<div class="absolute inset-0 z-0 opacity-10 grayscale pointer-events-none">
+<img alt="Security Server Room" class="w-full h-full object-cover" data-alt="Close-up of high-tech server racks with glowing blue fiber optic cables and digital binary patterns in a dark environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAES3sbewFagviV0oF6OGUwfJSL4uyyX0s_qLd4k3-40OCxCvbxPKGQRf1J1xuSuUAsln-0vfFBNEfdDV2J26nxw73MXWL3PR-KNDyaIaKlIvVMMwQ15cxpzlDniGrhgUsKfla6fd2mA3E211Ot8rNNW3fOTNvsTC70G33RD6L2Nrivq7Ar48-3DOniPyqqvjkkkovWPuf1iKFn4h5GwwMNRJg94p0KFz53Yz62LUou29ChQuzGuYGDp5b-HUhab6beiO0XEI9KaD9r"/>
+</div>
+</body></html>

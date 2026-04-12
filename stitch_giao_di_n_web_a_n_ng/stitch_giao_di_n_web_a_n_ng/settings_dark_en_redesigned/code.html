@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed": "#390c00",
+                        "tertiary": "#ffb59d",
+                        "primary-fixed": "#dbe1ff",
+                        "on-tertiary": "#5d1900",
+                        "inverse-primary": "#0052dd",
+                        "secondary-fixed-dim": "#b4c5ff",
+                        "secondary-fixed": "#dbe1ff",
+                        "on-secondary-fixed-variant": "#2a4387",
+                        "surface-variant": "#32353c",
+                        "on-secondary-container": "#a0b6ff",
+                        "on-error": "#690005",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "surface-container-high": "#272a31",
+                        "tertiary-container": "#c84000",
+                        "on-surface-variant": "#c3c6d8",
+                        "on-error-container": "#ffdad6",
+                        "on-primary-fixed-variant": "#003da9",
+                        "background": "#101319",
+                        "on-secondary-fixed": "#00174c",
+                        "on-primary-container": "#f3f3ff",
+                        "tertiary-fixed-dim": "#ffb59d",
+                        "tertiary-fixed": "#ffdbd0",
+                        "primary-container": "#0f62fe",
+                        "on-tertiary-fixed-variant": "#832700",
+                        "surface-tint": "#b4c5ff",
+                        "inverse-surface": "#e1e2eb",
+                        "surface-container-highest": "#32353c",
+                        "outline-variant": "#424656",
+                        "on-secondary": "#0e2b6f",
+                        "surface-container": "#1d2026",
+                        "error-container": "#93000a",
+                        "surface": "#101319",
+                        "outline": "#8c90a2",
+                        "on-surface": "#e1e2eb",
+                        "secondary-container": "#2d458a",
+                        "error": "#ffb4ab",
+                        "on-primary": "#002979",
+                        "surface-container-low": "#191c22",
+                        "surface-dim": "#101319",
+                        "on-background": "#e1e2eb",
+                        "surface-bright": "#363940",
+                        "secondary": "#b4c5ff",
+                        "surface-container-lowest": "#0b0e14",
+                        "on-primary-fixed": "#00174c",
+                        "on-tertiary-container": "#fff1ed",
+                        "inverse-on-surface": "#2e3037",
+                        "primary": "#b4c5ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Manrope"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .tonal-sectioning {
+            background: linear-gradient(180deg, #101319 0%, #191c22 100%);
+        }
+        .glass-panel {
+            background: rgba(29, 32, 38, 0.7);
+            backdrop-filter: blur(20px);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body selection:bg-primary-container selection:text-on-primary-container overflow-hidden">
+<!-- Sidebar Navigation -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-[#1D2026] flex flex-col border-r border-[#272A31] py-8 px-4 shadow-[24px_0_48px_rgba(15,98,254,0.06)] z-50">
+<div class="mb-12 px-4">
+<h1 class="text-xl font-black text-[#0F62FE] tracking-tighter">THE SENTINEL</h1>
+<p class="text-[10px] uppercase tracking-[0.2em] text-[#B4C5FF]/50 font-bold">Precision Security</p>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#B4C5FF]/70 hover:bg-[#272A31] transition-all group" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-medium text-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#B4C5FF]/70 hover:bg-[#272A31] transition-all group" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="font-medium text-sm">Access Logs</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#B4C5FF]/70 hover:bg-[#272A31] transition-all group" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-medium text-sm">User Management</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#B4C5FF]/70 hover:bg-[#272A31] transition-all group" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-medium text-sm">Lock Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#B4C5FF]/70 hover:bg-[#272A31] transition-all group" href="#">
+<span class="material-symbols-outlined">health_and_safety</span>
+<span class="font-medium text-sm">System Health</span>
+</a>
+</nav>
+<div class="mt-auto space-y-2 pt-8 border-t border-[#272A31]">
+<button class="w-full bg-[#0F62FE]/10 text-[#0F62FE] font-bold text-xs py-3 rounded-xl tracking-wider hover:bg-[#0F62FE]/20 transition-all mb-4">
+                DEPLOY FIRMWARE UPDATE
+            </button>
+<a class="flex items-center gap-3 px-4 py-2 text-[#B4C5FF]/50 hover:text-white transition-all" href="#">
+<span class="material-symbols-outlined text-lg">help</span>
+<span class="text-xs font-medium">Help Center</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-[#B4C5FF]/50 hover:text-white transition-all" href="#">
+<span class="material-symbols-outlined text-lg">logout</span>
+<span class="text-xs font-medium">Log Out</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-64 flex flex-col h-screen overflow-y-auto tonal-sectioning">
+<!-- Top Bar -->
+<header class="flex justify-between items-center px-8 py-4 w-full h-16 bg-[#101319] border-b border-[#272A31] sticky top-0 z-40">
+<div class="flex items-center gap-8">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#B4C5FF]/40 text-lg">search</span>
+<input class="bg-[#1D2026] border-none rounded-full py-2 pl-10 pr-6 text-sm text-on-surface placeholder:text-[#B4C5FF]/30 w-64 focus:ring-1 focus:ring-[#0F62FE]" placeholder="Search security protocols..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-[#B4C5FF]/60 hover:text-[#B4C5FF] transition-colors duration-300 text-sm font-medium" href="#">General</a>
+<a class="text-[#0F62FE] border-b-2 border-[#0F62FE] pb-1 text-sm font-medium" href="#">Settings</a>
+<a class="text-[#B4C5FF]/60 hover:text-[#B4C5FF] transition-colors duration-300 text-sm font-medium" href="#">Security</a>
+</nav>
+<div class="flex items-center gap-4 ml-4 pl-4 border-l border-[#272A31]">
+<span class="material-symbols-outlined text-[#B4C5FF]/60 hover:text-white cursor-pointer transition-all">notifications</span>
+<span class="material-symbols-outlined text-[#B4C5FF]/60 hover:text-white cursor-pointer transition-all">settings</span>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-[#0F62FE]/30">
+<img alt="Security Administrator Profile" data-alt="Security Administrator Profile close-up portrait of a man with focused expression in professional tech environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBnI7LoJ2dLHpdNrwVY9GwHR2oZIxnyoCnLnPRWTLCNWUBb7_YCf9jDHNDdxJZ7oyzdwylCzHSAhZvGvH02GgZrYoU1w-YRXZYjNCekae596y-TYko1-94VukC8L_PWZKa6ZKQY5gm8Womt8lD_pq6nP-Ju_skJWyAWVfdraZeigtXATQDgFTdtfuISYQSTPiI4awQzr3C8tAoP8qTL3o6n6E6dGmsOO9AMxXXLq6F5aiqm8PrU8IaldZoW-hJsHwjKJcs541YDxgfM"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Content Canvas -->
+<div class="p-10 max-w-7xl w-full mx-auto">
+<!-- Page Header -->
+<div class="mb-12">
+<h2 class="text-5xl font-black text-on-surface tracking-tighter mb-2">SYSTEM CONFIG</h2>
+<p class="text-primary font-medium tracking-wide">Sentinel Mainframe Core v2.4.0</p>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-12 gap-6">
+<!-- Access Management Card (Large) -->
+<div class="col-span-12 lg:col-span-8 bg-surface-container rounded-3xl p-8 border border-outline-variant/10 shadow-xl">
+<div class="flex justify-between items-start mb-10">
+<div>
+<h3 class="text-2xl font-bold text-on-surface mb-1">Access Management</h3>
+<p class="text-on-surface-variant text-sm font-label">Configure authentication tiers and biometrics</p>
+</div>
+<span class="material-symbols-outlined text-primary-container text-4xl" data-weight="fill">shield_person</span>
+</div>
+<div class="space-y-6">
+<div class="flex items-center justify-between p-4 bg-surface-container-high rounded-2xl group hover:bg-surface-container-highest transition-colors cursor-pointer">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-xl bg-primary-container/20 flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined">fingerprint</span>
+</div>
+<div>
+<h4 class="text-on-surface font-semibold">Biometric Override</h4>
+<p class="text-xs text-on-surface-variant">Require multi-factor for critical entry</p>
+</div>
+</div>
+<div class="w-12 h-6 bg-primary-container rounded-full relative p-1 flex items-center justify-end">
+<div class="w-4 h-4 bg-white rounded-full"></div>
+</div>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container-high rounded-2xl group hover:bg-surface-container-highest transition-colors cursor-pointer">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-xl bg-tertiary-container/20 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined">key_visualizer</span>
+</div>
+<div>
+<h4 class="text-on-surface font-semibold">Temporal Constraints</h4>
+<p class="text-xs text-on-surface-variant">Restrict access during specific cycles</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container-high rounded-2xl group hover:bg-surface-container-highest transition-colors cursor-pointer">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-xl bg-secondary-container/20 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined">emergency_home</span>
+</div>
+<div>
+<h4 class="text-on-surface font-semibold">Emergency Threshold</h4>
+<p class="text-xs text-on-surface-variant">Lockdown protocols and silent alarm triggers</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+</div>
+</div>
+</div>
+<!-- System Health Chip (Small) -->
+<div class="col-span-12 lg:col-span-4 space-y-6">
+<div class="bg-surface-container-high rounded-3xl p-8 border-l-4 border-primary">
+<div class="flex items-center justify-between mb-4">
+<span class="text-xs font-bold uppercase tracking-widest text-primary">Status</span>
+<span class="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_#0F62FE]"></span>
+</div>
+<h3 class="text-4xl font-black text-on-surface mb-2">98.2%</h3>
+<p class="text-sm text-on-surface-variant font-label">Encryption Integrity</p>
+</div>
+<div class="bg-surface-container-high rounded-3xl p-8 overflow-hidden relative group">
+<div class="absolute inset-0 bg-gradient-to-br from-primary-container/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<h3 class="text-lg font-bold text-on-surface mb-4">Quick Actions</h3>
+<div class="grid grid-cols-2 gap-3">
+<button class="p-4 bg-surface-container-highest rounded-xl text-center hover:bg-primary-container hover:text-white transition-all">
+<span class="material-symbols-outlined block mb-1">lock_reset</span>
+<span class="text-[10px] font-bold uppercase">Reset</span>
+</button>
+<button class="p-4 bg-surface-container-highest rounded-xl text-center hover:bg-primary-container hover:text-white transition-all">
+<span class="material-symbols-outlined block mb-1">sync_alt</span>
+<span class="text-[10px] font-bold uppercase">Sync</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Notification Stream (Wide/Detailed) -->
+<div class="col-span-12 lg:col-span-12 bg-surface-container rounded-3xl p-8 border border-outline-variant/10">
+<div class="flex items-center justify-between mb-8">
+<div>
+<h3 class="text-2xl font-bold text-on-surface">Notification Stream</h3>
+<p class="text-on-surface-variant text-sm font-label">Telemetry and security event routing</p>
+</div>
+<div class="flex gap-2">
+<span class="px-4 py-1.5 rounded-full bg-primary-container text-on-primary-container text-xs font-bold">ALL EVENTS</span>
+<span class="px-4 py-1.5 rounded-full bg-surface-container-highest text-on-surface-variant text-xs font-bold hover:text-on-surface cursor-pointer">CRITICAL ONLY</span>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-separate border-spacing-y-3">
+<thead>
+<tr class="text-on-surface-variant text-[10px] uppercase tracking-widest font-black">
+<th class="pb-4 px-4">Event Type</th>
+<th class="pb-4">Origin</th>
+<th class="pb-4 text-center">Protocol</th>
+<th class="pb-4 text-right px-4">Last Modified</th>
+</tr>
+</thead>
+<tbody>
+<tr class="bg-surface-container-low group hover:bg-surface-container-high transition-all">
+<td class="py-5 px-4 rounded-l-2xl">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-tertiary"></div>
+<span class="font-semibold text-sm">Failed Auth Spike</span>
+</div>
+</td>
+<td class="text-on-surface-variant text-sm font-label">North Perimeter Gate</td>
+<td class="text-center">
+<span class="px-3 py-1 bg-surface-container-highest rounded text-[10px] font-bold uppercase">Push-Alert</span>
+</td>
+<td class="text-right px-4 rounded-r-2xl text-on-surface-variant text-xs">2 mins ago</td>
+</tr>
+<tr class="bg-surface-container-low group hover:bg-surface-container-high transition-all">
+<td class="py-5 px-4 rounded-l-2xl">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<span class="font-semibold text-sm">Firmware Verification</span>
+</div>
+</td>
+<td class="text-on-surface-variant text-sm font-label">System Kernel</td>
+<td class="text-center">
+<span class="px-3 py-1 bg-surface-container-highest rounded text-[10px] font-bold uppercase">Silent-Log</span>
+</td>
+<td class="text-right px-4 rounded-r-2xl text-on-surface-variant text-xs">15 mins ago</td>
+</tr>
+<tr class="bg-surface-container-low group hover:bg-surface-container-high transition-all">
+<td class="py-5 px-4 rounded-l-2xl">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<span class="font-semibold text-sm">New Admin Access</span>
+</div>
+</td>
+<td class="text-on-surface-variant text-sm font-label">Encrypted Terminal 04</td>
+<td class="text-center">
+<span class="px-3 py-1 bg-surface-container-highest rounded text-[10px] font-bold uppercase">Email-High</span>
+</td>
+<td class="text-right px-4 rounded-r-2xl text-on-surface-variant text-xs">1 hour ago</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Threshold Configuration (Grid Cell) -->
+<div class="col-span-12 lg:col-span-12">
+<div class="bg-surface-container-low p-8 rounded-3xl flex flex-col md:flex-row gap-12 border border-outline-variant/10 items-center">
+<div class="flex-1">
+<h3 class="text-2xl font-bold text-on-surface mb-2">Threshold Configuration</h3>
+<p class="text-on-surface-variant text-sm mb-8 leading-relaxed max-w-md">Fine-tune the sensitivity of motion sensors and entry-failure triggers. Over-optimization may result in latent detection delays.</p>
+<div class="space-y-8">
+<div class="space-y-4">
+<div class="flex justify-between text-xs font-bold uppercase tracking-widest text-primary">
+<span>Detection Sensitivity</span>
+<span>75%</span>
+</div>
+<div class="h-2 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary-container w-3/4 rounded-full shadow-[0_0_12px_#0F62FE]"></div>
+</div>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between text-xs font-bold uppercase tracking-widest text-on-surface-variant">
+<span>Attempt Lockout Limit</span>
+<span>3 Trials</span>
+</div>
+<div class="h-2 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-1/3 rounded-full"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="w-full md:w-80 h-80 rounded-2xl overflow-hidden shadow-2xl grayscale group hover:grayscale-0 transition-all duration-700">
+<img class="w-full h-full object-cover" data-alt="Close up high-tech security smart lock mechanism with blue illuminated light accents in dark industrial setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8kHLRXmq3qhxzfO4h_g1aAllP-F478PNZMlasOlesvCzr5xVAny2JFvRGWbg3brY0O9gIZrizQes-BKaXBZ2CIWBcUgKunJGax-bcxfKlnGJun9hVAY6oS6FZu560_M1AGbfywfPAvTTt1l3IKH2ZzpzJh5UAGLoynGq5qCirckFw_Co0N1Ibmpej0vr3fRryI0HMU6eAJo3k7vaCxPToEvcICFpd5l-YyaBgf0U2LAg_b_opGY8i8utp38oX-aL8Hng46oq-p3r7"/>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Action Footer -->
+<div class="mt-16 flex justify-end gap-4 pb-12">
+<button class="px-8 py-4 bg-surface-container-high text-on-surface font-bold rounded-xl hover:bg-surface-container-highest transition-all">DISCARD CHANGES</button>
+<button class="px-8 py-4 bg-gradient-to-br from-primary-container to-primary text-white font-black rounded-xl shadow-[0_24px_48px_rgba(15,98,254,0.15)] hover:scale-[1.02] transition-all">COMMIT PROTOCOLS</button>
+</div>
+</div>
+</main>
+<!-- Floating Security Modal (Contextual) -->
+<div class="fixed bottom-8 right-8 z-[60] bg-surface glass-panel p-6 rounded-3xl border border-primary/20 shadow-[0_24px_48px_rgba(15,98,254,0.2)] max-w-xs">
+<div class="flex items-center gap-4 mb-4">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-white">
+<span class="material-symbols-outlined">security</span>
+</div>
+<div>
+<p class="text-xs font-black uppercase text-primary">Active Protection</p>
+<p class="text-[10px] text-on-surface-variant">Last checked 4s ago</p>
+</div>
+</div>
+<p class="text-sm text-on-surface mb-4">Encryption keys are scheduled for rotation in <span class="font-bold text-primary">02:44:12</span>.</p>
+<button class="w-full py-2 bg-surface-container-highest rounded-xl text-xs font-bold text-on-surface hover:text-primary transition-all">ROTATE NOW</button>
+</div>
+</body></html>

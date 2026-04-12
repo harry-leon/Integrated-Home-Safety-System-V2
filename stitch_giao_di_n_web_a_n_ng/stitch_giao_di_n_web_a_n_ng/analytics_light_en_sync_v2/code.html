@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SENTINEL | Analytics Hub</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-low": "#f1f3f9",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-container": "#390c00",
+                        "on-surface-variant": "#424656",
+                        "secondary-fixed": "#dbe1ff",
+                        "on-secondary": "#ffffff",
+                        "primary-container": "#0f62fe",
+                        "on-background": "#101319",
+                        "background": "#f8f9fc",
+                        "outline": "#8c90a2",
+                        "surface": "#ffffff",
+                        "on-primary-container": "#ffffff",
+                        "on-secondary-fixed-variant": "#2a4387",
+                        "error": "#ba1a1a",
+                        "on-error-container": "#410002",
+                        "surface-container-high": "#e1e2eb",
+                        "on-secondary-fixed": "#00174c",
+                        "surface-container": "#f1f3f9",
+                        "surface-container-highest": "#dbe1ff",
+                        "secondary": "#2d458a",
+                        "surface-bright": "#ffffff",
+                        "outline-variant": "#c3c6d8",
+                        "surface-tint": "#0f62fe",
+                        "inverse-on-surface": "#f1f3f9",
+                        "on-error": "#ffffff",
+                        "surface-dim": "#dbe1ff",
+                        "on-primary-fixed-variant": "#003da9",
+                        "surface-variant": "#e1e2eb",
+                        "on-primary": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed": "#dbe1ff",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed-dim": "#ffb59d",
+                        "tertiary-container": "#ffdbd0",
+                        "inverse-primary": "#b4c5ff",
+                        "secondary-container": "#dbe1ff",
+                        "primary": "#0f62fe",
+                        "on-surface": "#101319",
+                        "secondary-fixed-dim": "#b4c5ff",
+                        "tertiary-fixed": "#ffdbd0",
+                        "tertiary": "#c84000",
+                        "inverse-surface": "#2e3037",
+                        "on-tertiary-fixed-variant": "#832700",
+                        "on-secondary-container": "#00174c",
+                        "on-primary-fixed": "#00174c",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "on-tertiary-fixed": "#390c00"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Manrope"],
+                        "label": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+        }
+        .bg-primary-gradient {
+            background: linear-gradient(135deg, #0f62fe 0%, #b4c5ff 100%);
+        }
+        .scale-98-on-click-transition-300ms:active {
+            transform: scale(0.98);
+            transition: transform 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body selection:bg-primary-fixed selection:text-on-primary-fixed overflow-x-hidden">
+<!-- SideNavBar Anchor -->
+<aside class="h-screen w-72 left-0 top-0 fixed border-r border-outline-variant/20 bg-[#ffffff] flex flex-col py-8 px-6 space-y-4 z-40 hidden md:flex">
+<div class="mb-8 px-2">
+<h1 class="text-primary font-headline font-extrabold tracking-tighter text-2xl">SENTINEL</h1>
+<p class="text-[10px] font-headline uppercase tracking-[0.2em] text-outline font-bold mt-1">Security Hub</p>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center gap-4 px-4 py-3 rounded-full text-slate-400 hover:bg-surface-container transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">dashboard</span>
+<span class="font-headline text-sm uppercase tracking-widest">Dashboard</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-full text-slate-400 hover:bg-surface-container transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">settings_remote</span>
+<span class="font-headline text-sm uppercase tracking-widest">Remote Control</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-full text-slate-400 hover:bg-surface-container transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">fingerprint</span>
+<span class="font-headline text-sm uppercase tracking-widest">Fingerprints</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-full text-slate-400 hover:bg-surface-container transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">receipt_long</span>
+<span class="font-headline text-sm uppercase tracking-widest">Logs</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-full bg-primary/10 text-primary border-r-4 border-primary font-bold" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">analytics</span>
+<span class="font-headline text-sm uppercase tracking-widest">Analytics</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-full text-slate-400 hover:bg-surface-container transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">settings</span>
+<span class="font-headline text-sm uppercase tracking-widest">Settings</span>
+</a>
+</nav>
+<div class="pt-8 border-t border-outline-variant/10 space-y-2">
+<a class="flex items-center gap-4 px-4 py-2 text-slate-400 hover:text-on-surface" href="#">
+<span class="material-symbols-outlined text-sm">help</span>
+<span class="font-headline text-[11px] uppercase tracking-widest">Support</span>
+</a>
+<div class="flex items-center gap-4 px-4 py-2 text-primary">
+<span class="material-symbols-outlined text-sm">check_circle</span>
+<span class="font-headline text-[11px] uppercase tracking-widest">System Status</span>
+</div>
+</div>
+</aside>
+<!-- TopNavBar Anchor -->
+<header class="fixed top-0 w-full z-30 bg-surface/70 backdrop-blur-xl h-20 flex justify-between items-center px-8 shadow-[0px_24px_48px_rgba(15,98,254,0.05)] md:pl-80">
+<div class="flex items-center gap-8">
+<h2 class="font-headline text-xl font-bold tracking-tight text-primary">Analytics Engine</h2>
+<div class="hidden lg:flex items-center gap-6">
+<a class="text-outline hover:text-primary font-medium font-headline tracking-tight transition-colors" href="#">Real-time</a>
+<a class="text-primary font-bold border-b-2 border-primary font-headline tracking-tight" href="#">Intelligence</a>
+<a class="text-outline hover:text-primary font-medium font-headline tracking-tight transition-colors" href="#">Archives</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container rounded-full transition-all scale-98-on-click-transition-300ms">
+<span class="material-symbols-outlined">language</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container rounded-full transition-all scale-98-on-click-transition-300ms">
+<span class="material-symbols-outlined">dark_mode</span>
+</button>
+<div class="h-10 w-10 rounded-full bg-surface-container-highest flex items-center justify-center overflow-hidden border-2 border-white shadow-sm">
+<img class="w-full h-full object-cover" data-alt="professional headshot of a cybersecurity analyst in a minimalist office setting with soft natural light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuATDsDdknJJM4fQ6VDn6xkHxjh-Yx4U8cwEHZI27S98HBGMHZEAiVAihz-_LTBF74cTLfTt_cXD1bgL0Q3X-IQ2kmHuMiep0JJ5Yj_7oS2RlkCmToQPXH2BtzbjvRnZ6CrfF2-BCe_xVF8B-KODfiUKyfZUF7uXe247vBj-hRyYzy_z8MWBJvhBxRyOxf6xA8Af5C9wdKoCP7-kYzqh0Jf01w_ajochTaWP6FFnrRGiyctI0dEHKYsQ0w0Vw_C-feRSJQzsbU2ffX14"/>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="pt-28 pb-12 px-8 md:pl-80 max-w-[1600px] mx-auto min-h-screen">
+<!-- Security Health Overview - Bento Header -->
+<section class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-10">
+<div class="lg:col-span-2 bg-primary-gradient rounded-full p-8 text-white relative overflow-hidden group">
+<div class="relative z-10">
+<p class="text-white/70 font-headline font-semibold text-xs uppercase tracking-[0.2em] mb-2">Current Status</p>
+<h3 class="font-headline text-5xl font-extrabold tracking-tighter mb-4">SYSTEM OPTIMAL</h3>
+<div class="flex items-center gap-6">
+<div>
+<p class="text-white/60 text-[10px] font-label uppercase font-bold">Uptime</p>
+<p class="font-headline text-xl font-bold">99.98%</p>
+</div>
+<div class="w-px h-8 bg-white/20"></div>
+<div>
+<p class="text-white/60 text-[10px] font-label uppercase font-bold">Latency</p>
+<p class="font-headline text-xl font-bold">14ms</p>
+</div>
+</div>
+</div>
+<div class="absolute -right-10 -bottom-10 opacity-20 group-hover:scale-110 transition-transform duration-700">
+<span class="material-symbols-outlined text-[200px]" style="font-variation-settings: 'FILL' 1;">shield</span>
+</div>
+</div>
+<div class="bg-surface rounded-full p-8 shadow-[0px_12px_24px_rgba(0,0,0,0.02)] border border-outline-variant/10 flex flex-col justify-between">
+<div>
+<p class="text-outline font-headline font-semibold text-xs uppercase tracking-[0.2em] mb-1">Threats Blocked</p>
+<h4 class="font-headline text-4xl font-bold text-on-surface">1,284</h4>
+</div>
+<div class="flex items-center gap-2 text-primary font-bold text-sm">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+<span>12% from last week</span>
+</div>
+</div>
+<div class="bg-surface rounded-full p-8 shadow-[0px_12px_24px_rgba(0,0,0,0.02)] border border-outline-variant/10 flex flex-col justify-between">
+<div>
+<p class="text-outline font-headline font-semibold text-xs uppercase tracking-[0.2em] mb-1">Response Avg</p>
+<h4 class="font-headline text-4xl font-bold text-on-surface">0.8s</h4>
+</div>
+<div class="flex items-center gap-2 text-tertiary font-bold text-sm">
+<span class="material-symbols-outlined text-sm">bolt</span>
+<span>High Efficiency</span>
+</div>
+</div>
+</section>
+<!-- Analytics Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Entry Statistics - Confidence Chart Area -->
+<div class="lg:col-span-8 space-y-8">
+<div class="bg-surface-container rounded-full p-10 relative overflow-hidden group">
+<div class="flex justify-between items-start mb-12">
+<div>
+<h3 class="font-headline text-2xl font-bold text-on-surface tracking-tight">Entry Statistics</h3>
+<p class="text-on-surface-variant font-label text-sm mt-1">Biometric recognition success rate over 24h</p>
+</div>
+<div class="bg-primary px-6 py-2 rounded-full text-white font-bold text-sm">
+                            88% Confidence
+                        </div>
+</div>
+<div class="h-64 flex items-end gap-3 px-2">
+<!-- Abstract Line Chart Visualization -->
+<div class="flex-1 bg-primary/10 rounded-t-xl h-[40%] group-hover:h-[45%] transition-all duration-500 relative">
+<div class="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary border-2 border-white"></div>
+</div>
+<div class="flex-1 bg-primary/15 rounded-t-xl h-[55%] group-hover:h-[60%] transition-all duration-500 relative">
+<div class="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary border-2 border-white"></div>
+</div>
+<div class="flex-1 bg-primary/20 rounded-t-xl h-[75%] group-hover:h-[80%] transition-all duration-500 relative">
+<div class="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary border-2 border-white"></div>
+</div>
+<div class="flex-1 bg-primary/25 rounded-t-xl h-[65%] group-hover:h-[70%] transition-all duration-500 relative">
+<div class="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary border-2 border-white"></div>
+</div>
+<div class="flex-1 bg-primary/30 rounded-t-xl h-[85%] group-hover:h-[90%] transition-all duration-500 relative">
+<div class="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary border-2 border-white"></div>
+</div>
+<div class="flex-1 bg-primary/20 rounded-t-xl h-[70%] group-hover:h-[75%] transition-all duration-500 relative">
+<div class="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary border-2 border-white"></div>
+</div>
+<div class="flex-1 bg-primary/40 rounded-t-xl h-[95%] group-hover:h-[100%] transition-all duration-500 relative">
+<div class="absolute -top-1 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-primary border-2 border-white ring-4 ring-primary/20"></div>
+</div>
+<div class="flex-1 bg-primary/30 rounded-t-xl h-[80%] group-hover:h-[85%] transition-all duration-500 relative">
+<div class="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary border-2 border-white"></div>
+</div>
+</div>
+<div class="flex justify-between mt-6 px-4">
+<span class="text-xs font-label text-outline font-bold">00:00</span>
+<span class="text-xs font-label text-outline font-bold">06:00</span>
+<span class="text-xs font-label text-outline font-bold">12:00</span>
+<span class="text-xs font-label text-outline font-bold">18:00</span>
+<span class="text-xs font-label text-outline font-bold">NOW</span>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Ambient Gas Analysis -->
+<div class="bg-surface p-8 rounded-full shadow-[0px_12px_24px_rgba(0,0,0,0.02)] border border-outline-variant/10">
+<div class="flex items-center gap-4 mb-8">
+<div class="w-12 h-12 rounded-full bg-tertiary/10 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined">air</span>
+</div>
+<div>
+<h4 class="font-headline font-bold text-on-surface">Ambient Gas</h4>
+<p class="text-xs text-outline font-label">Air Quality Index</p>
+</div>
+</div>
+<div class="space-y-4">
+<div class="space-y-1">
+<div class="flex justify-between text-xs font-bold font-label uppercase">
+<span class="text-on-surface-variant">Carbon Monoxide</span>
+<span class="text-primary">2.4ppm</span>
+</div>
+<div class="h-2 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 25%"></div>
+</div>
+</div>
+<div class="space-y-1">
+<div class="flex justify-between text-xs font-bold font-label uppercase">
+<span class="text-on-surface-variant">Methane</span>
+<span class="text-primary">0.0ppm</span>
+</div>
+<div class="h-2 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 5%"></div>
+</div>
+</div>
+<div class="space-y-1">
+<div class="flex justify-between text-xs font-bold font-label uppercase">
+<span class="text-on-surface-variant">LPG</span>
+<span class="text-tertiary">1.2ppm</span>
+</div>
+<div class="h-2 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-tertiary rounded-full" style="width: 45%"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- PIR Sensor Heatmap -->
+<div class="bg-surface p-8 rounded-full shadow-[0px_12px_24px_rgba(0,0,0,0.02)] border border-outline-variant/10">
+<div class="flex items-center gap-4 mb-6">
+<div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">sensors</span>
+</div>
+<div>
+<h4 class="font-headline font-bold text-on-surface">PIR Activity</h4>
+<p class="text-xs text-outline font-label">Zonal movement heatmap</p>
+</div>
+</div>
+<div class="grid grid-cols-4 grid-rows-3 gap-2">
+<div class="aspect-square bg-primary/10 rounded-lg"></div>
+<div class="aspect-square bg-primary/40 rounded-lg"></div>
+<div class="aspect-square bg-primary/20 rounded-lg"></div>
+<div class="aspect-square bg-primary/60 rounded-lg"></div>
+<div class="aspect-square bg-primary/80 rounded-lg"></div>
+<div class="aspect-square bg-primary rounded-lg"></div>
+<div class="aspect-square bg-primary/10 rounded-lg"></div>
+<div class="aspect-square bg-primary/30 rounded-lg"></div>
+<div class="aspect-square bg-primary/50 rounded-lg"></div>
+<div class="aspect-square bg-primary/10 rounded-lg"></div>
+<div class="aspect-square bg-primary/20 rounded-lg"></div>
+<div class="aspect-square bg-primary/5 rounded-lg"></div>
+</div>
+<p class="mt-4 text-[10px] text-outline font-bold text-center uppercase tracking-widest">Main Lobby High Activity Area</p>
+</div>
+</div>
+</div>
+<!-- Incident Report List -->
+<div class="lg:col-span-4">
+<div class="bg-surface rounded-[2rem] p-8 shadow-[0px_32px_64px_rgba(0,0,0,0.04)] border border-outline-variant/10 h-full">
+<div class="flex items-center justify-between mb-10">
+<h3 class="font-headline text-xl font-bold text-on-surface">Security Incidents</h3>
+<span class="material-symbols-outlined text-outline">more_vert</span>
+</div>
+<div class="space-y-6">
+<!-- Incident Item -->
+<div class="flex gap-4 group">
+<div class="flex-shrink-0 mt-1">
+<div class="w-2 h-2 rounded-full bg-error ring-4 ring-error/10"></div>
+</div>
+<div class="flex-1 pb-6 border-b border-outline-variant/5">
+<div class="flex justify-between items-start mb-1">
+<p class="font-headline font-bold text-on-surface text-sm">Unrecognized Access Attempt</p>
+<span class="text-[10px] font-label text-outline uppercase font-bold">14:22</span>
+</div>
+<p class="text-xs text-on-surface-variant mb-3 leading-relaxed">Side entrance (Zone B) detected 3 failed face recognitions.</p>
+<div class="flex gap-2">
+<span class="px-3 py-1 bg-error-container text-on-error-container text-[10px] font-bold rounded-full uppercase">High Alert</span>
+<button class="text-[10px] font-bold text-primary hover:underline">Review Footage</button>
+</div>
+</div>
+</div>
+<!-- Incident Item -->
+<div class="flex gap-4 group">
+<div class="flex-shrink-0 mt-1">
+<div class="w-2 h-2 rounded-full bg-tertiary ring-4 ring-tertiary/10"></div>
+</div>
+<div class="flex-1 pb-6 border-b border-outline-variant/5">
+<div class="flex justify-between items-start mb-1">
+<p class="font-headline font-bold text-on-surface text-sm">Low Battery Warning</p>
+<span class="text-[10px] font-label text-outline uppercase font-bold">11:05</span>
+</div>
+<p class="text-xs text-on-surface-variant mb-3 leading-relaxed">PIR Sensor #12 at 15% capacity. Replacement advised.</p>
+<div class="flex gap-2">
+<span class="px-3 py-1 bg-tertiary-container text-on-tertiary-container text-[10px] font-bold rounded-full uppercase">Maintenance</span>
+</div>
+</div>
+</div>
+<!-- Incident Item -->
+<div class="flex gap-4 group">
+<div class="flex-shrink-0 mt-1">
+<div class="w-2 h-2 rounded-full bg-primary ring-4 ring-primary/10"></div>
+</div>
+<div class="flex-1 pb-6 border-b border-outline-variant/5">
+<div class="flex justify-between items-start mb-1">
+<p class="font-headline font-bold text-on-surface text-sm">Auto-Lock Verified</p>
+<span class="text-[10px] font-label text-outline uppercase font-bold">09:00</span>
+</div>
+<p class="text-xs text-on-surface-variant mb-3 leading-relaxed">All external perimeter gates successfully locked at start of day shift.</p>
+<div class="flex gap-2">
+<span class="px-3 py-1 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded-full uppercase">Routine</span>
+</div>
+</div>
+</div>
+<!-- Incident Item -->
+<div class="flex gap-4 group">
+<div class="flex-shrink-0 mt-1">
+<div class="w-2 h-2 rounded-full bg-primary ring-4 ring-primary/10"></div>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-1">
+<p class="font-headline font-bold text-on-surface text-sm">Weekly Report Generated</p>
+<span class="text-[10px] font-label text-outline uppercase font-bold">08:30</span>
+</div>
+<p class="text-xs text-on-surface-variant mb-3 leading-relaxed">System diagnostics complete. Intelligence summary ready.</p>
+<button class="flex items-center gap-2 text-[10px] font-bold text-primary hover:bg-primary/5 px-3 py-1 rounded-full border border-primary/20 transition-all">
+<span class="material-symbols-outlined text-[14px]">download</span>
+<span>Download PDF</span>
+</button>
+</div>
+</div>
+</div>
+<button class="w-full mt-10 py-4 rounded-full border-2 border-primary/10 text-primary font-bold font-headline text-sm hover:bg-primary/5 transition-all scale-98-on-click-transition-300ms">
+                        View Full History
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Nav for Mobile -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-xl border-t border-outline-variant/10 px-6 py-4 flex justify-between items-center z-50">
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">settings_remote</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">analytics</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">settings</span>
+</a>
+</nav>
+</body></html>

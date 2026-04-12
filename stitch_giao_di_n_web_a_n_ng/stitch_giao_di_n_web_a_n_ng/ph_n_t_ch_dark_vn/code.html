@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SENTINEL | Phân tích Hệ thống</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed": "#390c00",
+                        "background": "#101319",
+                        "inverse-surface": "#e1e2eb",
+                        "secondary-container": "#2d458a",
+                        "tertiary-container": "#c84000",
+                        "surface": "#101319",
+                        "inverse-on-surface": "#2e3037",
+                        "primary-fixed": "#dbe1ff",
+                        "on-background": "#e1e2eb",
+                        "on-tertiary-container": "#fff1ed",
+                        "secondary-fixed-dim": "#b4c5ff",
+                        "surface-tint": "#b4c5ff",
+                        "surface-container": "#1d2026",
+                        "on-error-container": "#ffdad6",
+                        "outline-variant": "#424656",
+                        "outline": "#8c90a2",
+                        "tertiary-fixed-dim": "#ffb59d",
+                        "surface-container-highest": "#32353c",
+                        "on-tertiary-fixed-variant": "#832700",
+                        "tertiary": "#ffb59d",
+                        "tertiary-fixed": "#ffdbd0",
+                        "on-surface-variant": "#c3c6d8",
+                        "on-primary-fixed": "#00174c",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "on-secondary-fixed-variant": "#2a4387",
+                        "error-container": "#93000a",
+                        "surface-container-low": "#191c22",
+                        "surface-bright": "#363940",
+                        "surface-dim": "#101319",
+                        "secondary": "#b4c5ff",
+                        "surface-variant": "#32353c",
+                        "on-primary": "#002979",
+                        "surface-container-high": "#272a31",
+                        "surface-container-lowest": "#0b0e14",
+                        "on-error": "#690005",
+                        "on-secondary": "#0e2b6f",
+                        "on-primary-container": "#f3f3ff",
+                        "secondary-fixed": "#dbe1ff",
+                        "inverse-primary": "#0052dd",
+                        "primary": "#b4c5ff",
+                        "error": "#ffb4ab",
+                        "primary-container": "#0f62fe",
+                        "on-surface": "#e1e2eb",
+                        "on-tertiary": "#5d1900",
+                        "on-primary-fixed-variant": "#003da9",
+                        "on-secondary-fixed": "#00174c",
+                        "on-secondary-container": "#a0b6ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Manrope"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body">
+<!-- SideNavBar (Authority: JSON & Design System) -->
+<aside class="h-screen w-64 fixed left-0 top-0 bg-[#101319] flex flex-col py-6 px-4 z-50">
+<div class="flex items-center gap-3 mb-10 px-2">
+<div class="w-8 h-8 rounded-lg bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-sm" style="font-variation-settings: 'FILL' 1;">shield</span>
+</div>
+<div>
+<h1 class="text-blue-600 font-bold font-headline tracking-tighter text-xl">SENTINEL</h1>
+<p class="text-[10px] text-slate-500 font-label tracking-widest uppercase">v2.4.0 Precision</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white hover:bg-[#1D2026] transition-all duration-300 font-medium text-sm rounded-xl group" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white hover:bg-[#1D2026] transition-all duration-300 font-medium text-sm rounded-xl" href="#">
+<span class="material-symbols-outlined">settings_remote</span>
+<span>Remote Control</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white hover:bg-[#1D2026] transition-all duration-300 font-medium text-sm rounded-xl" href="#">
+<span class="material-symbols-outlined">fingerprint</span>
+<span>Fingerprints</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white hover:bg-[#1D2026] transition-all duration-300 font-medium text-sm rounded-xl" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<span>Logs</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-blue-500 dark:text-blue-400 font-bold border-r-2 border-blue-600 bg-[#1D2026] text-sm rounded-l-xl" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">insert_chart</span>
+<span>Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white hover:bg-[#1D2026] transition-all duration-300 font-medium text-sm rounded-xl" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span>Settings</span>
+</a>
+</nav>
+<div class="mt-auto space-y-4">
+<button class="w-full py-3 px-4 rounded-xl bg-error-container text-on-error-container font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-sm">lock_person</span>
+                Emergency Lockout
+            </button>
+<div class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-400 hover:text-white transition-colors text-sm" href="#">
+<span class="material-symbols-outlined text-lg">help_outline</span>
+<span>Support</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-400 hover:text-white transition-colors text-sm" href="#">
+<span class="material-symbols-outlined text-lg">logout</span>
+<span>Sign Out</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="pl-64 min-h-screen">
+<!-- TopAppBar (Authority: JSON & Design System) -->
+<header class="w-full sticky top-0 z-40 bg-[#101319]/70 backdrop-blur-xl flex items-center justify-between px-8 h-16">
+<div class="flex items-center bg-surface-container-high rounded-full px-4 py-1.5 w-96">
+<span class="material-symbols-outlined text-on-surface-variant text-lg">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-full text-on-surface ml-2 placeholder:text-on-surface-variant/50" placeholder="Tìm kiếm dữ liệu phân tích..." type="text"/>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-4 text-slate-500">
+<button class="hover:bg-slate-800/50 p-2 rounded-full transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="hover:bg-slate-800/50 p-2 rounded-full transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined">language</span>
+</button>
+<button class="hover:bg-slate-800/50 p-2 rounded-full transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined">dark_mode</span>
+</button>
+</div>
+<div class="flex items-center gap-3 pl-6 border-l border-outline-variant/20">
+<div class="text-right">
+<p class="text-xs font-bold text-on-surface">Admin</p>
+<p class="text-[10px] text-primary">Sentinel Admin</p>
+</div>
+<img alt="Administrator Profile" class="w-8 h-8 rounded-full border border-primary/20" data-alt="close up headshot of a professional man with clean grooming and a confident expression in a tech office environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCUOj6ldDvTUk1QO5aTYXIjsxZvF6qXDIZegLRa42F5Fp9viCqVxXLO-HOrPcjb03PHrvBT7_Ps5BbeVlCF9RGEBF1H9ky_TV5Nr7d_GpB2cAQISDCGwPUNgVB8o_wk7ZAAaPfqoB-lgRk1-hvghlomzSTzilIeIWHIT8l5-Yl2TJ3hOeOffNV_tMVkmrL4LvfAXZFaBcPuJlBlUlyGP02IywO6NNo6yLP1eFT0bnFzOOLDtJBKVxP6O9Do1JHQl06RuUtyvOmPYPls"/>
+</div>
+</div>
+</header>
+<!-- Analytics Content -->
+<div class="p-8 space-y-8">
+<!-- Page Heading (Editorial Style) -->
+<div class="flex justify-between items-end">
+<div>
+<h2 class="text-4xl font-extrabold font-headline tracking-tighter text-on-surface uppercase">Phân Tích Hệ Thống</h2>
+<p class="text-on-surface-variant mt-2 font-medium opacity-80">Theo dõi độ chính xác và bảo mật của căn hộ trong thời gian thực.</p>
+</div>
+<div class="flex gap-2">
+<span class="px-4 py-2 rounded-full bg-surface-container-high text-xs font-bold text-on-surface hover:bg-surface-container-highest cursor-pointer transition-colors">7 Ngày Qua</span>
+<span class="px-4 py-2 rounded-full bg-primary-container text-xs font-bold text-on-primary-container cursor-pointer transition-colors">Xuất Báo Cáo</span>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-12 gap-6">
+<!-- Weekly Security Summary (Focus Typography) -->
+<div class="col-span-12 lg:col-span-4 bg-surface-container rounded-xl p-8 flex flex-col justify-between relative overflow-hidden">
+<div class="relative z-10">
+<h3 class="text-on-surface-variant text-xs font-bold tracking-widest uppercase mb-4">Tóm tắt hàng tuần</h3>
+<div class="space-y-6">
+<div>
+<p class="text-5xl font-extrabold font-headline text-primary tracking-tighter">98.4%</p>
+<p class="text-sm text-on-surface-variant mt-1">Chỉ số an toàn tổng thể</p>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<p class="text-xl font-bold text-on-surface">1,248</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-wider">Tổng lượt truy cập</p>
+</div>
+<div>
+<p class="text-xl font-bold text-tertiary">02</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-wider">Cảnh báo nghiêm trọng</p>
+</div>
+</div>
+</div>
+</div>
+<div class="absolute -right-10 -bottom-10 opacity-10">
+<span class="material-symbols-outlined text-[160px]" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+</div>
+</div>
+<!-- Access Stats (Comparison) -->
+<div class="col-span-12 lg:col-span-8 bg-surface-container rounded-xl p-8">
+<div class="flex justify-between items-start mb-8">
+<h3 class="text-on-surface-variant text-xs font-bold tracking-widest uppercase">Truy cập: Thành công vs Thất bại</h3>
+<div class="flex gap-4 items-center">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<span class="text-[10px] font-bold text-on-surface-variant">THÀNH CÔNG</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-error"></div>
+<span class="text-[10px] font-bold text-on-surface-variant">THẤT BẠI</span>
+</div>
+</div>
+</div>
+<!-- Mock Bar Chart using Flex -->
+<div class="h-40 flex items-end justify-between gap-3 px-2">
+<!-- Bar 1 -->
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full flex flex-col gap-1 items-center justify-end h-full">
+<div class="w-full bg-error/20 rounded-t-sm h-[5%] group-hover:bg-error transition-colors"></div>
+<div class="w-full bg-primary/40 rounded-t-sm h-[85%] group-hover:bg-primary transition-colors"></div>
+</div>
+<span class="text-[10px] font-label text-on-surface-variant">T2</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full flex flex-col gap-1 items-center justify-end h-full">
+<div class="w-full bg-error/20 rounded-t-sm h-[8%] group-hover:bg-error transition-colors"></div>
+<div class="w-full bg-primary/40 rounded-t-sm h-[75%] group-hover:bg-primary transition-colors"></div>
+</div>
+<span class="text-[10px] font-label text-on-surface-variant">T3</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full flex flex-col gap-1 items-center justify-end h-full">
+<div class="w-full bg-error/20 rounded-t-sm h-[3%] group-hover:bg-error transition-colors"></div>
+<div class="w-full bg-primary/40 rounded-t-sm h-[92%] group-hover:bg-primary transition-colors"></div>
+</div>
+<span class="text-[10px] font-label text-on-surface-variant">T4</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full flex flex-col gap-1 items-center justify-end h-full">
+<div class="w-full bg-error/20 rounded-t-sm h-[12%] group-hover:bg-error transition-colors"></div>
+<div class="w-full bg-primary/40 rounded-t-sm h-[60%] group-hover:bg-primary transition-colors"></div>
+</div>
+<span class="text-[10px] font-label text-on-surface-variant">T5</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full flex flex-col gap-1 items-center justify-end h-full">
+<div class="w-full bg-error/20 rounded-t-sm h-[4%] group-hover:bg-error transition-colors"></div>
+<div class="w-full bg-primary/40 rounded-t-sm h-[88%] group-hover:bg-primary transition-colors"></div>
+</div>
+<span class="text-[10px] font-label text-on-surface-variant">T6</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full flex flex-col gap-1 items-center justify-end h-full">
+<div class="w-full bg-error/20 rounded-t-sm h-[10%] group-hover:bg-error transition-colors"></div>
+<div class="w-full bg-primary/40 rounded-t-sm h-[40%] group-hover:bg-primary transition-colors"></div>
+</div>
+<span class="text-[10px] font-label text-on-surface-variant">T7</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full flex flex-col gap-1 items-center justify-end h-full">
+<div class="w-full bg-error/20 rounded-t-sm h-[2%] group-hover:bg-error transition-colors"></div>
+<div class="w-full bg-primary/40 rounded-t-sm h-[20%] group-hover:bg-primary transition-colors"></div>
+</div>
+<span class="text-[10px] font-label text-on-surface-variant">CN</span>
+</div>
+</div>
+</div>
+<!-- Environmental Monitoring (Gas & PIR) -->
+<div class="col-span-12 lg:col-span-7 bg-surface-container rounded-xl p-8">
+<div class="flex justify-between items-center mb-10">
+<div>
+<h3 class="text-on-surface-variant text-xs font-bold tracking-widest uppercase">Nồng độ Gas &amp; Kích hoạt PIR</h3>
+<p class="text-xs text-on-surface-variant/60 mt-1">Dữ liệu quan trắc 24 giờ qua</p>
+</div>
+<div class="flex items-center gap-2 bg-surface-container-high px-3 py-1.5 rounded-lg">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+<span class="text-xs font-bold text-on-surface">CẢNH BÁO: RÒ RỈ NHẸ</span>
+</div>
+</div>
+<!-- SVG Area Chart for Gas -->
+<div class="relative h-48 w-full">
+<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 800 200">
+<defs>
+<lineargradient id="gasGradient" x1="0%" x2="0%" y1="0%" y2="100%">
+<stop offset="0%" style="stop-color:var(--tw-gradient-from);stop-opacity:0.2"></stop>
+<stop offset="100%" style="stop-color:var(--tw-gradient-to);stop-opacity:0"></stop>
+</lineargradient>
+</defs>
+<path class="text-tertiary fill-current opacity-20" d="M0,150 Q100,140 200,160 T400,100 T600,120 T800,140 V200 H0 Z" fill="url(#gasGradient)"></path>
+<path d="M0,150 Q100,140 200,160 T400,100 T600,120 T800,140" fill="none" stroke="#ffb59d" stroke-linecap="round" stroke-width="3"></path>
+<!-- PIR Interaction Dots -->
+<circle cx="200" cy="160" fill="#b4c5ff" r="4"></circle>
+<circle cx="400" cy="100" fill="#b4c5ff" r="4"></circle>
+<circle cx="650" cy="125" fill="#b4c5ff" r="4"></circle>
+</svg>
+<!-- Chart Labels -->
+<div class="absolute inset-0 flex justify-between items-end pointer-events-none">
+<span class="text-[10px] text-on-surface-variant/40">00:00</span>
+<span class="text-[10px] text-on-surface-variant/40">06:00</span>
+<span class="text-[10px] text-on-surface-variant/40">12:00</span>
+<span class="text-[10px] text-on-surface-variant/40">18:00</span>
+<span class="text-[10px] text-on-surface-variant/40">23:59</span>
+</div>
+</div>
+<div class="mt-6 flex gap-8">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-tertiary">gas_meter</span>
+<div>
+<p class="text-xs text-on-surface-variant font-medium">Trung bình Gas</p>
+<p class="text-lg font-bold">12 ppm</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">motion_sensor_active</span>
+<div>
+<p class="text-xs text-on-surface-variant font-medium">Kích hoạt PIR</p>
+<p class="text-lg font-bold">42 Lần</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Incident Report (Asymmetric List) -->
+<div class="col-span-12 lg:col-span-5 bg-surface-container rounded-xl p-8">
+<h3 class="text-on-surface-variant text-xs font-bold tracking-widest uppercase mb-8">Báo cáo sự cố an ninh</h3>
+<div class="space-y-6">
+<!-- Incident Item -->
+<div class="relative pl-6 border-l-2 border-outline-variant/30 group">
+<div class="absolute -left-[5px] top-0 w-2 h-2 rounded-full bg-error group-hover:scale-125 transition-transform"></div>
+<div class="flex justify-between items-start">
+<div>
+<p class="text-sm font-bold text-on-surface">Cố gắng mở khóa bất hợp pháp</p>
+<p class="text-xs text-on-surface-variant/70 mt-1">Sảnh chính • 5 lần nhập sai mã</p>
+</div>
+<span class="text-[10px] font-label text-on-surface-variant/40">14:22</span>
+</div>
+</div>
+<div class="relative pl-6 border-l-2 border-outline-variant/30 group">
+<div class="absolute -left-[5px] top-0 w-2 h-2 rounded-full bg-tertiary group-hover:scale-125 transition-transform"></div>
+<div class="flex justify-between items-start">
+<div>
+<p class="text-sm font-bold text-on-surface">Pin yếu - Khóa cửa ban công</p>
+<p class="text-xs text-on-surface-variant/70 mt-1">Dưới 15% • Cần thay thế sớm</p>
+</div>
+<span class="text-[10px] font-label text-on-surface-variant/40">Hôm qua</span>
+</div>
+</div>
+<div class="relative pl-6 border-l-2 border-outline-variant/30 group">
+<div class="absolute -left-[5px] top-0 w-2 h-2 rounded-full bg-primary group-hover:scale-125 transition-transform"></div>
+<div class="flex justify-between items-start">
+<div>
+<p class="text-sm font-bold text-on-surface">Cập nhật phần mềm thành công</p>
+<p class="text-xs text-on-surface-variant/70 mt-1">Phiên bản 2.4.0 • Sentinel Core</p>
+</div>
+<span class="text-[10px] font-label text-on-surface-variant/40">12/10</span>
+</div>
+</div>
+<div class="pt-4 border-t border-outline-variant/10">
+<button class="text-xs font-bold text-primary flex items-center gap-2 hover:translate-x-1 transition-transform">
+                                XEM TOÀN BỘ LỊCH SỬ SỰ CỐ
+                                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer (Authority: JSON & Design System) -->
+<footer class="w-full py-4 mt-8 bg-[#101319] flex justify-between items-center px-8">
+<p class="font-inter text-xs tracking-wide text-slate-500 opacity-60">© 2024 Sentinel Security. Precision Transparency.</p>
+<div class="flex gap-6">
+<a class="font-inter text-xs tracking-wide text-slate-500 opacity-60 hover:opacity-100 transition-opacity underline" href="#">Privacy Policy</a>
+<a class="font-inter text-xs tracking-wide text-slate-500 opacity-60 hover:opacity-100 transition-opacity" href="#">Terms of Service</a>
+<a class="font-inter text-xs tracking-wide text-slate-500 opacity-60 hover:opacity-100 transition-opacity" href="#">API Docs</a>
+</div>
+</footer>
+</main>
+<!-- Contextual Tooltip (Aesthetic) -->
+<div class="fixed bottom-10 right-10 z-50">
+<button class="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-container to-primary flex items-center justify-center text-white shadow-[0px_24px_48px_rgba(15,98,254,0.08)] active:scale-95 transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">support_agent</span>
+</button>
+</div>
+</body></html>

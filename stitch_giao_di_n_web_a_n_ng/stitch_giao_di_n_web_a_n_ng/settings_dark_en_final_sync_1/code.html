@@ -1,0 +1,347 @@
+<html class="dark"><head>
+<meta charset="utf-8"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "primary-fixed-dim": "#b4c5ff",
+            "on-secondary-fixed-variant": "#2a4387",
+            "error": "#ffb4ab",
+            "primary-fixed": "#dbe1ff",
+            "on-secondary-container": "#a0b6ff",
+            "on-secondary-fixed": "#00174c",
+            "on-primary-container": "#f3f3ff",
+            "surface-container-high": "#272a31",
+            "inverse-surface": "#e1e2eb",
+            "outline-variant": "#424656",
+            "on-error-container": "#ffdad6",
+            "background": "#101319",
+            "primary-container": "#0f62fe",
+            "tertiary-fixed": "#ffdbd0",
+            "primary": "#b4c5ff",
+            "on-secondary": "#0e2b6f",
+            "surface-container-lowest": "#0b0e14",
+            "on-surface-variant": "#c3c6d8",
+            "inverse-on-surface": "#2e3037",
+            "outline": "#8c90a2",
+            "error-container": "#93000a",
+            "on-background": "#e1e2eb",
+            "tertiary-fixed-dim": "#ffb59d",
+            "on-tertiary-fixed": "#390c00",
+            "on-tertiary-container": "#fff1ed",
+            "on-primary-fixed-variant": "#003da9",
+            "on-primary": "#002979",
+            "tertiary": "#ffb59d",
+            "surface-dim": "#101319",
+            "on-tertiary-fixed-variant": "#832700",
+            "on-tertiary": "#5d1900",
+            "on-surface": "#e1e2eb",
+            "surface-container-highest": "#32353c",
+            "secondary-fixed": "#dbe1ff",
+            "surface-bright": "#363940",
+            "secondary": "#b4c5ff",
+            "secondary-container": "#2d458a",
+            "on-primary-fixed": "#00174c",
+            "inverse-primary": "#0052dd",
+            "surface-variant": "#32353c",
+            "surface-container": "#1d2026",
+            "surface": "#101319",
+            "on-error": "#690005",
+            "surface-container-low": "#191c22",
+            "secondary-fixed-dim": "#b4c5ff",
+            "tertiary-container": "#c84000",
+            "surface-tint": "#b4c5ff"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "fontFamily": {
+            "headline": ["Manrope"],
+            "body": ["Manrope"],
+            "label": ["Inter"]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .glass-nav {
+      background: rgba(16, 19, 25, 0.7);
+      backdrop-filter: blur(20px);
+    }
+    .status-gradient {
+      background: linear-gradient(135deg, #0f62fe 0%, #b4c5ff 100%);
+    }
+    .text-shadow-sm {
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background font-body selection:bg-primary-container selection:text-on-primary-container">
+<!-- SideNavBar -->
+<aside class="h-screen w-72 fixed left-0 top-0 z-40 bg-[#101319] dark:bg-[#101319] flex flex-col py-8 gap-y-2">
+<div class="px-8 mb-10">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-primary-container flex items-center justify-center text-on-primary-container shadow-[0_0_20px_rgba(15,98,254,0.3)]">
+<span class="material-symbols-outlined" data-icon="shield">shield</span>
+</div>
+<div>
+<h1 class="text-blue-500 font-black text-xl tracking-tighter">SENTINEL</h1>
+<p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">System Armed</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="text-slate-500 hover:text-slate-200 mx-4 flex items-center gap-4 px-4 py-3 hover:bg-[#1D2026] transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-['Manrope'] text-sm font-medium">Dashboard</span>
+</a>
+<a class="text-slate-500 hover:text-slate-200 mx-4 flex items-center gap-4 px-4 py-3 hover:bg-[#1D2026] transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="settings_remote">settings_remote</span>
+<span class="font-['Manrope'] text-sm font-medium">Remote Control</span>
+</a>
+<a class="text-slate-500 hover:text-slate-200 mx-4 flex items-center gap-4 px-4 py-3 hover:bg-[#1D2026] transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="fingerprint">fingerprint</span>
+<span class="font-['Manrope'] text-sm font-medium">Fingerprints</span>
+</a>
+<a class="text-slate-500 hover:text-slate-200 mx-4 flex items-center gap-4 px-4 py-3 hover:bg-[#1D2026] transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="list_alt">list_alt</span>
+<span class="font-['Manrope'] text-sm font-medium">Logs</span>
+</a>
+<a class="text-slate-500 hover:text-slate-200 mx-4 flex items-center gap-4 px-4 py-3 hover:bg-[#1D2026] transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-['Manrope'] text-sm font-medium">Analytics</span>
+</a>
+<a class="bg-[#272A31] text-blue-400 rounded-lg mx-4 flex items-center gap-4 px-4 py-3 transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-['Manrope'] text-sm font-medium">Settings</span>
+</a>
+</nav>
+<div class="mt-auto px-4 space-y-1">
+<div class="mx-4 mb-6 p-4 rounded-xl bg-surface-container-high">
+<p class="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-2">Emergency Hub</p>
+<button class="w-full py-2 bg-error-container text-error rounded-lg text-xs font-bold transition-transform active:scale-95">
+          Lock All Entries
+        </button>
+</div>
+<a class="text-slate-500 hover:text-slate-200 mx-4 flex items-center gap-4 px-4 py-3 hover:bg-[#1D2026] transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="font-['Manrope'] text-sm font-medium">Help Center</span>
+</a>
+<a class="text-slate-500 hover:text-slate-200 mx-4 flex items-center gap-4 px-4 py-3 hover:bg-[#1D2026] transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-['Manrope'] text-sm font-medium">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-72 min-h-screen p-12">
+<!-- Header -->
+<header class="mb-12 flex justify-between items-end">
+<div>
+<h2 class="text-5xl font-extrabold tracking-tighter text-on-surface mb-2">SYSTEM SETTINGS</h2>
+<p class="text-slate-500 font-medium max-w-md">Configure precision parameters for your hardware security layer and user access protocols.</p>
+</div>
+<div class="flex gap-4">
+<div class="h-14 w-14 rounded-full bg-surface-container-high flex items-center justify-center border border-outline-variant/10">
+<span class="material-symbols-outlined text-slate-400" data-icon="notifications">notifications</span>
+</div>
+<div class="flex items-center gap-3 pl-2">
+<img class="h-14 w-14 rounded-2xl object-cover grayscale border-2 border-primary/20" data-alt="Professional security administrator portrait in a high-tech environment with soft dramatic rim lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDMrdoEihzHyIATECOK18GFwc1OxDP7TKclNAF8g84RQHYk9gvGuC8fW9em-TcThCWq5b-xonx47Jtqie5Sb7sWqtFI_FcYkm4uzuS1buB3dLoKgyPGJXHc2paGYvXp7cpCo2RV25oBWYZTRkUQHMlJsyY2dOtLZdFatGeZXe7IToudJHAPt__wRLuPFiyX5SBd74SR0wzUd_K-OlplFJGxg0iiOCEJmDkIVXo-D_V7xuGtT8seydBUDuR8BuNWfILWuC5QEXGG0f0G"/>
+</div>
+</div>
+</header>
+<!-- Content Grid -->
+<div class="grid grid-cols-12 gap-8">
+<!-- Section: Access Management (Bento Card Large) -->
+<section class="col-span-8 bg-surface-container-low rounded-[2rem] p-8 overflow-hidden relative border border-outline-variant/5">
+<div class="flex justify-between items-start mb-10">
+<div>
+<h3 class="text-2xl font-bold tracking-tight text-primary mb-1">Access Management</h3>
+<p class="text-sm text-slate-500 font-medium">Credential hierarchy and biometric provisioning</p>
+</div>
+<button class="px-6 py-3 status-gradient text-on-primary-fixed font-bold rounded-xl active:scale-95 transition-transform flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="person_add">person_add</span>
+            PROVISION NEW USER
+          </button>
+</div>
+<div class="space-y-4">
+<!-- User Row -->
+<div class="flex items-center justify-between p-6 bg-surface-container rounded-2xl hover:bg-surface-container-high transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" data-icon="verified_user">verified_user</span>
+</div>
+<div>
+<p class="font-bold text-on-surface">Alex Rivera</p>
+<p class="text-xs font-medium text-slate-500">Master Administrator • Always Active</p>
+</div>
+</div>
+<div class="flex items-center gap-8">
+<div class="text-right">
+<p class="text-xs font-bold text-slate-500 mb-1 uppercase tracking-widest">Methods</p>
+<div class="flex gap-2">
+<span class="material-symbols-outlined text-xs text-primary" data-icon="fingerprint" data-weight="fill" style="font-variation-settings: 'FILL' 1;">fingerprint</span>
+<span class="material-symbols-outlined text-xs text-primary" data-icon="vibration">vibration</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-slate-600 cursor-pointer" data-icon="more_vert">more_vert</span>
+</div>
+</div>
+<!-- User Row -->
+<div class="flex items-center justify-between p-6 bg-surface-container rounded-2xl hover:bg-surface-container-high transition-colors border-l-4 border-tertiary">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-tertiary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary" data-icon="support_agent">support_agent</span>
+</div>
+<div>
+<p class="font-bold text-on-surface">Service Provider</p>
+<p class="text-xs font-medium text-slate-500">Temporary Token • Expires in 4h</p>
+</div>
+</div>
+<div class="flex items-center gap-8">
+<div class="text-right">
+<p class="text-xs font-bold text-slate-500 mb-1 uppercase tracking-widest">Methods</p>
+<div class="flex gap-2">
+<span class="material-symbols-outlined text-xs text-tertiary" data-icon="key">key</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-slate-600 cursor-pointer" data-icon="more_vert">more_vert</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Section: Threshold Config -->
+<section class="col-span-4 bg-surface-container-low rounded-[2rem] p-8 border border-outline-variant/5">
+<h3 class="text-xl font-bold tracking-tight text-on-surface mb-8">Threshold Config</h3>
+<div class="space-y-8">
+<div>
+<div class="flex justify-between items-center mb-4">
+<span class="text-sm font-bold text-slate-400">Auto-Lock Timer</span>
+<span class="text-sm font-bold text-primary">45 Seconds</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 65%;"></div>
+</div>
+</div>
+<div class="p-6 bg-surface-container-high rounded-2xl">
+<div class="flex justify-between items-center mb-6">
+<span class="font-bold text-sm">Force Detection</span>
+<div class="w-12 h-6 bg-primary-container rounded-full relative flex items-center px-1">
+<div class="w-4 h-4 bg-white rounded-full ml-auto"></div>
+</div>
+</div>
+<p class="text-xs text-slate-500 leading-relaxed">System will trigger internal alarm if hardware vibration exceeds 4.2G impact.</p>
+</div>
+<button class="w-full py-4 bg-surface-container rounded-xl text-sm font-bold border border-outline-variant/10 hover:border-primary/30 transition-all">
+            Calibrate Sensors
+          </button>
+</div>
+</section>
+<!-- Section: Temporal Constraints -->
+<section class="col-span-5 bg-surface-container-low rounded-[2rem] p-8 border border-outline-variant/5">
+<div class="flex items-center gap-3 mb-8">
+<span class="material-symbols-outlined text-primary" data-icon="schedule">schedule</span>
+<h3 class="text-xl font-bold tracking-tight text-on-surface">Temporal Constraints</h3>
+</div>
+<div class="grid grid-cols-7 gap-2 mb-8">
+<div class="h-12 flex items-center justify-center text-[10px] font-bold text-slate-500 border border-outline-variant/10 rounded-lg">M</div>
+<div class="h-12 flex items-center justify-center text-[10px] font-bold text-on-primary-container bg-primary-container rounded-lg">T</div>
+<div class="h-12 flex items-center justify-center text-[10px] font-bold text-on-primary-container bg-primary-container rounded-lg">W</div>
+<div class="h-12 flex items-center justify-center text-[10px] font-bold text-on-primary-container bg-primary-container rounded-lg">T</div>
+<div class="h-12 flex items-center justify-center text-[10px] font-bold text-on-primary-container bg-primary-container rounded-lg">F</div>
+<div class="h-12 flex items-center justify-center text-[10px] font-bold text-slate-500 border border-outline-variant/10 rounded-lg">S</div>
+<div class="h-12 flex items-center justify-center text-[10px] font-bold text-slate-500 border border-outline-variant/10 rounded-lg">S</div>
+</div>
+<div class="p-6 bg-surface-container-high rounded-2xl mb-4">
+<p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Active Period</p>
+<div class="flex justify-between items-end">
+<span class="text-3xl font-light tracking-tight">08:00 — 19:30</span>
+<span class="text-xs font-bold text-primary">BUSINESS HOURS</span>
+</div>
+</div>
+<p class="text-[11px] text-slate-500 font-medium italic px-2">Access restricted to Master Admin during off-peak intervals.</p>
+</section>
+<!-- Section: Notification Stream -->
+<section class="col-span-7 bg-surface-container-low rounded-[2rem] p-8 border border-outline-variant/5 overflow-hidden">
+<h3 class="text-xl font-bold tracking-tight text-on-surface mb-8">Notification Stream</h3>
+<div class="space-y-2">
+<!-- Notification Item -->
+<div class="group flex items-center gap-6 p-4 rounded-2xl hover:bg-surface-container transition-all">
+<div class="text-center w-12 shrink-0">
+<p class="text-xs font-bold text-slate-400">14:02</p>
+<p class="text-[10px] text-slate-600">Today</p>
+</div>
+<div class="h-10 w-px bg-outline-variant/20"></div>
+<div class="flex-1">
+<div class="flex items-center justify-between mb-1">
+<h4 class="text-sm font-bold text-on-surface">System Breach Warning</h4>
+<div class="w-2 h-2 rounded-full bg-error animate-pulse"></div>
+</div>
+<p class="text-xs text-slate-500">Unrecognized fingerprint attempt at Front Entrance.</p>
+</div>
+</div>
+<!-- Notification Item -->
+<div class="group flex items-center gap-6 p-4 rounded-2xl hover:bg-surface-container transition-all">
+<div class="text-center w-12 shrink-0">
+<p class="text-xs font-bold text-slate-400">12:15</p>
+<p class="text-[10px] text-slate-600">Today</p>
+</div>
+<div class="h-10 w-px bg-outline-variant/20"></div>
+<div class="flex-1">
+<div class="flex items-center justify-between mb-1">
+<h4 class="text-sm font-bold text-on-surface">Auto-Lock Executed</h4>
+</div>
+<p class="text-xs text-slate-500">Lock ID: "Vault-Main" secured successfully.</p>
+</div>
+</div>
+<!-- Notification Item -->
+<div class="group flex items-center gap-6 p-4 rounded-2xl hover:bg-surface-container transition-all">
+<div class="text-center w-12 shrink-0">
+<p class="text-xs font-bold text-slate-400">09:30</p>
+<p class="text-[10px] text-slate-600">Today</p>
+</div>
+<div class="h-10 w-px bg-outline-variant/20"></div>
+<div class="flex-1">
+<div class="flex items-center justify-between mb-1">
+<h4 class="text-sm font-bold text-on-surface">New Device Enrolled</h4>
+</div>
+<p class="text-xs text-slate-500">Admin "Alex Rivera" added iPhone 15 Pro.</p>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Footer Action -->
+<footer class="mt-12 flex justify-end gap-4">
+<button class="px-8 py-4 bg-surface-container-high text-on-surface font-bold rounded-xl hover:bg-surface-container-highest transition-all">
+        RESET TO FACTORY
+      </button>
+<button class="px-10 py-4 status-gradient text-on-primary-fixed font-bold rounded-xl active:scale-95 transition-transform shadow-[0_12px_24px_rgba(15,98,254,0.15)]">
+        APPLY SYSTEM OVERRIDE
+      </button>
+</footer>
+</main>
+<!-- Status Tooltip (Floating) -->
+<div class="fixed bottom-8 right-8 bg-surface-bright/80 backdrop-blur-xl border border-outline/10 p-4 rounded-2xl shadow-2xl flex items-center gap-4 z-50">
+<div class="w-3 h-3 rounded-full bg-primary relative">
+<div class="absolute inset-0 bg-primary rounded-full animate-ping opacity-75"></div>
+</div>
+<div>
+<p class="text-xs font-black tracking-widest uppercase text-primary">Network Optimal</p>
+<p class="text-[10px] text-slate-400 font-medium">Lat: 12ms • Encrypted P2P</p>
+</div>
+</div>
+</body></html>

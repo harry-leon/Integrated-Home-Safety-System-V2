@@ -37,6 +37,7 @@ public class SecurityConfiguration {
                         .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.ERROR).permitAll()
                         .requestMatchers(new org.springframework.security.web.util.matcher.AntPathRequestMatcher("/api/auth/login")).permitAll()
                         .requestMatchers(new org.springframework.security.web.util.matcher.AntPathRequestMatcher("/api/auth/register")).permitAll()
+                        .requestMatchers(new org.springframework.security.web.util.matcher.AntPathRequestMatcher("/api/integration/blynk/webhook", "POST")).permitAll()
                         .requestMatchers(new org.springframework.security.web.util.matcher.AntPathRequestMatcher("/h2-console/**")).permitAll()
                         .requestMatchers(new org.springframework.security.web.util.matcher.AntPathRequestMatcher("/**", "OPTIONS")).permitAll()
                         .anyRequest().authenticated()

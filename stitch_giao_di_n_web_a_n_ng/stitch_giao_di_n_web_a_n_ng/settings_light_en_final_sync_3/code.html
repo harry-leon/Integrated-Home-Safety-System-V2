@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>System Settings | SENTINEL</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;family=Inter:wght@300..700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-fixed": "#00174c",
+                    "secondary-container": "#2d458a",
+                    "primary": "#b4c5ff",
+                    "error": "#ffb4ab",
+                    "surface-container-low": "#191c22",
+                    "primary-fixed-dim": "#b4c5ff",
+                    "on-secondary-fixed": "#00174c",
+                    "on-surface": "#e1e2eb",
+                    "surface": "#101319",
+                    "surface-container-lowest": "#0b0e14",
+                    "tertiary-fixed": "#ffdbd0",
+                    "on-tertiary-fixed": "#390c00",
+                    "on-surface-variant": "#c3c6d8",
+                    "surface-container-highest": "#32353c",
+                    "on-background": "#e1e2eb",
+                    "on-primary-container": "#f3f3ff",
+                    "tertiary-fixed-dim": "#ffb59d",
+                    "surface-container": "#1d2026",
+                    "inverse-on-surface": "#2e3037",
+                    "primary-container": "#0f62fe",
+                    "surface-bright": "#363940",
+                    "on-error-container": "#ffdad6",
+                    "secondary-fixed": "#dbe1ff",
+                    "on-tertiary-fixed-variant": "#832700",
+                    "outline-variant": "#424656",
+                    "on-secondary-container": "#a0b6ff",
+                    "outline": "#8c90a2",
+                    "surface-variant": "#32353c",
+                    "primary-fixed": "#dbe1ff",
+                    "error-container": "#93000a",
+                    "on-primary": "#002979",
+                    "on-tertiary": "#5d1900",
+                    "tertiary": "#ffb59d",
+                    "inverse-primary": "#0052dd",
+                    "surface-tint": "#b4c5ff",
+                    "background": "#101319",
+                    "surface-dim": "#101319",
+                    "on-primary-fixed-variant": "#003da9",
+                    "on-secondary-fixed-variant": "#2a4387",
+                    "tertiary-container": "#c84000",
+                    "secondary": "#b4c5ff",
+                    "on-tertiary-container": "#fff1ed",
+                    "secondary-fixed-dim": "#b4c5ff",
+                    "inverse-surface": "#e1e2eb",
+                    "on-error": "#690005",
+                    "surface-container-high": "#272a31",
+                    "on-secondary": "#0e2b6f"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Manrope"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Manrope', sans-serif; }
+        .glass-effect { backdrop-filter: blur(20px); }
+        .primary-gradient { background: linear-gradient(135deg, #0f62fe 0%, #b4c5ff 100%); }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- TopNavBar -->
+<nav class="w-full sticky top-0 z-50 bg-[#101319]/70 backdrop-blur-xl flex justify-between items-center px-8 py-4 w-full tonal-sectioning bg-[#1D2026]">
+<div class="flex items-center gap-8">
+<span class="text-2xl font-bold tracking-tighter text-slate-900 dark:text-slate-100 font-['Manrope']">SENTINEL</span>
+<div class="hidden md:flex gap-6">
+<a class="text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors font-['Manrope'] tracking-tight" href="#">Dashboard</a>
+<a class="text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors font-['Manrope'] tracking-tight" href="#">Lock Registry</a>
+<a class="text-blue-600 dark:text-blue-400 font-medium font-['Manrope'] tracking-tight" href="#">Settings</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-white/5 rounded-full transition-colors active:scale-90 duration-200">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+</button>
+<button class="p-2 hover:bg-white/5 rounded-full transition-colors active:scale-90 duration-200">
+<span class="material-symbols-outlined text-blue-600 dark:text-blue-400">settings</span>
+</button>
+<img alt="Administrator profile" class="w-10 h-10 rounded-full object-cover border border-outline-variant/30" data-alt="Professional administrator profile portrait in a dark suit with neutral background and sharp lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDoAjHIiCWTmyzQQA0HmEtb1kBvN5tKayh6zxgscMfq7Z-eknX2fNXJDZIX8rriSh_G4Auf6JVF6OhWN9Zvd_DMZAyroYUw1AX3Q1f0sQ7M1dMa7tz5ZGjM1y2MtT0KoR2AoCy5G5Etr34k0fZRjGbYbvyv0Q5T8Oeu3jj8G4HYmPE6hZY95PLfyMnH0W3ftWmmmAoih1_nqge_RChuvxi--mNfgBB6vSE4abBCojdpIf3xlveMV3i1li50OyXAL9K2TatqTIMNQP7q"/>
+</div>
+</nav>
+<div class="flex">
+<!-- SideNavBar -->
+<aside class="hidden md:flex h-screen w-72 flex-col fixed left-0 top-0 bg-[#101319] bg-[#1D2026] py-8 space-y-2 z-40">
+<div class="px-8 mb-10">
+<h1 class="text-blue-600 font-black tracking-widest text-sm mb-1 uppercase">Cipher Blue</h1>
+<p class="text-on-surface-variant text-xs font-['Inter'] opacity-70">Precision Security</p>
+</div>
+<nav class="flex-1 px-4 space-y-1">
+<div class="flex items-center px-4 py-3 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-white/5 transition-all duration-300 active:scale-[0.98] cursor-pointer">
+<span class="material-symbols-outlined mr-3">dashboard</span>
+<span class="font-['Manrope'] font-medium text-sm">Dashboard</span>
+</div>
+<div class="flex items-center px-4 py-3 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-white/5 transition-all duration-300 active:scale-[0.98] cursor-pointer">
+<span class="material-symbols-outlined mr-3">lock</span>
+<span class="font-['Manrope'] font-medium text-sm">Lock Registry</span>
+</div>
+<div class="flex items-center px-4 py-3 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-white/5 transition-all duration-300 active:scale-[0.98] cursor-pointer">
+<span class="material-symbols-outlined mr-3">history</span>
+<span class="font-['Manrope'] font-medium text-sm">Access Logs</span>
+</div>
+<div class="flex items-center px-4 py-3 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-white/5 transition-all duration-300 active:scale-[0.98] cursor-pointer">
+<span class="material-symbols-outlined mr-3">shield</span>
+<span class="font-['Manrope'] font-medium text-sm">Security Protocols</span>
+</div>
+<div class="flex items-center px-4 py-3 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-white/5 transition-all duration-300 active:scale-[0.98] cursor-pointer">
+<span class="material-symbols-outlined mr-3">analytics</span>
+<span class="font-['Manrope'] font-medium text-sm">System Health</span>
+</div>
+</nav>
+<div class="px-6 py-6 border-t border-outline-variant/10">
+<div class="flex items-center px-4 py-3 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-white/5 transition-all cursor-pointer mb-2">
+<span class="material-symbols-outlined mr-3">help_center</span>
+<span class="text-sm">Support</span>
+</div>
+<div class="flex items-center px-4 py-3 rounded-xl text-error/80 hover:text-error hover:bg-error/5 transition-all cursor-pointer">
+<span class="material-symbols-outlined mr-3">logout</span>
+<span class="text-sm">Logout</span>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 md:ml-72 min-h-screen px-8 py-12">
+<header class="mb-12">
+<h2 class="text-5xl font-['Manrope'] font-bold text-on-surface tracking-tighter mb-4">System Settings</h2>
+<p class="text-on-surface-variant font-['Manrope'] text-lg max-w-2xl leading-relaxed">
+                    Configure the operational parameters and high-level security protocols for the SENTINEL network infrastructure.
+                </p>
+</header>
+<!-- Bento Grid Settings -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 auto-rows-min">
+<!-- 1. Access Management (Large Primary Card) -->
+<section class="lg:col-span-8 bg-surface-container rounded-xl p-8 relative overflow-hidden transition-colors hover:bg-surface-container-high group">
+<div class="absolute top-0 right-0 p-8">
+<span class="material-symbols-outlined text-primary/20 text-6xl group-hover:text-primary/40 transition-colors">group</span>
+</div>
+<div class="relative z-10 max-w-xl">
+<h3 class="text-2xl font-headline font-medium text-on-surface mb-6">Access Management</h3>
+<div class="space-y-6">
+<div class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-xl hover:bg-surface-variant/20 transition-colors">
+<div>
+<p class="text-on-surface font-medium mb-1">Biometric Authentication</p>
+<p class="text-xs font-['Inter'] text-on-surface-variant">Manage facial recognition and fingerprint data</p>
+</div>
+<div class="w-12 h-6 bg-primary-container rounded-full relative flex items-center px-1">
+<div class="w-4 h-4 bg-on-primary-container rounded-full ml-auto"></div>
+</div>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-xl hover:bg-surface-variant/20 transition-colors">
+<div>
+<p class="text-on-surface font-medium mb-1">Keycard Provisioning</p>
+<p class="text-xs font-['Inter'] text-on-surface-variant">Revoke or assign physical access tokens</p>
+</div>
+<button class="px-4 py-2 bg-surface-container-highest text-primary text-xs font-bold rounded-xl hover:bg-primary/10 transition-colors">MANAGE</button>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-xl hover:bg-surface-variant/20 transition-colors">
+<div>
+<p class="text-on-surface font-medium mb-1">Guest Entry Codes</p>
+<p class="text-xs font-['Inter'] text-on-surface-variant">Generate one-time use access pins</p>
+</div>
+<button class="px-4 py-2 bg-surface-container-highest text-primary text-xs font-bold rounded-xl hover:bg-primary/10 transition-colors">GENERATE</button>
+</div>
+</div>
+</div>
+</section>
+<!-- 2. Threshold Config (Secondary Card) -->
+<section class="lg:col-span-4 bg-surface-container-high rounded-xl p-8 border-l-4 border-tertiary">
+<h3 class="text-2xl font-headline font-medium text-on-surface mb-6">Threshold Config</h3>
+<div class="space-y-8">
+<div>
+<div class="flex justify-between mb-4">
+<span class="text-sm font-['Inter'] text-on-surface">Auto-Lock Delay</span>
+<span class="text-sm font-bold text-primary">30s</span>
+</div>
+<div class="h-2 bg-surface-container-lowest rounded-full overflow-hidden">
+<div class="h-full bg-primary-container w-1/3"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between mb-4">
+<span class="text-sm font-['Inter'] text-on-surface">Max Auth Attempts</span>
+<span class="text-sm font-bold text-primary">5</span>
+</div>
+<div class="h-2 bg-surface-container-lowest rounded-full overflow-hidden">
+<div class="h-full bg-primary-container w-2/3"></div>
+</div>
+</div>
+<div class="pt-4">
+<p class="text-xs font-['Inter'] text-on-surface-variant leading-relaxed opacity-60">
+                                Parameters exceeding these thresholds will trigger an immediate system lockdown and administrator alert.
+                            </p>
+</div>
+</div>
+</section>
+<!-- 3. Temporal Constraints (Mid Card) -->
+<section class="lg:col-span-5 bg-surface-container rounded-xl p-8 transition-colors hover:bg-surface-container-high group">
+<div class="flex items-center gap-4 mb-8">
+<div class="p-3 bg-primary/10 rounded-xl">
+<span class="material-symbols-outlined text-primary">schedule</span>
+</div>
+<h3 class="text-xl font-headline font-medium text-on-surface">Temporal Constraints</h3>
+</div>
+<div class="space-y-4">
+<div class="flex items-center gap-4 p-4 bg-surface-container-lowest rounded-xl">
+<div class="w-10 h-10 flex items-center justify-center rounded-lg bg-surface-container-highest text-on-surface-variant font-bold text-xs">M-F</div>
+<div class="flex-1">
+<p class="text-sm font-medium">Office Hours Entry</p>
+<p class="text-xs text-on-surface-variant">08:00 — 18:00</p>
+</div>
+<span class="material-symbols-outlined text-primary text-sm">edit</span>
+</div>
+<div class="flex items-center gap-4 p-4 bg-surface-container-lowest rounded-xl">
+<div class="w-10 h-10 flex items-center justify-center rounded-lg bg-surface-container-highest text-on-surface-variant font-bold text-xs">S-S</div>
+<div class="flex-1">
+<p class="text-sm font-medium">Restricted Access</p>
+<p class="text-xs text-on-surface-variant">Total Lockout</p>
+</div>
+<span class="material-symbols-outlined text-primary text-sm">edit</span>
+</div>
+<button class="w-full py-3 mt-4 border border-outline-variant/30 rounded-xl text-xs font-bold tracking-widest text-on-surface-variant hover:bg-white/5 transition-colors uppercase">Add Schedule</button>
+</div>
+</section>
+<!-- 4. Notification Stream (Detailed Card) -->
+<section class="lg:col-span-7 bg-surface-container rounded-xl p-8">
+<h3 class="text-xl font-headline font-medium text-on-surface mb-8">Notification Stream</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="p-5 bg-surface-container-highest/40 rounded-xl space-y-4">
+<div class="flex items-center justify-between">
+<span class="material-symbols-outlined text-primary">mail</span>
+<div class="w-10 h-5 bg-primary-container rounded-full flex items-center px-1">
+<div class="w-3 h-3 bg-white rounded-full ml-auto"></div>
+</div>
+</div>
+<div>
+<h4 class="text-sm font-bold mb-1">Email Reports</h4>
+<p class="text-xs text-on-surface-variant">Daily activity summary &amp; security audit logs</p>
+</div>
+</div>
+<div class="p-5 bg-surface-container-highest/40 rounded-xl space-y-4">
+<div class="flex items-center justify-between">
+<span class="material-symbols-outlined text-primary">smartphone</span>
+<div class="w-10 h-5 bg-primary-container rounded-full flex items-center px-1">
+<div class="w-3 h-3 bg-white rounded-full ml-auto"></div>
+</div>
+</div>
+<div>
+<h4 class="text-sm font-bold mb-1">Push Alerts</h4>
+<p class="text-xs text-on-surface-variant">Instant notifications for unauthorized entry attempts</p>
+</div>
+</div>
+<div class="p-5 bg-surface-container-highest/40 rounded-xl space-y-4">
+<div class="flex items-center justify-between">
+<span class="material-symbols-outlined text-on-surface-variant">webhook</span>
+<div class="w-10 h-5 bg-surface-container-highest rounded-full flex items-center px-1">
+<div class="w-3 h-3 bg-on-surface-variant/40 rounded-full"></div>
+</div>
+</div>
+<div>
+<h4 class="text-sm font-bold mb-1">Webhook Events</h4>
+<p class="text-xs text-on-surface-variant">Integrate security events with external API endpoints</p>
+</div>
+</div>
+<div class="p-5 bg-surface-container-highest/40 rounded-xl space-y-4">
+<div class="flex items-center justify-between">
+<span class="material-symbols-outlined text-primary">sms</span>
+<div class="w-10 h-5 bg-primary-container rounded-full flex items-center px-1">
+<div class="w-3 h-3 bg-white rounded-full ml-auto"></div>
+</div>
+</div>
+<div>
+<h4 class="text-sm font-bold mb-1">SMS Gateway</h4>
+<p class="text-xs text-on-surface-variant">Critical critical alerts sent via cellular network</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Status Action Card -->
+<div class="lg:col-span-12 flex flex-col md:flex-row items-center justify-between gap-8 mt-12 p-8 bg-surface-container rounded-xl">
+<div>
+<h4 class="text-xl font-headline font-bold mb-2">Save System Changes</h4>
+<p class="text-on-surface-variant text-sm font-['Inter']">Ensure all protocols are verified before applying to the SENTINEL core.</p>
+</div>
+<div class="flex gap-4 w-full md:w-auto">
+<button class="flex-1 md:px-8 py-4 border border-outline-variant rounded-xl font-bold text-sm tracking-tight hover:bg-white/5 transition-colors">Discard</button>
+<button class="flex-1 md:px-12 py-4 primary-gradient text-on-primary-fixed font-bold text-sm tracking-tight rounded-xl shadow-lg shadow-primary/10 active:scale-95 transition-transform">Deploy Configuration</button>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Footer Mobile Nav (Visible only on mobile) -->
+<div class="md:hidden fixed bottom-0 left-0 right-0 h-16 glass-effect bg-surface/70 border-t border-outline-variant/10 flex justify-around items-center z-50">
+<span class="material-symbols-outlined text-on-surface-variant">dashboard</span>
+<span class="material-symbols-outlined text-on-surface-variant">lock</span>
+<div class="w-12 h-12 primary-gradient rounded-full flex items-center justify-center -mt-8 shadow-xl">
+<span class="material-symbols-outlined text-on-primary-fixed" style="font-variation-settings: 'FILL' 1;">add</span>
+</div>
+<span class="material-symbols-outlined text-primary">settings</span>
+<span class="material-symbols-outlined text-on-surface-variant">person</span>
+</div>
+</body></html>

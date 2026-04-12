@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Login (Light - EN)</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface-variant": "#c3c6d8",
+                        "secondary": "#b4c5ff",
+                        "outline-variant": "#424656",
+                        "surface-variant": "#32353c",
+                        "surface-container": "#1d2026",
+                        "surface-container-high": "#272a31",
+                        "tertiary-container": "#c84000",
+                        "surface-container-highest": "#32353c",
+                        "surface-bright": "#363940",
+                        "tertiary-fixed": "#ffdbd0",
+                        "on-tertiary": "#5d1900",
+                        "on-tertiary-fixed": "#390c00",
+                        "on-secondary-fixed-variant": "#2a4387",
+                        "surface-container-low": "#191c22",
+                        "surface": "#101319",
+                        "on-primary-fixed-variant": "#003da9",
+                        "on-error": "#690005",
+                        "on-secondary-container": "#a0b6ff",
+                        "on-primary-fixed": "#00174c",
+                        "on-tertiary-container": "#fff1ed",
+                        "on-secondary": "#0e2b6f",
+                        "on-primary-container": "#f3f3ff",
+                        "on-background": "#e1e2eb",
+                        "error-container": "#93000a",
+                        "tertiary-fixed-dim": "#ffb59d",
+                        "secondary-fixed": "#dbe1ff",
+                        "primary-container": "#0f62fe",
+                        "inverse-surface": "#e1e2eb",
+                        "secondary-container": "#2d458a",
+                        "inverse-primary": "#0052dd",
+                        "surface-tint": "#b4c5ff",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "error": "#ffb4ab",
+                        "on-error-container": "#ffdad6",
+                        "surface-container-lowest": "#0b0e14",
+                        "on-tertiary-fixed-variant": "#832700",
+                        "outline": "#8c90a2",
+                        "inverse-on-surface": "#2e3037",
+                        "on-primary": "#002979",
+                        "secondary-fixed-dim": "#b4c5ff",
+                        "on-secondary-fixed": "#00174c",
+                        "tertiary": "#ffb59d",
+                        "primary-fixed": "#dbe1ff",
+                        "background": "#101319",
+                        "on-surface": "#e1e2eb",
+                        "surface-dim": "#101319",
+                        "primary": "#b4c5ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Manrope"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #0f62fe 0%, #b4c5ff 100%);
+        }
+        .scale-98-on-click:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body class="bg-white text-surface min-h-screen font-body flex items-center justify-center p-6">
+<!-- Suppression of Nav Shell per Task Rules for Login screens -->
+<main class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-0 overflow-hidden bg-white shadow-2xl rounded-3xl border border-slate-100">
+<!-- Brand Narrative / Hero Visual Section -->
+<section class="hidden lg:flex lg:col-span-7 bg-[#F4F7FF] flex-col justify-between p-16 relative overflow-hidden">
+<div class="relative z-10">
+<div class="flex items-center gap-2 mb-12">
+<span class="text-3xl font-extrabold tracking-tighter text-[#0F62FE]">SENTINEL</span>
+</div>
+<h1 class="text-6xl font-headline font-extrabold text-surface-container tracking-tighter leading-tight mb-8">
+                    Precision <br/>
+<span class="text-[#0F62FE]">Transparency.</span>
+</h1>
+<p class="text-xl text-slate-500 font-medium max-w-md leading-relaxed">
+                    Access your high-security environment with an interface designed for clarity and absolute control.
+                </p>
+</div>
+<!-- Abstract Security Visual -->
+<div class="relative mt-12 h-64 w-full bg-white/50 backdrop-blur-xl rounded-2xl border border-white/80 p-8 shadow-sm">
+<div class="flex items-center justify-between mb-8">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-[#0F62FE]/10 flex items-center justify-center text-[#0F62FE]">
+<span class="material-symbols-outlined">shield</span>
+</div>
+<div>
+<p class="text-sm font-label font-bold text-surface-container">SYSTEM STATUS</p>
+<p class="text-xs font-label text-[#0F62FE]">ENCRYPTED &amp; ACTIVE</p>
+</div>
+</div>
+<div class="h-2 w-24 bg-slate-200 rounded-full overflow-hidden">
+<div class="h-full w-2/3 bg-[#0F62FE]"></div>
+</div>
+</div>
+<img class="absolute bottom-0 right-0 w-1/2 h-full object-cover rounded-tl-3xl opacity-20 mix-blend-multiply" data-alt="Futuristic server room with blue glowing lights and symmetrical metal structures representing high security data infrastructure" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAS9Km-9UhOM0e_S-KVAqr8FHHyJ1FWSPDnmmifUeYQk0PjOyPfMA2gYgvIlBE97zRb1Msb3QqHbFtS7_33qqbAlcIEopST9VDN0MSpQMgBonM6zPRwigB1ns-DYAFZjJp3BgBQpjHeq3afQcgxQNr7SFxaPj9kaaHINZS891o9vqknPaClin8pVbyWoXa8GYqI2gQYzmfb2j2y69OAV435_1Jk_2-LwqGQRCpBMEh6h0xfhDROXAt-vOMnzluhUdYQTVUxki6Rrm6v"/>
+</div>
+</section>
+<!-- Login Form Section -->
+<section class="col-span-1 lg:col-span-5 flex flex-col justify-center p-8 lg:p-16 bg-white">
+<div class="w-full max-w-sm mx-auto">
+<div class="mb-10">
+<h2 class="text-3xl font-headline font-bold text-surface-container mb-2">Login (Light - EN)</h2>
+<p class="text-slate-500">Secure entry to the Sentinel perimeter.</p>
+</div>
+<form class="space-y-6">
+<!-- Email Field -->
+<div class="space-y-2">
+<label class="block text-sm font-label font-semibold text-surface-container ml-1">Email Address</label>
+<div class="relative group">
+<input class="w-full h-14 px-5 bg-slate-50 border-none rounded-xl text-surface-container placeholder-slate-400 focus:ring-2 focus:ring-[#0F62FE] transition-all duration-300 font-label" placeholder="name@company.com" type="email"/>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-300">alternate_email</span>
+</div>
+</div>
+<!-- Password Field -->
+<div class="space-y-2">
+<div class="flex justify-between items-center px-1">
+<label class="text-sm font-label font-semibold text-surface-container">Password</label>
+<a class="text-xs font-label text-[#0F62FE] font-bold hover:text-[#B4C5FF] transition-colors" href="#">Forgot password?</a>
+</div>
+<div class="relative group">
+<input class="w-full h-14 px-5 bg-slate-50 border-none rounded-xl text-surface-container placeholder-slate-400 focus:ring-2 focus:ring-[#0F62FE] transition-all duration-300 font-label" placeholder="••••••••" type="password"/>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-300">lock</span>
+</div>
+</div>
+<!-- Remember Me -->
+<div class="flex items-center gap-3 px-1">
+<input class="w-5 h-5 rounded border-slate-300 text-[#0F62FE] focus:ring-[#0F62FE]" id="remember" type="checkbox"/>
+<label class="text-sm font-label text-slate-600" for="remember">Remember session for 30 days</label>
+</div>
+<!-- Authorize Button -->
+<button class="w-full h-14 bg-gradient-primary text-white font-headline font-bold rounded-xl shadow-lg shadow-[#0F62FE]/20 hover:shadow-[#0F62FE]/40 transition-all duration-300 scale-98-on-click flex items-center justify-center gap-2" type="submit">
+<span>Authorize Session</span>
+<span class="material-symbols-outlined">verified_user</span>
+</button>
+</form>
+<!-- SSO Section -->
+<div class="mt-12">
+<div class="relative flex items-center mb-8">
+<div class="flex-grow border-t border-slate-100"></div>
+<span class="px-4 text-xs font-label text-slate-400 uppercase tracking-widest">Or continue with SSO/Biometric</span>
+<div class="flex-grow border-t border-slate-100"></div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<button class="flex items-center justify-center gap-3 h-14 border border-slate-100 rounded-xl hover:bg-slate-50 transition-colors font-label font-semibold text-surface-container scale-98-on-click">
+<span class="material-symbols-outlined text-[#0F62FE]">fingerprint</span>
+<span>Biometric</span>
+</button>
+<button class="flex items-center justify-center gap-3 h-14 border border-slate-100 rounded-xl hover:bg-slate-50 transition-colors font-label font-semibold text-surface-container scale-98-on-click">
+<span class="material-symbols-outlined text-[#0F62FE]">hub</span>
+<span>SSO</span>
+</button>
+</div>
+</div>
+<div class="mt-12 text-center">
+<p class="text-sm text-slate-400">
+                        New to the perimeter? <a class="text-[#0F62FE] font-bold" href="#">Request Access</a>
+</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Contextual Information (High Security Aesthetic) -->
+<div class="fixed bottom-8 left-8 hidden lg:block">
+<div class="flex items-center gap-3 text-[10px] font-label text-slate-300 uppercase tracking-[0.2em]">
+<span class="material-symbols-outlined text-xs">location_on</span>
+<span>Secure Node: 84.192.11.0</span>
+<span class="w-1 h-1 bg-slate-300 rounded-full"></span>
+<span>Latency: 14ms</span>
+</div>
+</div>
+</body></html>

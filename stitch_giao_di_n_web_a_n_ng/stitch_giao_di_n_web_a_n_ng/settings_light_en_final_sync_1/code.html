@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SENTINEL | System Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed-dim": "#b4c5ff",
+                    "on-secondary-fixed-variant": "#2a4387",
+                    "error": "#ffb4ab",
+                    "primary-fixed": "#dbe1ff",
+                    "on-secondary-container": "#a0b6ff",
+                    "on-secondary-fixed": "#00174c",
+                    "on-primary-container": "#f3f3ff",
+                    "surface-container-high": "#272a31",
+                    "inverse-surface": "#e1e2eb",
+                    "outline-variant": "#424656",
+                    "on-error-container": "#ffdad6",
+                    "background": "#101319",
+                    "primary-container": "#0f62fe",
+                    "tertiary-fixed": "#ffdbd0",
+                    "primary": "#b4c5ff",
+                    "on-secondary": "#0e2b6f",
+                    "surface-container-lowest": "#0b0e14",
+                    "on-surface-variant": "#c3c6d8",
+                    "inverse-on-surface": "#2e3037",
+                    "outline": "#8c90a2",
+                    "error-container": "#93000a",
+                    "on-background": "#e1e2eb",
+                    "tertiary-fixed-dim": "#ffb59d",
+                    "on-tertiary-fixed": "#390c00",
+                    "on-tertiary-container": "#fff1ed",
+                    "on-primary-fixed-variant": "#003da9",
+                    "on-primary": "#002979",
+                    "tertiary": "#ffb59d",
+                    "surface-dim": "#101319",
+                    "on-tertiary-fixed-variant": "#832700",
+                    "on-tertiary": "#5d1900",
+                    "on-surface": "#e1e2eb",
+                    "surface-container-highest": "#32353c",
+                    "secondary-fixed": "#dbe1ff",
+                    "surface-bright": "#363940",
+                    "secondary": "#b4c5ff",
+                    "secondary-container": "#2d458a",
+                    "on-primary-fixed": "#00174c",
+                    "inverse-primary": "#0052dd",
+                    "surface-variant": "#32353c",
+                    "surface-container": "#1d2026",
+                    "surface": "#101319",
+                    "on-error": "#690005",
+                    "surface-container-low": "#191c22",
+                    "secondary-fixed-dim": "#b4c5ff",
+                    "tertiary-container": "#c84000",
+                    "surface-tint": "#b4c5ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Manrope"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { background-color: #101319; color: #e1e2eb; font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        input[type="range"] { -webkit-appearance: none; background: transparent; }
+        input[type="range"]::-webkit-slider-runnable-track { background: #1d2026; height: 6px; border-radius: 999px; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%; background: #0f62fe; cursor: pointer; margin-top: -6px; border: 2px solid #b4c5ff; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #32353c; border-radius: 10px; }
+    </style>
+</head>
+<body class="overflow-hidden">
+<!-- Top Navigation -->
+<nav class="fixed top-0 w-full z-50 bg-[#101319]/70 backdrop-blur-xl h-20 flex justify-between items-center px-8 w-full max-w-screen-2xl mx-auto font-['Manrope'] tracking-tight leading-relaxed">
+<div class="text-2xl font-bold tracking-tighter text-blue-600 dark:text-blue-500">SENTINEL</div>
+<div class="hidden md:flex items-center gap-8">
+<a class="text-slate-400 font-medium hover:bg-blue-500/10 transition-colors duration-300 px-3 py-1 rounded" href="#">Dashboard</a>
+<a class="text-slate-400 font-medium hover:bg-blue-500/10 transition-colors duration-300 px-3 py-1 rounded" href="#">Remote Control</a>
+<a class="text-blue-600 font-semibold border-b-2 border-blue-600 px-3 py-1" href="#">Settings</a>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary transition-all">notifications</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary transition-all">settings_suggest</span>
+<div class="w-8 h-8 rounded-full overflow-hidden bg-surface-container-highest">
+<img class="w-full h-full object-cover" data-alt="professional male headshot with focused expression and subtle dramatic lighting against dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfRLEuy_DrhzEwmwpxu6BgyQTK73407DavjSIunJ0cgEIkylI_tO76ulUzqoi6IDfiJpRDhQL2ODTAUVF0Y8f4AkZLVJ3q7rBpJM-uEazj1BPGz_Svaqh0cV7Bi4HB91VWQXT7LXT1AUCOZ2DpcJPOWhny1mfEKbspm8CdYjWNk_Ba0hWQ4w-Nyi-kjXmLKV75LQYIHp9c546Fw3BQHbnImT4CyTqfmKcHKI_9Xq64ZraZGgVhqOyNScUM_NjpW6HrzNpfCmnmnkcv"/>
+</div>
+</div>
+</nav>
+<!-- Side Navigation -->
+<aside class="h-screen w-72 fixed left-0 top-0 z-40 bg-[#101319] flex flex-col py-8 gap-y-2 pt-24 hidden lg:flex">
+<div class="px-8 mb-8">
+<div class="flex items-center gap-3 p-4 bg-surface-container rounded-xl">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">security</span>
+<div>
+<p class="text-sm font-bold text-on-surface">System Armed</p>
+<p class="text-xs text-on-surface-variant">Precision Security</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 flex flex-col">
+<a class="flex items-center gap-4 py-3 px-8 text-slate-500 hover:text-slate-200 transition-all hover:bg-[#1D2026] mx-4 rounded-lg font-['Manrope'] text-sm font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span> Dashboard
+            </a>
+<a class="flex items-center gap-4 py-3 px-8 text-slate-500 hover:text-slate-200 transition-all hover:bg-[#1D2026] mx-4 rounded-lg font-['Manrope'] text-sm font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="settings_remote">settings_remote</span> Remote Control
+            </a>
+<a class="flex items-center gap-4 py-3 px-8 text-slate-500 hover:text-slate-200 transition-all hover:bg-[#1D2026] mx-4 rounded-lg font-['Manrope'] text-sm font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="fingerprint">fingerprint</span> Fingerprints
+            </a>
+<a class="flex items-center gap-4 py-3 px-8 bg-[#272A31] text-blue-400 rounded-lg mx-4 font-['Manrope'] text-sm font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span> Settings
+            </a>
+<div class="mt-auto px-4 space-y-2">
+<button class="w-full py-4 bg-gradient-to-br from-primary-container to-primary text-on-primary-container font-bold rounded-xl active:scale-95 transition-all text-sm mb-4">
+                    Lock All Entries
+                </button>
+<a class="flex items-center gap-4 py-3 px-4 text-slate-500 hover:text-slate-200 transition-all font-['Manrope'] text-sm font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span> Help Center
+                </a>
+<a class="flex items-center gap-4 py-3 px-4 text-error transition-all font-['Manrope'] text-sm font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span> Logout
+                </a>
+</div>
+</nav>
+</aside>
+<!-- Main Content -->
+<main class="lg:ml-72 pt-24 min-h-screen px-6 md:px-12 pb-12 custom-scrollbar overflow-y-auto max-h-screen">
+<header class="mb-12">
+<h1 class="text-4xl font-extrabold font-headline tracking-tighter text-on-surface">SYSTEM PREFERENCES</h1>
+<p class="text-on-surface-variant font-body mt-2">Adjust security protocols and IoT node sensitivities.</p>
+</header>
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-8">
+<!-- Access Management Section -->
+<section class="xl:col-span-8 space-y-8">
+<div class="bg-surface-container rounded-2xl p-8 border-l-4 border-primary">
+<div class="flex justify-between items-start mb-8">
+<div>
+<h2 class="text-xl font-medium font-headline text-on-surface">Access Management</h2>
+<p class="text-sm text-on-surface-variant mt-1">Configure biometric and keycard authentication levels.</p>
+</div>
+<span class="material-symbols-outlined text-primary-container">shield_person</span>
+</div>
+<div class="grid md:grid-cols-2 gap-6">
+<div class="bg-surface-container-high p-6 rounded-xl space-y-4">
+<div class="flex justify-between items-center">
+<span class="material-symbols-outlined text-primary">fingerprint</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+</label>
+</div>
+<div>
+<p class="font-medium text-on-surface">Biometric Authentication</p>
+<p class="text-xs text-on-surface-variant mt-1">Require fingerprint scan for all physical entries.</p>
+</div>
+</div>
+<div class="bg-surface-container-high p-6 rounded-xl space-y-4">
+<div class="flex justify-between items-center">
+<span class="material-symbols-outlined text-primary">credit_card</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+</label>
+</div>
+<div>
+<p class="font-medium text-on-surface">Keycard Access</p>
+<p class="text-xs text-on-surface-variant mt-1">Allow RFID keycards for quick proximity unlock.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Threshold Config Section -->
+<div class="bg-surface-container rounded-2xl p-8">
+<h2 class="text-xl font-medium font-headline text-on-surface mb-8">Threshold Configuration</h2>
+<div class="space-y-12">
+<div class="space-y-4">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-tertiary">gas_meter</span>
+<span class="font-medium">Gas Sensitivity</span>
+</div>
+<span class="font-label text-sm text-primary">42 ppm</span>
+</div>
+<input class="w-full" max="100" min="0" type="range" value="42"/>
+<p class="text-xs text-on-surface-variant italic">Trigger alarm if air particulates exceed this limit.</p>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-tertiary">light_mode</span>
+<span class="font-medium">Light Sensor Activation</span>
+</div>
+<span class="font-label text-sm text-primary">65%</span>
+</div>
+<input class="w-full" max="100" min="0" type="range" value="65"/>
+<p class="text-xs text-on-surface-variant italic">Ambient brightness required to activate status illumination.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Sidebar Content -->
+<section class="xl:col-span-4 space-y-8">
+<!-- Temporal Constraints -->
+<div class="bg-surface-container rounded-2xl p-8 border-l-4 border-tertiary">
+<h2 class="text-xl font-medium font-headline text-on-surface mb-6">Temporal Constraints</h2>
+<div class="space-y-6">
+<div class="space-y-2">
+<label class="text-xs font-label text-on-surface-variant uppercase tracking-widest">Auto-lock Delay</label>
+<div class="bg-surface-container-highest p-4 rounded-lg flex items-center justify-between">
+<span class="font-medium text-on-surface">30 Seconds</span>
+<span class="material-symbols-outlined text-on-surface-variant text-sm">schedule</span>
+</div>
+</div>
+<div class="space-y-2">
+<label class="text-xs font-label text-on-surface-variant uppercase tracking-widest">Keypad Lockout Duration</label>
+<div class="bg-surface-container-highest p-4 rounded-lg flex items-center justify-between">
+<span class="font-medium text-on-surface">15 Minutes</span>
+<span class="material-symbols-outlined text-on-surface-variant text-sm">lock_clock</span>
+</div>
+</div>
+<p class="text-[10px] leading-relaxed text-on-surface-variant/60">Strict timing parameters prevent brute-force attacks and ensure passive security coverage.</p>
+</div>
+</div>
+<!-- Notification Stream -->
+<div class="bg-surface-container rounded-2xl p-8">
+<h2 class="text-xl font-medium font-headline text-on-surface mb-6">Notification Stream</h2>
+<div class="space-y-4">
+<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-xl">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-primary-container/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-xl">notifications_active</span>
+</div>
+<div>
+<p class="font-medium text-sm">Web Push</p>
+<p class="text-[10px] text-on-surface-variant">Critical Alerts Only</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+</label>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-xl">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-tertiary-container/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary text-xl">alternate_email</span>
+</div>
+<div>
+<p class="font-medium text-sm">Email Alerts</p>
+<p class="text-[10px] text-on-surface-variant">Daily Summary</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+</label>
+</div>
+</div>
+</div>
+<!-- Identity Visual -->
+<div class="rounded-2xl overflow-hidden relative group">
+<img class="w-full h-48 object-cover grayscale transition-all duration-700 group-hover:grayscale-0" data-alt="ultra-modern minimalist smart lock interface with blue neon light mounted on a dark textured wood door" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCidxd6k2GhNWk6hty4eo_vXesQJPndQHyC_tyuxNUSmcKutgWpbrtpXyMsufN8oy8qVcDuS2qBWPoUxDNEmkB4ESMAzb_L8yrNE56Fsv6ilRlENtLizfF5_rqUe9wTcvDoFGxauVtTLD5oVCt_AoIXQSefFbuQVrjVsW2K4sWkjpHoqDET_IjlzjdqjkdlGpDmUo6fkJacXSjngwMqFoka8LshtahNHHHaBXeYHvKHIHJusHlwj0DKLp8zUGOqG7s8TsZOrRP7Aexs"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background to-transparent opacity-60"></div>
+<div class="absolute bottom-4 left-4">
+<p class="text-xs font-label text-on-surface tracking-[0.2em] font-bold">SENTINEL-X NODE 04</p>
+<p class="text-[10px] text-primary">Uptime: 99.99%</p>
+</div>
+</div>
+</section>
+</div>
+<!-- Floating Action Button - Only for Home/Dash context but added here as per 'Task' requirement logic where FAB is suppressed on settings, however, to show design system capability, we provide a Save FAB -->
+<!-- Suppressing per instructions: "You MUST suppress the FAB on Settings..." -->
+</main>
+<!-- Mobile Bottom Navigation -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-[#101319]/90 backdrop-blur-xl flex justify-around items-center h-20 px-6 z-50">
+<button class="flex flex-col items-center gap-1 text-slate-500">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="text-[10px]">Home</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-slate-500">
+<span class="material-symbols-outlined" data-icon="fingerprint">fingerprint</span>
+<span class="text-[10px]">Access</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-blue-500">
+<span class="material-symbols-outlined" data-icon="settings" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="text-[10px]">Settings</span>
+</button>
+</nav>
+</body></html>
