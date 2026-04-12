@@ -17,6 +17,7 @@ public class OpenApiConfig {
         final String securitySchemeName = "bearerAuth";
         
         return new OpenAPI()
+                .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
                 .info(new Info().title("Integrated Home Safety System API")
                         .description("REST API documentation for the Smart Lock and Home Safety System.")
                         .version("v2.0")

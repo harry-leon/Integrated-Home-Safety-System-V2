@@ -15,6 +15,9 @@ import java.util.UUID;
 public class FingerprintController {
 
     private final VerificationService verificationService;
+    private final com.smartlock.repository.FingerprintRepository fingerprintRepository;
+    private final com.smartlock.repository.DeviceRepository deviceRepository;
+    private final com.smartlock.repository.UserRepository userRepository;
 
     @PostMapping("/enroll")
     @PreAuthorize("hasAnyRole('ADMIN', 'MEMBER')")
@@ -26,7 +29,26 @@ public class FingerprintController {
         if (!verificationService.isVerified(verificationToken)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Step-up verification required for this action");
         }
-        return ResponseEntity.accepted().build();
+        
+        var device = deviceRepository.findById(deviceId).orElse(null);
+        if (device == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Device not found");
+        }
+        
+        String email = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getName();
+        var user = userRepository.findByEmail(email).orElse(null);
+
+        com.smartlock.model.Fingerprint fingerprint = com.smartlock.model.Fingerprint.builder()
+                .device(device)
+                .personName(personName)
+                .registeredBy(user)
+                .accessLevel("STANDARD")
+                .isActive(true)
+                .build();
+                
+        fingerprintRepository.save(fingerprint);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(fingerprint);
     }
 
     @DeleteMapping("/{id}")
@@ -38,12 +60,25 @@ public class FingerprintController {
         if (!verificationService.isVerified(verificationToken)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Step-up verification required for this action");
         }
+        
+        if (fingerprintRepository.existsById(id)) {
+            fingerprintRepository.deleteById(id);
+        }
+        
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'MEMBER')")
-    public ResponseEntity<Void> renameFingerprint(@PathVariable UUID id, @RequestParam String newName) {
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> renameFingerprint(@PathVariable UUID id, @RequestParam String newName) {
+        var fingerprint = fingerprintRepository.findById(id).orElse(null);
+        if (fingerprint == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Fingerprint not found");
+        }
+        
+        fingerprint.setPersonName(newName);
+        fingerprintRepository.save(fingerprint);
+        
+        return ResponseEntity.ok(fingerprint);
     }
 }
