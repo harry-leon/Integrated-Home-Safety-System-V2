@@ -50,9 +50,9 @@ public class CommandService {
             executeCommand(savedCommand);
         } else {
             log.info("Device {} is offline. Command {} queued for later.", device.getDeviceCode(), savedCommand.getId());
+            notifyStatusUpdate(savedCommand);
         }
 
-        notifyStatusUpdate(savedCommand);
         return savedCommand.getId();
     }
 
@@ -67,6 +67,7 @@ public class CommandService {
             blynkService.updateVirtualPin(10, blynkPayload); 
 
             command.setStatus(CommandStatus.SENT);
+            command.setSentAt(LocalDateTime.now());
             commandRepository.save(command);
             notifyStatusUpdate(command);
             log.info("Command {} sent to Blynk for device {}", command.getId(), command.getDevice().getDeviceCode());
@@ -114,9 +115,9 @@ public class CommandService {
     public void handleCommandTimeouts() {
         LocalDateTime timeoutThreshold = LocalDateTime.now().minusSeconds(TIMEOUT_SECONDS);
         
-        commandRepository.findAll().stream()
+        commandRepository.findByStatusIn(java.util.List.of(CommandStatus.SENT, CommandStatus.RETRYING)).stream()
                 .filter(c -> (c.getStatus() == CommandStatus.SENT || c.getStatus() == CommandStatus.RETRYING))
-                .filter(c -> c.getRequestedAt().isBefore(timeoutThreshold))
+                .filter(c -> c.getSentAt() != null && c.getSentAt().isBefore(timeoutThreshold))
                 .forEach(command -> {
                     if (command.getRetryCount() < MAX_RETRIES) {
                         log.info("Retrying command {} (Attempt {})", command.getId(), command.getRetryCount() + 1);

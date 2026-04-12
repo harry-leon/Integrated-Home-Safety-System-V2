@@ -22,26 +22,40 @@ public class BlynkWebhookController {
     private final CommandService commandService;
     private final DeviceRepository deviceRepository;
 
+    @org.springframework.beans.factory.annotation.Value("${blynk.auth-token:}")
+    private String globalWebhookToken;
+
     @GetMapping("/webhook")
     public ResponseEntity<Void> handleBlynkWebhook(
             @RequestParam String deviceCode,
             @RequestParam String pin,
-            @RequestParam String value) {
+            @RequestParam String value,
+            @RequestParam(required = false) String token) {
         
         log.info("Received Blynk Webhook: Device={}, Pin={}, Value={}", deviceCode, pin, value);
 
-        // 1. Cập nhật trạng thái Device là ONLINE khi có bất kỳ dữ liệu nào gửi về
-        deviceRepository.findByDeviceCode(deviceCode).ifPresent(device -> {
-            boolean wasOffline = !device.isOnline();
-            device.setOnline(true);
-            device.setLastSeen(LocalDateTime.now());
-            deviceRepository.save(device);
+        java.util.Optional<Device> deviceOpt = deviceRepository.findByDeviceCode(deviceCode);
+        if (deviceOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Device device = deviceOpt.get();
 
-            // Nếu thiết bị vừa Online trở lại, xử lý các lệnh đang chờ
-            if (wasOffline) {
-                commandService.processOfflineCommands(device);
-            }
-        });
+        boolean isValidToken = (token != null) && (token.equals(globalWebhookToken) || token.equals(device.getProviderToken()));
+        if (!isValidToken) {
+            log.warn("Unauthorized webhook attempt for device {}", deviceCode);
+            return ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED).build();
+        }
+
+        // 1. Cập nhật trạng thái Device là ONLINE khi có bất kỳ dữ liệu nào gửi về
+        boolean wasOffline = !device.isOnline();
+        device.setOnline(true);
+        device.setLastSeen(LocalDateTime.now());
+        deviceRepository.save(device);
+
+        // Nếu thiết bị vừa Online trở lại, xử lý các lệnh đang chờ
+        if (wasOffline) {
+            commandService.processOfflineCommands(device);
+        }
 
 
         // 2. Gửi dữ liệu real-time lên Web Dashboard qua WebSocket

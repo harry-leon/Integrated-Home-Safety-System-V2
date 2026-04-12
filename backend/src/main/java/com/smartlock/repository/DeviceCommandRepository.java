@@ -12,5 +12,6 @@ import java.util.UUID;
 public interface DeviceCommandRepository extends JpaRepository<DeviceCommand, UUID> {
     List<DeviceCommand> findByDeviceIdAndStatus(UUID deviceId, CommandStatus status);
     List<com.smartlock.model.DeviceCommand> findAllByDeviceAndStatus(com.smartlock.model.Device device, CommandStatus status);
+    List<DeviceCommand> findByStatusIn(List<CommandStatus> statuses);
 }
 
