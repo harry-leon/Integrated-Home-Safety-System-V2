@@ -3,6 +3,7 @@
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
+import Link from 'next/link';
 
 export default function RemoteControlPage() {
   const { t } = useLanguage();
@@ -250,7 +251,7 @@ export default function RemoteControlPage() {
         <div className="card" style={{ padding: '2rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
             <h4 className="font-headline" style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--on-surface)' }}>{t('recentEvents')}</h4>
-            <a href="#" className="font-label text-primary" style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em' }}>{t('viewFullLog')}</a>
+            <Link href="/logs" className="font-label text-primary" style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em' }}>{t('viewFullLog')}</Link>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>

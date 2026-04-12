@@ -1,5 +1,6 @@
 'use client';
 import { useLanguage } from '@/context/LanguageContext';
+import Link from 'next/link';
 
 export default function Footer() {
   const { t } = useLanguage();
@@ -10,8 +11,8 @@ export default function Footer() {
         {t('systemOnline')} | {t('lastSync')}
       </div>
       <div className="footer__links">
-        <a href="#">{t('terms')}</a>
-        <a href="#">{t('privacy')}</a>
+        <Link href="/terms-of-service">{t('terms')}</Link>
+        <Link href="/privacy-policy">{t('privacy')}</Link>
       </div>
     </footer>
   );
