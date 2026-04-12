@@ -1,7 +1,6 @@
 package com.smartlock.dto;
 
 import lombok.Data;
-import java.util.UUID;
 
 @Data
 public class DeviceCommandRequestDTO {

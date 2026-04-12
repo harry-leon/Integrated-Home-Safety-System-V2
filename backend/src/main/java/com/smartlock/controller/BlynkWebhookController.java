@@ -22,20 +22,41 @@ public class BlynkWebhookController {
     private final CommandService commandService;
     private final DeviceRepository deviceRepository;
 
+    @org.springframework.beans.factory.annotation.Value("${blynk.auth-token:}")
+    private String globalWebhookToken;
+
     @GetMapping("/webhook")
     public ResponseEntity<Void> handleBlynkWebhook(
             @RequestParam String deviceCode,
             @RequestParam String pin,
-            @RequestParam String value) {
+            @RequestParam String value,
+            @RequestParam(required = false) String token) {
         
         log.info("Received Blynk Webhook: Device={}, Pin={}, Value={}", deviceCode, pin, value);
 
+        java.util.Optional<Device> deviceOpt = deviceRepository.findByDeviceCode(deviceCode);
+        if (deviceOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Device device = deviceOpt.get();
+
+        boolean isValidToken = (token != null) && (token.equals(globalWebhookToken) || token.equals(device.getProviderToken()));
+        if (!isValidToken) {
+            log.warn("Unauthorized webhook attempt for device {}", deviceCode);
+            return ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED).build();
+        }
+
         // 1. Cập nhật trạng thái Device là ONLINE khi có bất kỳ dữ liệu nào gửi về
-        deviceRepository.findByDeviceCode(deviceCode).ifPresent(device -> {
-            device.setOnline(true);
-            device.setLastSeen(LocalDateTime.now());
-            deviceRepository.save(device);
-        });
+        boolean wasOffline = !device.isOnline();
+        device.setOnline(true);
+        device.setLastSeen(LocalDateTime.now());
+        deviceRepository.save(device);
+
+        // Nếu thiết bị vừa Online trở lại, xử lý các lệnh đang chờ
+        if (wasOffline) {
+            commandService.processOfflineCommands(device);
+        }
+
 
         // 2. Gửi dữ liệu real-time lên Web Dashboard qua WebSocket
         messagingTemplate.convertAndSend("/topic/devices/" + deviceCode + "/updates", 
@@ -46,6 +67,10 @@ public class BlynkWebhookController {
         if (pin.equals("V10")) {
             try {
                 String[] parts = value.split(":");
+                if (parts.length < 2) {
+                    log.warn("Invalid command acknowledgement format: {}", value);
+                    return ResponseEntity.badRequest().build();
+                }
                 UUID commandId = UUID.fromString(parts[0]);
                 boolean isSuccess = "SUCCESS".equalsIgnoreCase(parts[1]);
                 String reason = parts.length > 2 ? parts[2] : "";
