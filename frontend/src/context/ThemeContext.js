@@ -9,24 +9,32 @@ const ThemeContext = createContext({
 
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState('light');
+  const [mounted, setMounted] = useState(false);
 
-  // Sync React state with the theme already applied by the inline script in layout.js
   useEffect(() => {
-    const applied = document.documentElement.getAttribute('data-theme');
-    if (applied === 'dark' || applied === 'light') {
-      setTheme(applied);
+    const saved = localStorage.getItem('sentinel-theme');
+    if (saved === 'dark' || saved === 'light') {
+      setTheme(saved);
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      setTheme('dark');
     }
+    setMounted(true);
   }, []);
 
-  // Keep the attribute and localStorage in sync when the user toggles
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('sentinel-theme', theme);
-  }, [theme]);
+    if (mounted) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('sentinel-theme', theme);
+    }
+  }, [theme, mounted]);
 
   const toggleTheme = useCallback(() => {
     setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
   }, []);
+
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
