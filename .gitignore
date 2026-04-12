@@ -16,6 +16,11 @@ Thumbs.db
 # Backend (Maven)
 backend/target/
 backend/*.log
+backend/errors.txt
+backend/get_errors.ps1
+backend/*.txt
+backend/*.ps1
+backend/*.class
 
 # Project specific
 node_modules/
