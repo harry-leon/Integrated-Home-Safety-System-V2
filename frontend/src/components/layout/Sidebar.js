@@ -10,11 +10,7 @@ export default function Sidebar({ isOpen, onClose }) {
 
   const navItems = [
     { href: '/dashboard', icon: 'dashboard', label: t('navDashboard') },
-    { href: '/remote-control', icon: 'settings_remote', label: t('navRemoteControl') },
-    { href: '/fingerprints', icon: 'fingerprint', label: t('navFingerprints') },
-    { href: '/logs', icon: 'history', label: t('navLogs') },
-    { href: '/analytics', icon: 'analytics', label: t('navAnalytics') },
-    { href: '/settings', icon: 'settings', label: t('navSettings') },
+    { href: '/remote-control', icon: 'settings_remote', label: t('navRemoteControl') }
   ];
 
   return (
@@ -53,10 +49,10 @@ export default function Sidebar({ isOpen, onClose }) {
 
         {/* Footer */}
         <div className="sidebar__footer">
-          <Link href="/support" className="sidebar__link" onClick={onClose}>
+          <span className="sidebar__link" style={{ opacity: 0.5, cursor: 'not-allowed' }}>
             <span className="material-symbols-outlined">help</span>
             {t('navSupport')}
-          </Link>
+          </span>
           <button className="sidebar__link sidebar__link--logout">
             <span className="material-symbols-outlined">logout</span>
             {t('navLogout')}
