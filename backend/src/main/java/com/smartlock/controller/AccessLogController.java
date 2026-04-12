@@ -25,7 +25,16 @@ public class AccessLogController {
             @RequestParam(required = false) String date) {
         
         List<com.smartlock.model.AccessLog> logs;
-        if (deviceId != null) {
+        if (date != null && !date.isEmpty()) {
+            java.time.LocalDate targetDate = java.time.LocalDate.parse(date);
+            java.time.LocalDateTime start = targetDate.atStartOfDay();
+            java.time.LocalDateTime end = targetDate.atTime(23, 59, 59, 999999999);
+            logs = accessLogRepository.findByCreatedAtBetweenOrderByCreatedAtDesc(start, end);
+            // If deviceId is also provided, filter manually
+            if (deviceId != null) {
+                logs = logs.stream().filter(l -> l.getDevice() != null && l.getDevice().getId().equals(deviceId)).toList();
+            }
+        } else if (deviceId != null) {
             logs = accessLogRepository.findByDeviceIdOrderByCreatedAtDesc(deviceId);
         } else {
             logs = accessLogRepository.findAllByOrderByCreatedAtDesc();
@@ -36,7 +45,7 @@ public class AccessLogController {
             dto.setId(log.getId());
             if (log.getDevice() != null) {
                 dto.setDeviceId(log.getDevice().getId());
-                dto.setDeviceName(log.getDevice().getName());
+                dto.setDeviceName(log.getDevice().getDeviceName());
             }
             if (log.getUser() != null) {
                 dto.setUserName(log.getUser().getFullName());
@@ -54,20 +63,25 @@ public class AccessLogController {
         return ResponseEntity.ok(response);
     }
 
+    private String escapeCsv(String value) {
+        if (value == null) return "";
+        return "\"" + value.replace("\"", "\"\"") + "\"";
+    }
+
     @GetMapping("/export")
     @PreAuthorize("hasAnyRole('ADMIN', 'MEMBER')")
     public ResponseEntity<byte[]> exportToCsv() {
         List<com.smartlock.model.AccessLog> logs = accessLogRepository.findAllByOrderByCreatedAtDesc();
         StringBuilder csv = new StringBuilder("ID,Device,User,Person,Method,Action,Detail,Time\n");
         for (com.smartlock.model.AccessLog log : logs) {
-            csv.append(log.getId()).append(",");
-            csv.append(log.getDevice() != null ? log.getDevice().getName() : "").append(",");
-            csv.append(log.getUser() != null ? log.getUser().getFullName() : "").append(",");
-            csv.append(log.getFingerprint() != null ? log.getFingerprint().getPersonName() : "").append(",");
-            csv.append(log.getMethod()).append(",");
-            csv.append(log.getAction()).append(",");
-            csv.append(log.getDetail()).append(",");
-            csv.append(log.getCreatedAt()).append("\n");
+            csv.append(escapeCsv(log.getId().toString())).append(",");
+            csv.append(escapeCsv(log.getDevice() != null ? log.getDevice().getDeviceName() : "")).append(",");
+            csv.append(escapeCsv(log.getUser() != null ? log.getUser().getFullName() : "")).append(",");
+            csv.append(escapeCsv(log.getFingerprint() != null ? log.getFingerprint().getPersonName() : "")).append(",");
+            csv.append(escapeCsv(log.getMethod() != null ? log.getMethod().name() : "")).append(",");
+            csv.append(escapeCsv(log.getAction() != null ? log.getAction().name() : "")).append(",");
+            csv.append(escapeCsv(log.getDetail())).append(",");
+            csv.append(escapeCsv(log.getCreatedAt() != null ? log.getCreatedAt().toString() : "")).append("\n");
         }
         
         return org.springframework.http.ResponseEntity.ok()

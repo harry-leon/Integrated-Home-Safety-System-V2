@@ -44,11 +44,12 @@ public class FingerprintController {
                 .registeredBy(user)
                 .accessLevel("STANDARD")
                 .isActive(true)
+                .fingerSlotId((int) (fingerprintRepository.count() + 1)) // temporary auto-increment slot
                 .build();
                 
         fingerprintRepository.save(fingerprint);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(fingerprint);
+        return ResponseEntity.status(HttpStatus.CREATED).body(java.util.Map.of("id", fingerprint.getId()));
     }
 
     @DeleteMapping("/{id}")
