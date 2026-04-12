@@ -73,7 +73,11 @@ public class AuthService {
     }
 
     public boolean reAuthenticate(ReAuthRequestDTO request) {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()) {
+            return false;
+        }
+        String email = auth.getName();
         var user = userRepository.findByEmail(email)
                 .orElseThrow();
         

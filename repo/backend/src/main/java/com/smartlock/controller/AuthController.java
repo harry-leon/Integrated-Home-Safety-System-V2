@@ -32,8 +32,13 @@ public class AuthController {
 
     @PostMapping("/re-auth")
     public ResponseEntity<?> reAuthenticate(@RequestBody ReAuthRequestDTO request) {
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+        }
+
         if (authService.reAuthenticate(request)) {
-            String email = SecurityContextHolder.getContext().getAuthentication().getName();
+            String email = auth.getName();
             String verificationToken = authService.generateVerificationToken(email);
             return ResponseEntity.ok(Map.of("verificationToken", verificationToken));
         }
