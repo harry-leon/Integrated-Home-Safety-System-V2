@@ -32,10 +32,17 @@ public class BlynkWebhookController {
 
         // 1. Cập nhật trạng thái Device là ONLINE khi có bất kỳ dữ liệu nào gửi về
         deviceRepository.findByDeviceCode(deviceCode).ifPresent(device -> {
+            boolean wasOffline = !device.isOnline();
             device.setOnline(true);
             device.setLastSeen(LocalDateTime.now());
             deviceRepository.save(device);
+
+            // Nếu thiết bị vừa Online trở lại, xử lý các lệnh đang chờ
+            if (wasOffline) {
+                commandService.processOfflineCommands(device);
+            }
         });
+
 
         // 2. Gửi dữ liệu real-time lên Web Dashboard qua WebSocket
         messagingTemplate.convertAndSend("/topic/devices/" + deviceCode + "/updates", 

@@ -44,4 +44,8 @@ public class DeviceCommand {
     private LocalDateTime completedAt;
     
     private String failureReason;
+    
+    @Builder.Default
+    private int retryCount = 0;
 }
+

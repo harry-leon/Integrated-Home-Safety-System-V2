@@ -1,0 +1,4 @@
+﻿[ERROR] /C:/Users/huygi/Downloads/demo/repo/backend/src/main/java/com/smartlock/controller/AuthController.java:[45,31] cannot find symbol
+[ERROR] /C:/Users/huygi/Downloads/demo/repo/backend/src/main/java/com/smartlock/controller/AuthController.java:[46,38] cannot find symbol
+[ERROR] /C:/Users/huygi/Downloads/demo/repo/backend/src/main/java/com/smartlock/controller/AuthController.java:[45,31] cannot find symbol
+[ERROR] /C:/Users/huygi/Downloads/demo/repo/backend/src/main/java/com/smartlock/controller/AuthController.java:[46,38] cannot find symbol

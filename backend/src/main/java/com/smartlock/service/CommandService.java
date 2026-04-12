@@ -23,6 +23,10 @@ public class CommandService {
     private final DeviceCommandRepository commandRepository;
     private final DeviceRepository deviceRepository;
     private final SimpMessagingTemplate messagingTemplate;
+    private final BlynkService blynkService;
+
+    private static final int MAX_RETRIES = 3;
+    private static final int TIMEOUT_SECONDS = 15;
 
     /**
      * Step 1: User sends command from Web UI.
@@ -32,26 +36,56 @@ public class CommandService {
         Device device = deviceRepository.findById(deviceId)
                 .orElseThrow(() -> new RuntimeException("Device not found"));
 
-        // OFFLINE HANDLING: Kiểm tra trạng thái thiết bị trước khi gửi
-        if (!device.isOnline()) {
-            log.warn("Device {} is offline. Command rejected.", device.getDeviceCode());
-            throw new RuntimeException("Device is currently offline. Cannot send command.");
-        }
-
         DeviceCommand command = DeviceCommand.builder()
                 .device(device)
                 .commandType(commandType)
                 .payloadJson(payloadJson)
-                .status(CommandStatus.QUEUED)
+                .status(device.isOnline() ? CommandStatus.QUEUED : CommandStatus.PENDING_OFFLINE)
+                .retryCount(0)
                 .build();
 
         DeviceCommand savedCommand = commandRepository.save(command);
         
-        // Thông báo cho UI là lệnh đã được đưa vào hàng đợi
+        if (device.isOnline()) {
+            executeCommand(savedCommand);
+        } else {
+            log.info("Device {} is offline. Command {} queued for later.", device.getDeviceCode(), savedCommand.getId());
+        }
+
         notifyStatusUpdate(savedCommand);
-        
-        log.info("Command {} queued for device {}", savedCommand.getId(), device.getDeviceCode());
         return savedCommand.getId();
+    }
+
+    /**
+     * Physical execution of the command via Blynk.
+     */
+    public void executeCommand(DeviceCommand command) {
+        try {
+            // Mapping: Gửi CommandID và Payload tới Pin V10 (hoặc pin tùy chỉnh)
+            // Ví dụ: "commandId:LOCK_TOGGLE"
+            String blynkPayload = command.getId().toString() + ":" + command.getCommandType();
+            blynkService.updateVirtualPin(10, blynkPayload); 
+
+            command.setStatus(CommandStatus.SENT);
+            commandRepository.save(command);
+            notifyStatusUpdate(command);
+            log.info("Command {} sent to Blynk for device {}", command.getId(), command.getDevice().getDeviceCode());
+        } catch (Exception e) {
+            log.error("Failed to send command {} to Blynk: {}", command.getId(), e.getMessage());
+        }
+    }
+
+    /**
+     * HÀNG ĐỢI OFFLINE: Khi thiết bị Online trở lại, gửi ngay các lệnh đang chờ.
+     */
+    @Transactional
+    public void processOfflineCommands(Device device) {
+        commandRepository.findAllByDeviceAndStatus(device, CommandStatus.PENDING_OFFLINE)
+            .forEach(command -> {
+                log.info("Processing offline command {} for now-online device {}", command.getId(), device.getDeviceCode());
+                command.setStatus(CommandStatus.QUEUED);
+                executeCommand(command);
+            });
     }
 
     /**
@@ -72,30 +106,41 @@ public class CommandService {
     }
 
     /**
-     * TIMEOUT HANDLING: Tự động quét và đánh dấu quá hạn cho các lệnh RECENT mà không có phản hồi.
-     * Chạy mỗi 10 giây.
+     * RETRY & TIMEOUT HANDLING: 
+     * Tự động quét và thử lại nếu chưa nhận được phản hồi.
      */
     @Scheduled(fixedRate = 10000)
     @Transactional
     public void handleCommandTimeouts() {
-        LocalDateTime timeoutThreshold = LocalDateTime.now().minusSeconds(15);
+        LocalDateTime timeoutThreshold = LocalDateTime.now().minusSeconds(TIMEOUT_SECONDS);
         
-        // Tìm các lệnh ở trạng thái QUEUED hoặc SENT quá 15 giây
-        // (Lưu ý: Bạn có thể viết thêm query trong Repository để tìm chính xác hơn)
         commandRepository.findAll().stream()
-                .filter(c -> (c.getStatus() == CommandStatus.QUEUED || c.getStatus() == CommandStatus.SENT))
+                .filter(c -> (c.getStatus() == CommandStatus.SENT || c.getStatus() == CommandStatus.RETRYING))
                 .filter(c -> c.getRequestedAt().isBefore(timeoutThreshold))
                 .forEach(command -> {
-                    command.setStatus(CommandStatus.TIMEOUT);
-                    command.setFailureReason("No response from device (Timeout)");
-                    commandRepository.save(command);
-                    notifyStatusUpdate(command);
-                    log.warn("Command {} timed out for device {}", command.getId(), command.getDevice().getDeviceCode());
+                    if (command.getRetryCount() < MAX_RETRIES) {
+                        log.info("Retrying command {} (Attempt {})", command.getId(), command.getRetryCount() + 1);
+                        command.setRetryCount(command.getRetryCount() + 1);
+                        command.setStatus(CommandStatus.RETRYING);
+                        executeCommand(command);
+                    } else {
+                        command.setStatus(CommandStatus.TIMEOUT);
+                        command.setFailureReason("Max retries reached. No response from device.");
+                        commandRepository.save(command);
+                        notifyStatusUpdate(command);
+                        log.warn("Command {} timed out after {} retries", command.getId(), MAX_RETRIES);
+                    }
                 });
     }
 
     private void notifyStatusUpdate(DeviceCommand command) {
         String destination = "/topic/devices/" + command.getDevice().getDeviceCode() + "/commands";
-        messagingTemplate.convertAndSend(destination, command);
+        java.util.Map<String, Object> payload = new java.util.HashMap<>();
+        payload.put("commandId", command.getId());
+        payload.put("type", command.getCommandType());
+        payload.put("status", command.getStatus());
+        payload.put("retryCount", command.getRetryCount());
+        messagingTemplate.convertAndSend(destination, payload);
     }
 }
+
