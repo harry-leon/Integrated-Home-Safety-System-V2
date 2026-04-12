@@ -38,14 +38,12 @@ public class SecurityConfiguration {
                         .requestMatchers(new org.springframework.security.web.util.matcher.AntPathRequestMatcher("/api/auth/login")).permitAll()
                         .requestMatchers(new org.springframework.security.web.util.matcher.AntPathRequestMatcher("/api/auth/register")).permitAll()
                         .requestMatchers(new org.springframework.security.web.util.matcher.AntPathRequestMatcher("/api/integration/blynk/webhook", "POST")).permitAll()
-                        .requestMatchers(new org.springframework.security.web.util.matcher.AntPathRequestMatcher("/h2-console/**")).permitAll()
                         .requestMatchers(new org.springframework.security.web.util.matcher.AntPathRequestMatcher("/**", "OPTIONS")).permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .headers(headers -> headers.frameOptions(frame -> frame.disable()))
                 .exceptionHandling(ex -> ex
                         .accessDeniedHandler((request, response, accessDeniedException) -> {
                             response.setStatus(403);
@@ -57,10 +55,13 @@ public class SecurityConfiguration {
         return http.build();
     }
 
+    @org.springframework.beans.factory.annotation.Value("${cors.allowed-origins:http://localhost:3000}")
+    private String allowedOrigins;
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("*"));
+        configuration.setAllowedOrigins(java.util.Arrays.asList(allowedOrigins.split(",")));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Verification-Token"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
