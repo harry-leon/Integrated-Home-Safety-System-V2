@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 const translations = {
   en: {

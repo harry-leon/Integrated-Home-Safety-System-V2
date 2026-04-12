@@ -91,7 +91,7 @@ public class AuthService {
         var user = userRepository.findByEmail(email).orElseThrow();
         Map<String, Object> claims = new HashMap<>();
         claims.put("type", "VERIFICATION");
-        // Verification token expires in 5 minutes
-        return jwtService.generateToken(claims, user);
+        // Verification token expires in 5 minutes (300,000 ms)
+        return jwtService.generateToken(claims, user, 300000);
     }
 }
