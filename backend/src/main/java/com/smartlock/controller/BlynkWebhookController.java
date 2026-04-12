@@ -67,6 +67,10 @@ public class BlynkWebhookController {
         if (pin.equals("V10")) {
             try {
                 String[] parts = value.split(":");
+                if (parts.length < 2) {
+                    log.warn("Invalid command acknowledgement format: {}", value);
+                    return ResponseEntity.badRequest().build();
+                }
                 UUID commandId = UUID.fromString(parts[0]);
                 boolean isSuccess = "SUCCESS".equalsIgnoreCase(parts[1]);
                 String reason = parts.length > 2 ? parts[2] : "";
