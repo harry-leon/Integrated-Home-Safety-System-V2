@@ -11,8 +11,8 @@ public class BlynkService {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    // Bạn sẽ lấy các thông tin này từ Blynk Console (Template Settings)
-    @Value("${blynk.auth-token:YOUR_AUTH_TOKEN}")
+    // Cấu hình mã token được tiêm vào từ application.properties / môi trường biến (Environment variable)
+    @Value("${blynk.auth-token}")
     private String authToken;
 
     @Value("${blynk.base-url:https://blynk.cloud/external/api}")
