@@ -191,12 +191,16 @@ export function LanguageProvider({ children }) {
   const [lang, setLang] = useState('en');
 
   // Load persistence
-  useEffect(() => {
+  const loadLang = useCallback(() => {
     const saved = localStorage.getItem('sentinel-lang');
-    if (saved && ['en', 'vi'].includes(saved) && saved !== lang) {
+    if (saved && ['en', 'vi'].includes(saved)) {
       setLang(saved);
     }
-  }, [lang]);
+  }, []);
+
+  useEffect(() => {
+    loadLang();
+  }, [loadLang]);
 
   const toggleLang = () => {
     const nLang = lang === 'en' ? 'vi' : 'en';

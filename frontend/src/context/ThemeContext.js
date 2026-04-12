@@ -11,7 +11,7 @@ export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState('light');
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
+  const initTheme = useCallback(() => {
     const saved = localStorage.getItem('sentinel-theme');
     if (saved === 'dark' || saved === 'light') {
       setTheme(saved);
@@ -20,6 +20,10 @@ export function ThemeProvider({ children }) {
     }
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    initTheme();
+  }, [initTheme]);
 
   useEffect(() => {
     if (mounted) {
