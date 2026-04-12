@@ -1,7 +1,6 @@
 package com.smartlock.common.security;
 
 import com.smartlock.service.JwtService;
-import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

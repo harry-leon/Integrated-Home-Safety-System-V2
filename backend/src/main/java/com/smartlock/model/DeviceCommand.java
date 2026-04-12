@@ -40,8 +40,14 @@ public class DeviceCommand {
     @CreationTimestamp
     private LocalDateTime requestedAt;
     
+    private LocalDateTime sentAt;
+    
     private LocalDateTime acknowledgedAt;
     private LocalDateTime completedAt;
     
     private String failureReason;
+    
+    @Builder.Default
+    private int retryCount = 0;
 }
+
