@@ -8,22 +8,23 @@ const ThemeContext = createContext({
 });
 
 export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState('light');
+  const [theme, setTheme] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('sentinel-theme');
+      if (saved === 'dark' || saved === 'light') {
+        return saved;
+      }
+      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        return 'dark';
+      }
+    }
+    return 'light';
+  });
   const [mounted, setMounted] = useState(false);
 
-  const initTheme = useCallback(() => {
-    const saved = localStorage.getItem('sentinel-theme');
-    if (saved === 'dark' || saved === 'light') {
-      setTheme(saved);
-    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      setTheme('dark');
-    }
+  useEffect(() => {
     setMounted(true);
   }, []);
-
-  useEffect(() => {
-    initTheme();
-  }, [initTheme]);
 
   useEffect(() => {
     if (mounted) {

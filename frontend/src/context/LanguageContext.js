@@ -188,19 +188,15 @@ const translations = {
 const LanguageContext = createContext();
 
 export function LanguageProvider({ children }) {
-  const [lang, setLang] = useState('en');
-
-  // Load persistence
-  const loadLang = useCallback(() => {
-    const saved = localStorage.getItem('sentinel-lang');
-    if (saved && ['en', 'vi'].includes(saved)) {
-      setLang(saved);
+  const [lang, setLang] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('sentinel-lang');
+      if (saved && ['en', 'vi'].includes(saved)) {
+        return saved;
+      }
     }
-  }, []);
-
-  useEffect(() => {
-    loadLang();
-  }, [loadLang]);
+    return 'en';
+  });
 
   const toggleLang = () => {
     const nLang = lang === 'en' ? 'vi' : 'en';
