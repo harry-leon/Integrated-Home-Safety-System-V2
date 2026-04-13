@@ -2,7 +2,7 @@ name: Continuous Deployment (Vercel & Render)
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "dev" ]
 
 jobs:
   deploy-backend:
