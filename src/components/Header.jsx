@@ -10,11 +10,23 @@ const Header = () => {
 
   return (
     <header className="w-full sticky top-0 z-40 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/20 flex justify-between items-center px-8 py-4 font-['Manrope'] antialiased tracking-tight transition-colors duration-300">
-      <div className="flex items-center gap-8">
-        <span className="md:hidden text-2xl font-black tracking-tighter text-primary">SENTINEL</span>
-        <div className="hidden md:flex items-center bg-surface-container-high rounded-xl px-4 py-2 w-96 border border-outline-variant/20 transition-colors duration-300">
-          <span className="material-symbols-outlined text-outline mr-2">search</span>
-          <input className="bg-transparent border-none focus:ring-0 text-sm text-on-surface w-full outline-none placeholder:text-outline" placeholder={t('search')} type="text" />
+      <div className="flex items-center gap-4 sm:gap-8">
+        <span className="md:hidden text-2xl font-black tracking-tighter text-primary" aria-label="Sentinel Logo">SENTINEL</span>
+        <div className="hidden md:flex items-center gap-4">
+          <div className="relative group">
+            <select aria-label="Lựa chọn Thiết bị" className="appearance-none bg-surface-container border border-outline-variant/20 rounded-xl px-4 py-2 pl-10 pr-8 text-sm font-bold text-on-surface hover:border-primary transition-all duration-300 outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer shadow-sm">
+              <option value="main-gate">🚪 Cửa Chính (Main Gate)</option>
+              <option value="garage">🚗 Cửa Gara (Garage)</option>
+              <option value="backdoor">🌿 Cửa Sau (Backyard)</option>
+            </select>
+            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline group-hover:text-primary transition-colors pointer-events-none text-[18px]">vpn_key</span>
+            <span className="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-outline pointer-events-none text-[18px]">expand_more</span>
+          </div>
+
+          <div className="flex items-center bg-surface-container-high rounded-xl px-4 py-2 w-64 border border-outline-variant/20 transition-all duration-300 focus-within:ring-2 focus-within:ring-primary/50 focus-within:border-primary">
+            <span className="material-symbols-outlined text-outline mr-2 text-[18px]" aria-hidden="true">search</span>
+            <input aria-label="Tìm kiếm trong hệ thống" className="bg-transparent border-none focus:ring-0 text-sm text-on-surface w-full outline-none placeholder:text-outline" placeholder={t('search')} type="text" />
+          </div>
         </div>
       </div>
       

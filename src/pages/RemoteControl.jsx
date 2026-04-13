@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useLang } from '../contexts/LangContext';
+import GuestAccessModal from '../components/GuestAccessModal';
 
 const RemoteControl = () => {
   const { t } = useLang();
   const [locked, setLocked] = useState(true);
+  const [isGuestModalOpen, setIsGuestModalOpen] = useState(false);
 
   return (
     <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
@@ -15,6 +17,13 @@ const RemoteControl = () => {
           <p className="text-outline font-medium mt-1">Quản lý an ninh thời gian thực</p>
         </div>
         <div className="flex items-center gap-4">
+          <button 
+            onClick={() => setIsGuestModalOpen(true)}
+            className="hidden sm:flex items-center gap-2 px-4 py-2 bg-primary-container text-on-primary-container rounded-xl font-bold shadow-sm hover:opacity-90 transition-all border border-primary/20"
+          >
+            <span className="material-symbols-outlined text-[18px]">key</span>
+            Cấp quyền Khách
+          </button>
           <div className="bg-surface-container px-4 py-2 rounded-full flex items-center gap-2 border border-outline-variant/10 shadow-sm transition-colors duration-300">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
             <span className="text-xs font-semibold text-on-surface">HỆ THỐNG TRỰC TUYẾN</span>
@@ -96,6 +105,11 @@ const RemoteControl = () => {
           </div>
         </div>
       </div>
+
+      <GuestAccessModal 
+        isOpen={isGuestModalOpen} 
+        onClose={() => setIsGuestModalOpen(false)} 
+      />
     </div>
   );
 };
