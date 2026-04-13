@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useLang } from '../contexts/LangContext';
 import { useTimeWeather } from '../contexts/TimeWeatherContext';
+import { smartLockApi } from '../services/api';
 
 const Dashboard = () => {
   const { t } = useLang();
   const { weather } = useTimeWeather();
   const [wifiSignal, setWifiSignal] = useState(92);
+  const [alerts, setAlerts] = useState([]);
+  const [isLoadingAlerts, setIsLoadingAlerts] = useState(true);
 
   // Simulate real-time wifi signal fluctuation
   useEffect(() => {
@@ -18,6 +21,21 @@ const Dashboard = () => {
         return next;
       });
     }, 5000);
+    
+    // Fetch Alerts
+    const fetchAlerts = async () => {
+      setIsLoadingAlerts(true);
+      try {
+        const data = await smartLockApi.getAlerts();
+        setAlerts(data || []);
+      } catch (err) {
+        setAlerts([]); // fallback to empty
+      } finally {
+        setIsLoadingAlerts(false);
+      }
+    };
+    
+    fetchAlerts();
     return () => clearInterval(wInterval);
   }, []);
 
@@ -118,34 +136,45 @@ const Dashboard = () => {
             <a className="text-primary text-sm font-semibold hover:underline cursor-pointer">{t('view_all')}</a>
           </div>
           <div className="space-y-4">
-            {/* Alert Item 1 */}
-            <div className="flex items-center p-5 bg-surface-container-low border border-outline-variant/10 rounded-2xl relative overflow-hidden transition-colors duration-300">
-              <div className="absolute left-0 top-0 bottom-0 w-1 bg-error"></div>
-              <div className="w-12 h-12 rounded-full bg-error/10 flex items-center justify-center mr-4">
-                <span className="material-symbols-outlined text-error">warning</span>
-              </div>
-              <div className="flex-1">
-                <div className="flex justify-between items-start">
-                  <h4 className="font-bold text-on-surface">Phát hiện truy cập trái phép</h4>
-                  <span className="text-xs font-label text-outline">14:20 Hôm nay</span>
+            {isLoadingAlerts ? (
+              Array(2).fill(0).map((_, i) => (
+                <div key={i} className="flex items-center p-5 bg-surface-container-low border border-outline-variant/10 rounded-2xl animate-pulse">
+                  <div className="w-12 h-12 rounded-full bg-surface-container-highest flex-shrink-0 mr-4"></div>
+                  <div className="flex-1 space-y-2">
+                    <div className="w-32 h-4 bg-surface-container-highest rounded"></div>
+                    <div className="w-64 h-3 bg-surface-container-highest rounded"></div>
+                  </div>
                 </div>
-                <p className="text-sm text-outline mt-1">Cửa chính đã được thử mở bằng vân tay không hợp lệ 3 lần liên tiếp.</p>
+              ))
+            ) : alerts.length === 0 ? (
+              <div className="p-8 text-center border-2 border-dashed border-outline-variant/20 rounded-2xl">
+                <span className="material-symbols-outlined text-4xl text-outline mb-2">check_circle</span>
+                <p className="text-outline font-medium text-sm">Hệ thống an toàn. Không có cảnh báo.</p>
               </div>
-            </div>
-            {/* Alert Item 2 */}
-            <div className="flex items-center p-5 bg-surface-container-low border border-outline-variant/10 rounded-2xl relative overflow-hidden transition-colors duration-300">
-              <div className="absolute left-0 top-0 bottom-0 w-1 bg-tertiary"></div>
-              <div className="w-12 h-12 rounded-full bg-tertiary/10 flex items-center justify-center mr-4">
-                <span className="material-symbols-outlined text-tertiary">battery_alert</span>
-              </div>
-              <div className="flex-1">
-                <div className="flex justify-between items-start">
-                  <h4 className="font-bold text-on-surface">Pin yếu (Smart Lock B)</h4>
-                  <span className="text-xs font-label text-outline">Hôm qua</span>
-                </div>
-                <p className="text-sm text-outline mt-1">Dung lượng pin dưới 15%. Vui lòng thay pin hoặc sạc thiết bị.</p>
-              </div>
-            </div>
+            ) : (
+              alerts.map((alert, i) => {
+                const isCritical = alert.severity === 'CRITICAL' || alert.alertType === 'TAMPERED';
+                const color = isCritical ? 'error' : 'tertiary';
+                const icon = isCritical ? 'warning' : 'battery_alert';
+                const dateObj = new Date(alert.createdAt);
+                
+                return (
+                  <div key={i} className="flex items-center p-5 bg-surface-container-low border border-outline-variant/10 rounded-2xl relative overflow-hidden transition-colors duration-300">
+                    <div className={`absolute left-0 top-0 bottom-0 w-1 bg-${color}`}></div>
+                    <div className={`w-12 h-12 rounded-full bg-${color}/10 flex items-center justify-center mr-4`}>
+                      <span className={`material-symbols-outlined text-${color}`}>{icon}</span>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex justify-between items-start">
+                        <h4 className="font-bold text-on-surface">{alert.alertType} / {alert.severity}</h4>
+                        <span className="text-xs font-label text-outline">{dateObj.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}</span>
+                      </div>
+                      <p className="text-sm text-outline mt-1">{alert.message || 'Cảnh báo hệ thống'}</p>
+                    </div>
+                  </div>
+                );
+              })
+            )}
           </div>
         </div>
 
