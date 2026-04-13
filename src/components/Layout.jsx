@@ -17,23 +17,23 @@ const Layout = () => {
       </main>
       
       {/* Mobile Navigation (suppressed on desktop) */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-surface-container/95 backdrop-blur-xl border-t border-outline-variant/20 flex justify-around items-center py-4 px-6 z-50">
-        <div className="flex flex-col items-center text-primary">
+      <nav aria-label="Mobile Navigation" className="md:hidden fixed bottom-0 left-0 right-0 bg-surface-container/95 backdrop-blur-xl border-t border-outline-variant/20 flex justify-around items-center py-4 px-6 z-50">
+        <NavLink to="/" className={({isActive}) => `flex flex-col items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded pl-2 pr-2 ${isActive ? 'text-primary' : 'text-outline hover:text-primary transition-colors'}`}>
           <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>dashboard</span>
           <span className="text-[10px] font-bold mt-1">Tổng quan</span>
-        </div>
-        <div className="flex flex-col items-center text-outline hover:text-primary transition-colors">
+        </NavLink>
+        <NavLink to="/remote" className={({isActive}) => `flex flex-col items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded pl-2 pr-2 ${isActive ? 'text-primary' : 'text-outline hover:text-primary transition-colors'}`}>
           <span className="material-symbols-outlined">lock</span>
           <span className="text-[10px] font-bold mt-1">Khóa</span>
-        </div>
-        <div className="flex flex-col items-center text-outline hover:text-primary transition-colors">
+        </NavLink>
+        <NavLink to="/dashboard" className={({isActive}) => `flex flex-col items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded pl-2 pr-2 ${isActive ? 'text-primary' : 'text-outline hover:text-primary transition-colors'}`}>
           <span className="material-symbols-outlined">notifications</span>
           <span className="text-[10px] font-bold mt-1">Cảnh báo</span>
-        </div>
-        <div className="flex flex-col items-center text-outline hover:text-primary transition-colors">
+        </NavLink>
+        <NavLink to="/settings" className={({isActive}) => `flex flex-col items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded pl-2 pr-2 ${isActive ? 'text-primary' : 'text-outline hover:text-primary transition-colors'}`}>
           <span className="material-symbols-outlined">person</span>
-          <span className="text-[10px] font-bold mt-1">Tôi</span>
-        </div>
+          <span className="text-[10px] font-bold mt-1">Cài đặt</span>
+        </NavLink>
       </nav>
     </div>
   );
