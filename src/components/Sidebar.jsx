@@ -27,12 +27,13 @@ const Sidebar = () => {
             key={item.path}
             to={item.path}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-4 py-3 font-['Manrope'] text-sm font-medium transition-all duration-300 rounded-lg ${
+              `flex items-center gap-3 px-4 py-3 font-['Manrope'] text-sm font-medium transition-all duration-300 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
                 isActive
                   ? 'bg-primary/10 text-primary border-l-4 border-primary shadow-sm'
                   : 'text-outline hover:text-on-surface hover:bg-surface-container-high'
               }`
             }
+            aria-label={item.name}
           >
             <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>
               {item.icon}
@@ -43,12 +44,12 @@ const Sidebar = () => {
       </nav>
 
       <div className="mt-auto space-y-2 pt-8 border-t border-outline-variant/20">
-        <NavLink to="/support" className="flex items-center gap-3 px-4 py-3 text-outline hover:text-on-surface hover:bg-surface-container-high transition-all duration-300 font-['Manrope'] text-sm font-medium rounded-lg">
-          <span className="material-symbols-outlined">help</span>
+        <NavLink aria-label={t('support')} to="/support" className="flex items-center gap-3 px-4 py-3 text-outline hover:text-on-surface hover:bg-surface-container-high transition-all duration-300 font-['Manrope'] text-sm font-medium rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
+          <span className="material-symbols-outlined" aria-hidden="true">help</span>
           <span>{t('support')}</span>
         </NavLink>
-        <NavLink to="/login" className="flex items-center gap-3 px-4 py-3 text-outline hover:text-error hover:bg-error/10 transition-all duration-300 font-['Manrope'] text-sm font-medium rounded-lg">
-          <span className="material-symbols-outlined">logout</span>
+        <NavLink aria-label={t('logout')} to="/login" className="flex items-center gap-3 px-4 py-3 text-outline hover:text-error hover:bg-error/10 transition-all duration-300 font-['Manrope'] text-sm font-medium rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-error">
+          <span className="material-symbols-outlined" aria-hidden="true">logout</span>
           <span>{t('logout')}</span>
         </NavLink>
       </div>
