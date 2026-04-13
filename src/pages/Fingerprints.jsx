@@ -1,15 +1,61 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLang } from '../contexts/LangContext';
+import { smartLockApi } from '../services/api';
 
 const Fingerprints = () => {
   const { t } = useLang();
+  
+  const [users, setUsers] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const mockUsers = [
-    { id: '#001', initials: 'NH', name: 'Nguyễn Hoàng', level: 'Quản trị viên', levelClass: 'text-blue-500 bg-blue-500/10 border-blue-500/20', meta: 'ID: 8829 | 256-bit AES', lastActive: 'Hôm nay, 08:42 AM', status: 'Thành công', statusClass: 'text-emerald-500' },
-    { id: '#002', initials: 'MT', name: 'Minh Tú', level: 'Nhân viên', levelClass: 'text-tertiary bg-tertiary/10 border-tertiary/20', meta: 'ID: 7712 | 256-bit AES', lastActive: 'Hôm qua, 18:15 PM', status: 'Truy cập', statusClass: 'text-outline' },
-    { id: '#003', initials: 'KH', name: 'Khánh Huyền', level: 'Khách', levelClass: 'text-tertiary bg-tertiary/10 border-tertiary/20', meta: 'ID: 9021 | 256-bit AES', lastActive: '12/10/2023, 09:20 AM', status: 'Từ chối', statusClass: 'text-error' },
-    { id: '#004', initials: 'AN', name: 'Anh Ngọc', level: 'Kỹ thuật', levelClass: 'text-blue-500 bg-blue-500/10 border-blue-500/20', meta: 'ID: 6652 | 256-bit AES', lastActive: '05/10/2023, 14:33 PM', status: 'Bảo trì', statusClass: 'text-emerald-500' },
-  ];
+  useEffect(() => {
+    const fetchUsers = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const data = await smartLockApi.getFingerprints();
+        if (data) {
+          const mapped = data.map(item => {
+            const dateObj = new Date(item.lastAccess || item.registeredAt);
+            const isToday = dateObj.toDateString() === new Date().toDateString();
+            const timeStr = dateObj.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+            const lastActive = isToday ? `Hôm nay, ${timeStr}` : `${dateObj.toLocaleDateString('vi-VN')}, ${timeStr}`;
+            
+            let levelClass = 'text-tertiary bg-tertiary/10 border-tertiary/20';
+            if (item.accessLevel === 'ADMIN') levelClass = 'text-blue-500 bg-blue-500/10 border-blue-500/20';
+            else if (item.accessLevel === 'GUEST') levelClass = 'text-error bg-error/10 border-error/20';
+
+            return {
+              id: `#${String(item.fingerSlotId).padStart(3, '0')}`,
+              initials: item.personName.substring(0, 2).toUpperCase(),
+              name: item.personName,
+              level: item.accessLevel || 'STANDARD',
+              levelClass,
+              meta: `Slot: ${item.fingerSlotId} | ${item.isActive ? 'Active' : 'Inactive'}`,
+              lastActive,
+              status: item.isActive ? 'Bình thường' : 'Vô hiệu hóa',
+              statusClass: item.isActive ? 'text-emerald-500' : 'text-error',
+              rawData: item
+            };
+          });
+          setUsers(mapped);
+        } else {
+          setUsers([]);
+        }
+      } catch (err) {
+        // Backend hasn't completely implemented GET /fingerprints so we fallback gracefully
+        setUsers([]);
+        if (err.message && !err.message.includes("404")) {
+           setError('Không thể kết nối đến máy chủ.');
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchUsers();
+  }, []);
 
   return (
     <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500 relative">
@@ -67,34 +113,65 @@ const Fingerprints = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-outline-variant/10">
-            {mockUsers.map(user => (
-              <tr key={user.id} className="hover:bg-surface-container-high transition-colors duration-200 group">
-                <td className="px-8 py-5 text-primary font-mono font-bold">{user.id}</td>
-                <td className="px-8 py-5">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center text-xs font-bold text-on-surface border border-outline-variant/20">{user.initials}</div>
-                    <span className="font-medium text-on-surface">{user.name}</span>
+            {isLoading ? (
+              Array(4).fill(0).map((_, i) => (
+                <tr key={i} className="animate-pulse">
+                  <td className="px-8 py-5"><div className="h-4 bg-surface-container-highest rounded w-12"></div></td>
+                  <td className="px-8 py-5"><div className="flex items-center gap-3"><div className="w-8 h-8 rounded-full bg-surface-container-highest"></div><div className="h-4 bg-surface-container-highest rounded w-24"></div></div></td>
+                  <td className="px-8 py-5"><div className="h-5 bg-surface-container-highest rounded-full w-20"></div></td>
+                  <td className="px-8 py-5"><div className="h-4 bg-surface-container-highest rounded w-32"></div></td>
+                  <td className="px-8 py-5"><div className="h-4 bg-surface-container-highest rounded w-28 mb-1"></div><div className="h-3 bg-surface-container-highest rounded w-16"></div></td>
+                  <td className="px-8 py-5"></td>
+                </tr>
+              ))
+            ) : error ? (
+              <tr>
+                <td colSpan="6" className="px-8 py-12 text-center text-error">
+                  <div className="flex flex-col items-center justify-center">
+                    <span className="material-symbols-outlined text-4xl mb-3">error</span>
+                    <p className="font-bold">{error}</p>
                   </div>
-                </td>
-                <td className="px-8 py-5">
-                  <span className={`text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-wider border ${user.levelClass}`}>
-                    {user.level}
-                  </span>
-                </td>
-                <td className="px-8 py-5 text-outline text-sm font-label">{user.meta}</td>
-                <td className="px-8 py-5">
-                  <div className="flex flex-col">
-                    <span className="text-on-surface text-sm">{user.lastActive}</span>
-                    <span className={`text-[10px] font-bold uppercase tracking-tighter ${user.statusClass}`}>{user.status}</span>
-                  </div>
-                </td>
-                <td className="px-8 py-5 text-right">
-                  <button className="p-2 text-outline hover:text-on-surface hover:bg-surface-container-highest rounded-lg transition-colors">
-                    <span className="material-symbols-outlined">more_vert</span>
-                  </button>
                 </td>
               </tr>
-            ))}
+            ) : users.length === 0 ? (
+              <tr>
+                <td colSpan="6" className="px-8 py-12 text-center text-outline">
+                  <div className="flex flex-col items-center justify-center">
+                    <span className="material-symbols-outlined text-4xl mb-3 text-surface-container-highest">fingerprint</span>
+                    <p className="font-medium text-sm">Chưa có vân tay nào được đăng ký.</p>
+                  </div>
+                </td>
+              </tr>
+            ) : (
+              users.map(user => (
+                <tr key={user.id} className="hover:bg-surface-container-high transition-colors duration-200 group">
+                  <td className="px-8 py-5 text-primary font-mono font-bold">{user.id}</td>
+                  <td className="px-8 py-5">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center text-xs font-bold text-on-surface border border-outline-variant/20">{user.initials}</div>
+                      <span className="font-medium text-on-surface">{user.name}</span>
+                    </div>
+                  </td>
+                  <td className="px-8 py-5">
+                    <span className={`text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-wider border ${user.levelClass}`}>
+                      {user.level}
+                    </span>
+                  </td>
+                  <td className="px-8 py-5 text-outline text-sm font-label">{user.meta}</td>
+                  <td className="px-8 py-5">
+                    <div className="flex flex-col">
+                      <span className="text-on-surface text-sm">{user.lastActive}</span>
+                      <span className={`text-[10px] font-bold uppercase tracking-tighter ${user.statusClass}`}>{user.status}</span>
+                    </div>
+                  </td>
+                  <td className="px-8 py-5 text-right">
+                    <button className="p-2 text-outline hover:text-on-surface hover:bg-surface-container-highest rounded-lg transition-colors">
+                      <span className="material-symbols-outlined">more_vert</span>
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
         

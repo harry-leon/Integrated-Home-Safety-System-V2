@@ -1,15 +1,84 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLang } from '../contexts/LangContext';
+import { smartLockApi } from '../services/api';
 
 const Logs = () => {
   const { t } = useLang();
+  
+  const [logs, setLogs] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const logs = [
-    { time: '14:24:02', date: '24/05/2024', type: 'Truy cập', typeIcon: 'person', typeColor: 'blue', entity: 'Nguyen_Van_A', entityIcon: 'person', detail: 'Mở khóa cửa chính (Main Gate) qua nhận diện khuôn mặt.', status: 'Thành công', statusColor: 'emerald' },
-    { time: '14:18:45', date: '24/05/2024', type: 'Cảnh báo', typeIcon: 'warning', typeColor: 'orange', entity: 'Sensor_B12', entityIcon: 'lock', detail: 'Phát hiện nỗ lực cạy cửa tại kho hàng số 2.', status: 'Từ chối', statusColor: 'red' },
-    { time: '13:55:12', date: '24/05/2024', type: 'Lệnh', typeIcon: 'terminal', typeColor: 'purple', entity: 'System_Core', entityIcon: 'shield', detail: 'Cập nhật chính sách bảo mật cho toàn bộ hệ thống vân tay.', status: 'Thành công', statusColor: 'emerald' },
-    { time: '12:40:01', date: '24/05/2024', type: 'Truy cập', typeIcon: 'person', typeColor: 'blue', entity: 'Unknown_User', entityIcon: 'person', detail: 'Nỗ lực đăng nhập hệ thống quản trị từ IP 192.168.1.105.', status: 'Từ chối', statusColor: 'red' },
-  ];
+  useEffect(() => {
+    const fetchLogs = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const data = await smartLockApi.getAccessLogs();
+        if (data) {
+          // Map backend DTO to frontend structure
+          const formattedLogs = data.map(log => {
+            const dateObj = new Date(log.createdAt);
+            const time = dateObj.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const date = dateObj.toLocaleDateString('vi-VN');
+            
+            // Determine type format
+            let type = 'Truy cập';
+            let typeIcon = 'person';
+            let typeColor = 'blue';
+            let entityIcon = 'person';
+            
+            if (log.action === 'TAMPERED' || log.action === 'DENIED') {
+              type = 'Cảnh báo';
+              typeIcon = 'warning';
+              typeColor = 'orange';
+              entityIcon = 'lock';
+            } else if (log.method === 'REMOTE') {
+              type = 'Lệnh';
+              typeIcon = 'terminal';
+              typeColor = 'purple';
+              entityIcon = 'shield';
+            }
+            
+            let statusStr = 'Thành công';
+            let statusColor = 'emerald';
+            if (log.action === 'DENIED') {
+              statusStr = 'Từ chối';
+              statusColor = 'red';
+            } else if (log.action === 'TAMPERED') {
+              statusStr = 'Cảnh báo';
+              statusColor = 'red';
+            }
+            
+            return {
+              id: log.id,
+              time,
+              date,
+              type,
+              typeIcon,
+              typeColor,
+              entity: log.personName || log.userName || log.deviceName || 'Unknown',
+              entityIcon,
+              detail: log.detail || `${log.action} qua ${log.method}`,
+              status: statusStr,
+              statusColor
+            };
+          });
+          setLogs(formattedLogs);
+        } else {
+          setLogs([]);
+        }
+      } catch (err) {
+        setError('Không thể tải nhật ký. Vui lòng thử lại sau.');
+        // Fallback for demo purposes if backend fails/unavailable
+        setLogs([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchLogs();
+  }, []);
 
   return (
     <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500 relative pb-20">
@@ -74,43 +143,74 @@ const Logs = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-outline-variant/10">
-                {logs.map((log, i) => (
-                  <tr key={i} className="hover:bg-surface-container-highest/20 transition-colors group cursor-default">
-                    <td className="px-6 py-6">
-                      <div className="flex flex-col">
-                        <span className="text-sm font-bold text-on-surface">{log.time}</span>
-                        <span className="text-[10px] text-outline font-label mt-1">{log.date}</span>
+                {isLoading ? (
+                  Array(5).fill(0).map((_, i) => (
+                    <tr key={i} className="animate-pulse">
+                      <td className="px-6 py-6"><div className="h-4 bg-surface-container-highest rounded w-20 mb-2"></div><div className="h-3 bg-surface-container-highest rounded w-16"></div></td>
+                      <td className="px-6 py-6"><div className="h-6 bg-surface-container-highest rounded-full w-24"></div></td>
+                      <td className="px-6 py-6"><div className="flex items-center gap-3"><div className="w-8 h-8 rounded-lg bg-surface-container-highest"></div><div className="h-4 bg-surface-container-highest rounded w-28"></div></div></td>
+                      <td className="px-6 py-6"><div className="h-4 bg-surface-container-highest rounded w-full max-w-[200px]"></div></td>
+                      <td className="px-6 py-6"><div className="h-6 bg-surface-container-highest rounded-full w-20"></div></td>
+                      <td className="px-6 py-6"></td>
+                    </tr>
+                  ))
+                ) : error ? (
+                  <tr>
+                    <td colSpan="6" className="px-6 py-12 text-center">
+                      <div className="flex flex-col items-center justify-center text-error">
+                        <span className="material-symbols-outlined text-4xl mb-4">error</span>
+                        <p className="font-bold">{error}</p>
                       </div>
-                    </td>
-                    <td className="px-6 py-6">
-                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-${log.typeColor}-500/10 text-${log.typeColor}-500 text-[10px] font-bold uppercase tracking-wider border border-${log.typeColor}-500/20`}>
-                        <span className={`w-1.5 h-1.5 rounded-full bg-${log.typeColor}-500`}></span>
-                        {t(log.type)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-6">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-surface-container-highest flex items-center justify-center text-on-surface border border-outline-variant/10">
-                          <span className="material-symbols-outlined text-sm">{log.entityIcon}</span>
-                        </div>
-                        <span className="text-sm font-medium text-on-surface">{log.entity}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-6">
-                      <p className="text-sm text-outline leading-relaxed max-w-sm">{t(log.detail)}</p>
-                    </td>
-                    <td className="px-6 py-6">
-                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-${log.statusColor}-500/10 text-${log.statusColor}-500 text-[10px] font-bold uppercase tracking-wider`}>
-                        {t(log.status)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-6 text-right">
-                      <button className="opacity-0 group-hover:opacity-100 p-2 text-outline hover:text-on-surface transition-all rounded-lg hover:bg-surface-container-highest">
-                        <span className="material-symbols-outlined text-sm">more_vert</span>
-                      </button>
                     </td>
                   </tr>
-                ))}
+                ) : logs.length === 0 ? (
+                  <tr>
+                    <td colSpan="6" className="px-6 py-12 text-center">
+                      <div className="flex flex-col items-center justify-center text-outline">
+                        <span className="material-symbols-outlined text-4xl mb-4 text-surface-container-highest">search_off</span>
+                        <p className="font-medium text-sm">{t('Không có sự kiện nào được tìm thấy.')}</p>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  logs.map((log, i) => (
+                    <tr key={i} className="hover:bg-surface-container-highest/20 transition-colors group cursor-default">
+                      <td className="px-6 py-6">
+                        <div className="flex flex-col">
+                          <span className="text-sm font-bold text-on-surface">{log.time}</span>
+                          <span className="text-[10px] text-outline font-label mt-1">{log.date}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-6">
+                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-${log.typeColor}-500/10 text-${log.typeColor}-500 text-[10px] font-bold uppercase tracking-wider border border-${log.typeColor}-500/20`}>
+                          <span className={`w-1.5 h-1.5 rounded-full bg-${log.typeColor}-500`}></span>
+                          {t(log.type)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-6">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-lg bg-surface-container-highest flex items-center justify-center text-on-surface border border-outline-variant/10">
+                            <span className="material-symbols-outlined text-sm">{log.entityIcon}</span>
+                          </div>
+                          <span className="text-sm font-medium text-on-surface">{log.entity}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-6">
+                        <p className="text-sm text-outline leading-relaxed max-w-sm">{t(log.detail)}</p>
+                      </td>
+                      <td className="px-6 py-6">
+                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-${log.statusColor}-500/10 text-${log.statusColor}-500 text-[10px] font-bold uppercase tracking-wider`}>
+                          {t(log.status)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-6 text-right">
+                        <button className="opacity-0 group-hover:opacity-100 p-2 text-outline hover:text-on-surface transition-all rounded-lg hover:bg-surface-container-highest">
+                          <span className="material-symbols-outlined text-sm">more_vert</span>
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
