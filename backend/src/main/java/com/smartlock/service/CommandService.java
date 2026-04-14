@@ -24,6 +24,7 @@ public class CommandService {
     private final DeviceRepository deviceRepository;
     private final SimpMessagingTemplate messagingTemplate;
     private final BlynkService blynkService;
+    private final org.springframework.context.ApplicationEventPublisher eventPublisher;
 
     private static final int MAX_RETRIES = 3;
     private static final int TIMEOUT_SECONDS = 15;
@@ -46,6 +47,9 @@ public class CommandService {
 
         DeviceCommand savedCommand = commandRepository.save(command);
         
+        eventPublisher.publishEvent(new com.smartlock.event.AuditLogEvent(this, "COMMAND_SENT", 
+                commandType + " for device " + device.getDeviceCode(), "System/WebUser"));
+
         if (device.isOnline()) {
             executeCommand(savedCommand);
         } else {

@@ -21,6 +21,7 @@ public class BlynkWebhookController {
     private final SimpMessagingTemplate messagingTemplate;
     private final CommandService commandService;
     private final DeviceRepository deviceRepository;
+    private final com.smartlock.service.AlertService alertService;
 
     @org.springframework.beans.factory.annotation.Value("${blynk.auth-token:}")
     private String globalWebhookToken;
@@ -78,6 +79,18 @@ public class BlynkWebhookController {
                 commandService.acknowledgeCommand(commandId, isSuccess, reason);
             } catch (Exception e) {
                 log.error("Failed to parse command acknowledgement from Blynk: {}", value);
+            }
+        }
+
+        // 4. Xử lý cảm biến khí gas (Gas Leak Simulation)
+        if (pin.equals("V11")) {
+            try {
+                int gasValue = Integer.parseInt(value);
+                if (gasValue > 1000) {
+                    alertService.createAlert(device, com.smartlock.model.enums.AlertType.GAS_LEAK, "CRITICAL", "High Gas Concentration Detected!", gasValue);
+                }
+            } catch (NumberFormatException e) {
+                log.warn("Invalid gas sensor value: {}", value);
             }
         }
 

@@ -11,8 +11,11 @@ This project adopts a **Monorepo** structure, housing both the API backend and t
 ### Backend (`/backend`)
 - **Framework:** Spring Boot 3 (Java 17)
 - **Security:** Spring Security + JWT Authentication
-- **Database:** H2 In-Memory Database (Configured for quick local development)
+- **Database:** 
+  - **Local:** H2 File-based (Configured for quick local development)
+  - **Production:** PostgreSQL (Ready for Docker deployment)
 - **Migrations:** Flyway (Automatically handles schema creation and data seeding)
+- **Monitoring:** Command Retry Logic & Offline Queuing implemented.
 - **Build Tool:** Maven
 
 ### Frontend (`/frontend`)
@@ -32,7 +35,8 @@ This project adopts a **Monorepo** structure, housing both the API backend and t
 
 - **Robust Authentication:** JWT-based secure login, registration, and RBAC (Role-Based Access Control).
 - **Device Management:** Register, monitor, and configure smart locks and home sensors.
-- **Access Logs & Analytics:** Realtime monitoring and logging of lock/unlock events and unauthorized intrusion attempts.
+- **Command Reliability:** Integrated **Retry Logic** (up to 3 attempts) and **Offline Queuing** to ensure commands reach devices as soon as they reconnect.
+- **Premium Dashboard:** High-end **Aegis Sentinel** dashboard with glassmorphism UI, real-time status updates, and comprehensive activity logs.
 - **Automated Database Seeding:** Flyway automatically populates the database with mocked sensors, devices, and user data on first launch.
 - **Continuous Integration Pipeline:** Any code pushed must pass automated linters and Maven builds.
 
