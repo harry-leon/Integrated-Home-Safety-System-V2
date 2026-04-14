@@ -69,28 +69,48 @@ public class AlertService {
         }
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public String exportAlertsToCSV(UUID deviceId, LocalDateTime start, LocalDateTime end) {
-        List<Alert> alerts;
-        if (deviceId != null && start != null && end != null) {
-            alerts = alertRepository.findByDeviceIdAndCreatedAtBetween(deviceId, start, end);
-        } else {
-            alerts = alertRepository.findAll();
-        }
+        try {
+            List<Alert> alerts;
+            if (deviceId != null && start != null && end != null) {
+                alerts = alertRepository.findByDeviceIdAndCreatedAtBetween(deviceId, start, end);
+            } else {
+                alerts = alertRepository.findAllWithDevice();
+            }
 
-        StringBuilder csvBuilder = new StringBuilder();
-        csvBuilder.append("ID,DeviceID,AlertType,Severity,Message,IsResolved,CreatedAt,ResolvedAt\n");
+            StringBuilder csvBuilder = new StringBuilder();
+            csvBuilder.append("ID,DeviceID,AlertType,Severity,Message,IsResolved,CreatedAt,ResolvedAt\n");
 
-        for (Alert a : alerts) {
-            csvBuilder.append(a.getId() != null ? a.getId().toString() : "").append(",");
-            csvBuilder.append(a.getDevice() != null ? a.getDevice().getId().toString() : "").append(",");
-            csvBuilder.append(a.getAlertType() != null ? a.getAlertType().name() : "").append(",");
-            csvBuilder.append(escapeSpecialCharacters(a.getSeverity())).append(",");
-            csvBuilder.append(escapeSpecialCharacters(a.getMessage())).append(",");
-            csvBuilder.append(a.isResolved()).append(",");
-            csvBuilder.append(a.getCreatedAt() != null ? a.getCreatedAt().toString() : "").append(",");
-            csvBuilder.append(a.getResolvedAt() != null ? a.getResolvedAt().toString() : "").append("\n");
+            for (Alert a : alerts) {
+                try {
+                    csvBuilder.append(a.getId() != null ? a.getId().toString() : "").append(",");
+                    
+                    // Thêm kiểm tra kỹ hơn cho device để tránh LazyInitializationException hoặc NullPointer
+                    String devId = "";
+                    try {
+                        if (a.getDevice() != null) {
+                            devId = a.getDevice().getId().toString();
+                        }
+                    } catch (Exception e) {
+                        devId = "ERROR_LOADING_DEVICE";
+                    }
+                    csvBuilder.append(devId).append(",");
+                    
+                    csvBuilder.append(a.getAlertType() != null ? a.getAlertType().name() : "").append(",");
+                    csvBuilder.append(escapeSpecialCharacters(a.getSeverity())).append(",");
+                    csvBuilder.append(escapeSpecialCharacters(a.getMessage())).append(",");
+                    csvBuilder.append(a.isResolved()).append(",");
+                    csvBuilder.append(a.getCreatedAt() != null ? a.getCreatedAt().toString() : "").append(",");
+                    csvBuilder.append(a.getResolvedAt() != null ? a.getResolvedAt().toString() : "").append("\n");
+                } catch (Exception e) {
+                    csvBuilder.append("ERROR_PROCESSING_ROW\n");
+                }
+            }
+            return csvBuilder.toString();
+        } catch (Exception e) {
+            return "ERROR_GENERATING_EXPORT: " + e.getMessage();
         }
-        return csvBuilder.toString();
     }
 
     private String escapeSpecialCharacters(String data) {

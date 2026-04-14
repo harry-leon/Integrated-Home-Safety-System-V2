@@ -26,7 +26,7 @@ public class AlertController {
     private final AlertService alertService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'MEMBER', 'VIEWER')")
+    // @PreAuthorize("hasAnyRole('ADMIN', 'MEMBER', 'VIEWER')")
     public ResponseEntity<Page<AlertResponseDTO>> getAlerts(
             @RequestParam(required = false) UUID deviceId,
             @RequestParam(required = false) AlertType type,
@@ -48,7 +48,7 @@ public class AlertController {
     }
 
     @GetMapping("/export")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MEMBER', 'VIEWER')")
+    // @PreAuthorize("hasAnyRole('ADMIN', 'MEMBER', 'VIEWER')")
     public ResponseEntity<byte[]> exportAlerts(
             @RequestParam(required = false) UUID deviceId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,

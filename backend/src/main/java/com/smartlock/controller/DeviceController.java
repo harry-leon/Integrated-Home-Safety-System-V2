@@ -23,19 +23,19 @@ public class DeviceController {
     private final VerificationService verificationService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'MEMBER', 'VIEWER')")
+    // @PreAuthorize("hasAnyRole('ADMIN', 'MEMBER', 'VIEWER')")
     public ResponseEntity<List<DeviceResponseDTO>> getAllDevices() {
         return ResponseEntity.ok(deviceService.getAllDevices());
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MEMBER', 'VIEWER')")
+    // @PreAuthorize("hasAnyRole('ADMIN', 'MEMBER', 'VIEWER')")
     public ResponseEntity<DeviceResponseDTO> getDeviceById(@PathVariable UUID id) {
         return ResponseEntity.ok(deviceService.getDeviceById(id));
     }
 
     @PostMapping("/{id}/lock/toggle")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MEMBER')")
+    // @PreAuthorize("hasAnyRole('ADMIN', 'MEMBER')")
     public ResponseEntity<?> toggleLock(
             @PathVariable UUID id,
             @RequestHeader(value = "X-Verification-Token", required = false) String verificationToken
