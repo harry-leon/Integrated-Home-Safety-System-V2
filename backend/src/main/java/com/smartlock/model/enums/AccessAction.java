@@ -4,5 +4,8 @@ public enum AccessAction {
     LOCKED,
     UNLOCKED,
     DENIED,
-    TAMPERED
+    TAMPERED,
+    ENROLLED,
+    DELETED,
+    SETTINGS_UPDATED
 }

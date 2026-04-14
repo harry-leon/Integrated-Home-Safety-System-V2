@@ -26,6 +26,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
+    private final com.smartlock.common.security.LoginRateLimiterService rateLimiterService;
 
     public LoginResponseDTO register(RegisterRequestDTO request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
@@ -48,12 +49,23 @@ public class AuthService {
     }
 
     public LoginResponseDTO login(LoginRequestDTO request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()
-                )
-        );
+        if (rateLimiterService.isBlocked(request.getEmail())) {
+            throw new RuntimeException("Account is temporarily locked due to too many failed attempts. Please try again in 15 minutes.");
+        }
+
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail(),
+                            request.getPassword()
+                    )
+            );
+            rateLimiterService.loginSucceeded(request.getEmail());
+        } catch (org.springframework.security.core.AuthenticationException e) {
+            rateLimiterService.loginFailed(request.getEmail());
+            throw new RuntimeException("Invalid email or password");
+        }
+
         var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow();
         

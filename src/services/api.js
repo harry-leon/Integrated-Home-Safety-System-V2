@@ -122,6 +122,10 @@ export const smartLockApi = {
     });
   },
 
+  getWeeklySnapshot: async () => {
+    return fetchApi('/api/analytics/snapshot/weekly');
+  },
+
   exportAlerts: async (params = {}) => {
     const queryStr = new URLSearchParams(cleanParams(params)).toString();
     const url = `/api/alerts/export${queryStr ? `?${queryStr}` : ''}`;
