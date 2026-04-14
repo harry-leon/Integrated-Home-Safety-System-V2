@@ -45,7 +45,7 @@ public class SettingsService {
     }
 
     public NotificationSettingsDTO getNotificationSettings(String username) {
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findByEmail(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         NotificationSettings ns = notificationSettingsRepository.findByUserId(user.getId())
                 .orElseGet(() -> {
@@ -64,7 +64,7 @@ public class SettingsService {
     }
 
     public NotificationSettingsDTO updateNotificationSettings(String username, NotificationSettingsDTO dto) {
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findByEmail(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         NotificationSettings settings = notificationSettingsRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new RuntimeException("Notification settings not found"));

@@ -58,7 +58,7 @@ public class AlertService {
     public void resolveAlert(UUID alertId, String username) {
         Alert alert = alertRepository.findById(alertId)
                 .orElseThrow(() -> new RuntimeException("Alert not found"));
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findByEmail(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (!alert.isResolved()) {
