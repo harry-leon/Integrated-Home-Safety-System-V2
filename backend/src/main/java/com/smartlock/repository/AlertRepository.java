@@ -15,5 +15,9 @@ import java.util.UUID;
 @Repository
 public interface AlertRepository extends JpaRepository<Alert, UUID>, JpaSpecificationExecutor<Alert> {
     Page<Alert> findByDeviceId(UUID deviceId, Pageable pageable);
+
+    @org.springframework.data.jpa.repository.Query("SELECT a FROM Alert a LEFT JOIN FETCH a.device")
+    List<Alert> findAllWithDevice();
+
     List<Alert> findByDeviceIdAndCreatedAtBetween(UUID deviceId, LocalDateTime start, LocalDateTime end);
 }

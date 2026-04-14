@@ -6,52 +6,64 @@ import com.smartlock.repository.AccessLogRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.persistence.criteria.Predicate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AccessLogService {
 
     private final AccessLogRepository accessLogRepository;
 
     public Page<AccessLogResponseDTO> getAccessLogs(UUID deviceId, LocalDateTime start, LocalDateTime end, Pageable pageable) {
-        Specification<AccessLog> spec = (root, query, cb) -> {
-            List<Predicate> predicates = new ArrayList<>();
-            if (deviceId != null) {
-                predicates.add(cb.equal(root.get("device").get("id"), deviceId));
-            }
-            if (start != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("createdAt"), start));
-            }
-            if (end != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("createdAt"), end));
-            }
-            return cb.and(predicates.toArray(new Predicate[0]));
-        };
-
-        return accessLogRepository.findAll(spec, pageable).map(this::mapToDTO);
+        List<AccessLog> logs = accessLogRepository.findLogsOptimized(deviceId, start, end);
+        
+        int total = logs != null ? logs.size() : 0;
+        int startIdx = (int) pageable.getOffset();
+        
+        List<AccessLogResponseDTO> items = new ArrayList<>();
+        if (logs != null && startIdx < total) {
+            int endIdx = Math.min((startIdx + pageable.getPageSize()), total);
+            items = logs.subList(startIdx, endIdx).stream()
+                        .map(this::mapToDTO)
+                        .collect(Collectors.toList());
+        }
+        
+        return new PageImpl<>(items, pageable, total);
     }
 
     public String exportLogsToCSV(UUID deviceId, LocalDateTime start, LocalDateTime end) {
-        // Implementation similar to AlertService
-        List<AccessLog> logs = accessLogRepository.findAllByOrderByCreatedAtDesc(); // Simplification for now
+        List<AccessLog> logs = accessLogRepository.findLogsOptimized(deviceId, start, end);
+        if (logs == null) logs = new ArrayList<>();
+
         StringBuilder csv = new StringBuilder("ID,Device,User,Person,Method,Action,Detail,Time\n");
         for (AccessLog log : logs) {
-            csv.append(log.getId()).append(",");
-            csv.append(log.getDevice() != null ? log.getDevice().getDeviceName() : "").append(",");
-            csv.append(log.getUser() != null ? log.getUser().getFullName() : "").append(",");
-            csv.append(log.getFingerprint() != null ? log.getFingerprint().getPersonName() : "").append(",");
-            csv.append(log.getMethod()).append(",");
-            csv.append(log.getAction()).append(",");
+            csv.append(log.getId() != null ? log.getId() : "").append(",");
+            
+            String deviceName = "";
+            try { if (log.getDevice() != null) deviceName = log.getDevice().getDeviceName(); } catch (Exception e) {}
+            csv.append(deviceName != null ? deviceName : "").append(",");
+            
+            String userName = "";
+            try { if (log.getUser() != null) userName = log.getUser().getFullName(); } catch (Exception e) {}
+            csv.append(userName != null ? userName : "").append(",");
+            
+            String personName = "";
+            try { if (log.getFingerprint() != null) personName = log.getFingerprint().getPersonName(); } catch (Exception e) {}
+            csv.append(personName != null ? personName : "").append(",");
+            
+            csv.append(log.getMethod() != null ? log.getMethod() : "").append(",");
+            csv.append(log.getAction() != null ? log.getAction() : "").append(",");
             csv.append(escapeCsv(log.getDetail())).append(",");
-            csv.append(log.getCreatedAt()).append("\n");
+            csv.append(log.getCreatedAt() != null ? log.getCreatedAt() : "").append("\n");
         }
         return csv.toString();
     }
