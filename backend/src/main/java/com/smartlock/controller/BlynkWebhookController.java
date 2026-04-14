@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.smartlock.model.enums.AccessAction;
+import com.smartlock.model.enums.AccessMethod;
+
 @RestController
 @RequestMapping("/api/integration/blynk")
 @RequiredArgsConstructor
@@ -19,8 +22,9 @@ import java.util.UUID;
 public class BlynkWebhookController {
 
     private final SimpMessagingTemplate messagingTemplate;
-    private final CommandService commandService;
-    private final DeviceRepository deviceRepository;
+    private final com.smartlock.service.AuditLogService auditLogService;
+    private final com.smartlock.repository.DeviceRepository deviceRepository;
+    private final com.smartlock.service.CommandService commandService;
 
     @org.springframework.beans.factory.annotation.Value("${blynk.auth-token:}")
     private String globalWebhookToken;
@@ -63,21 +67,32 @@ public class BlynkWebhookController {
                 "Pin " + pin + " changed to " + value);
 
         // 3. Xử lý xác nhận lệnh (Acknowledgement)
-        // Ví dụ: ESP32 gửi về V10 giá trị "commandId:SUCCESS" hoặc "commandId:FAILURE"
         if (pin.equals("V10")) {
             try {
                 String[] parts = value.split(":");
-                if (parts.length < 2) {
-                    log.warn("Invalid command acknowledgement format: {}", value);
-                    return ResponseEntity.badRequest().build();
+                if (parts.length >= 2) {
+                    UUID commandId = UUID.fromString(parts[0]);
+                    boolean isSuccess = "SUCCESS".equalsIgnoreCase(parts[1]);
+                    String reason = parts.length > 2 ? parts[2] : "";
+                    commandService.acknowledgeCommand(commandId, isSuccess, reason);
                 }
-                UUID commandId = UUID.fromString(parts[0]);
-                boolean isSuccess = "SUCCESS".equalsIgnoreCase(parts[1]);
-                String reason = parts.length > 2 ? parts[2] : "";
-
-                commandService.acknowledgeCommand(commandId, isSuccess, reason);
             } catch (Exception e) {
-                log.error("Failed to parse command acknowledgement from Blynk: {}", value);
+                log.error("Failed to parse command acknowledgement: {}", value);
+            }
+        }
+
+        // 4. Nhật ký truy cập vật lý (Physical Audit)
+        if (pin.equals("V11")) {
+            try {
+                String[] parts = value.split(":");
+                if (parts.length >= 3) {
+                    AccessAction action = AccessAction.valueOf(parts[0].toUpperCase());
+                    AccessMethod method = AccessMethod.valueOf(parts[1].toUpperCase());
+                    String detail = parts[2];
+                    auditLogService.logAction(device, action, method, detail);
+                }
+            } catch (Exception e) {
+                log.error("Failed to parse physical action: {}", value);
             }
         }
 

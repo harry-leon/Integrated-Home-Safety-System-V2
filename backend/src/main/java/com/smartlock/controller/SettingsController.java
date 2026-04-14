@@ -12,6 +12,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
+import com.smartlock.model.enums.AccessAction;
+import com.smartlock.model.enums.AccessMethod;
 
 @RestController
 @RequestMapping("/api/settings")
@@ -20,6 +22,8 @@ public class SettingsController {
 
     private final VerificationService verificationService;
     private final SettingsService settingsService;
+    private final com.smartlock.service.AuditLogService auditLogService;
+    private final com.smartlock.repository.DeviceRepository deviceRepository;
 
     @GetMapping("/device/{deviceId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'MEMBER', 'VIEWER')")
@@ -37,7 +41,14 @@ public class SettingsController {
         if (!verificationService.isVerified(verificationToken)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Step-up verification required for this action");
         }
-        return ResponseEntity.ok(settingsService.updateDeviceSettings(deviceId, settings));
+        
+        var result = settingsService.updateDeviceSettings(deviceId, settings);
+        
+        deviceRepository.findById(deviceId).ifPresent(device -> {
+            auditLogService.logAction(device, AccessAction.SETTINGS_UPDATED, AccessMethod.REMOTE, "Cập nhật cấu hình thiết bị: " + device.getDeviceCode());
+        });
+
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/notifications")

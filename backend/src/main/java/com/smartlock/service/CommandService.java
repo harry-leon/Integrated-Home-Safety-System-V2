@@ -15,6 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.smartlock.model.enums.AccessAction;
+import com.smartlock.model.enums.AccessMethod;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -24,6 +27,7 @@ public class CommandService {
     private final DeviceRepository deviceRepository;
     private final SimpMessagingTemplate messagingTemplate;
     private final BlynkService blynkService;
+    private final AuditLogService auditLogService;
 
     private static final int MAX_RETRIES = 3;
     private static final int TIMEOUT_SECONDS = 15;
@@ -101,6 +105,16 @@ public class CommandService {
             command.setFailureReason(failureReason);
 
             commandRepository.save(command);
+            
+            if (isSuccess && "LOCK_TOGGLE".equals(command.getCommandType())) {
+                auditLogService.logAction(
+                    command.getDevice(), 
+                    AccessAction.UNLOCKED, 
+                    AccessMethod.REMOTE, 
+                    "Điều khiển từ xa thành công"
+                );
+            }
+
             notifyStatusUpdate(command);
             log.info("Command {} updated to status: {}", commandId, command.getStatus());
         });

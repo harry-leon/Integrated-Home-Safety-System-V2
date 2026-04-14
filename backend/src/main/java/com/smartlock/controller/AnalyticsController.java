@@ -21,6 +21,7 @@ public class AnalyticsController {
     private final AnalyticsService analyticsService;
 
     @GetMapping("/snapshot/weekly")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MEMBER', 'VIEWER')")
     public ResponseEntity<WeeklySnapshotDTO> getWeeklySnapshot() {
         return ResponseEntity.ok(analyticsService.getWeeklySnapshot());
     }

@@ -8,6 +8,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
+import com.smartlock.model.enums.AccessAction;
+import com.smartlock.model.enums.AccessMethod;
 
 @RestController
 @RequestMapping("/api/fingerprints")
@@ -18,6 +20,7 @@ public class FingerprintController {
     private final com.smartlock.repository.FingerprintRepository fingerprintRepository;
     private final com.smartlock.repository.DeviceRepository deviceRepository;
     private final com.smartlock.repository.UserRepository userRepository;
+    private final com.smartlock.service.AuditLogService auditLogService;
 
     @PostMapping("/enroll")
     @PreAuthorize("hasAnyRole('ADMIN', 'MEMBER')")
@@ -48,6 +51,8 @@ public class FingerprintController {
                 .build();
                 
         fingerprintRepository.save(fingerprint);
+        
+        auditLogService.logAction(device, AccessAction.ENROLLED, AccessMethod.FINGERPRINT, "Đã đăng ký vân tay mới cho: " + personName);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(java.util.Map.of("id", fingerprint.getId()));
     }
@@ -62,9 +67,10 @@ public class FingerprintController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Step-up verification required for this action");
         }
         
-        if (fingerprintRepository.existsById(id)) {
+        fingerprintRepository.findById(id).ifPresent(fp -> {
+            auditLogService.logAction(fp.getDevice(), AccessAction.DELETED, AccessMethod.FINGERPRINT, "Đã xóa vân tay của: " + fp.getPersonName());
             fingerprintRepository.deleteById(id);
-        }
+        });
         
         return ResponseEntity.noContent().build();
     }
