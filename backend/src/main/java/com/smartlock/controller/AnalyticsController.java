@@ -11,13 +11,19 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+import com.smartlock.dto.WeeklySnapshotDTO;
+
 @RestController
 @RequestMapping("/api/analytics")
 @RequiredArgsConstructor
-// @PreAuthorize("hasAnyRole('ADMIN', 'MEMBER', 'VIEWER')")
 public class AnalyticsController {
 
     private final AnalyticsService analyticsService;
+
+    @GetMapping("/snapshot/weekly")
+    public ResponseEntity<WeeklySnapshotDTO> getWeeklySnapshot() {
+        return ResponseEntity.ok(analyticsService.getWeeklySnapshot());
+    }
 
     @GetMapping("/reports/weekly")
     public ResponseEntity<List<WeeklyReportResponseDTO>> getWeeklyReports(@RequestParam UUID deviceId) {

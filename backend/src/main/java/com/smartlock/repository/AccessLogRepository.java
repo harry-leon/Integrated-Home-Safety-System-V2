@@ -33,4 +33,13 @@ public interface AccessLogRepository extends JpaRepository<AccessLog, UUID>, Jpa
             "LEFT JOIN FETCH a.fingerprint " +
             "ORDER BY a.createdAt DESC")
     List<AccessLog> findAllOptimized();
+
+    long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
+    long countByDeviceIdAndCreatedAtBetween(UUID deviceId, LocalDateTime start, LocalDateTime end);
+    
+    @org.springframework.data.jpa.repository.Query("SELECT COUNT(a) FROM AccessLog a WHERE a.action = 'DENIED' AND a.createdAt BETWEEN :start AND :end")
+    long countFailedAttemptsBetween(LocalDateTime start, LocalDateTime end);
+
+    @org.springframework.data.jpa.repository.Query("SELECT COUNT(a) FROM AccessLog a WHERE a.device.id = :deviceId AND a.action = 'DENIED' AND a.createdAt BETWEEN :start AND :end")
+    long countFailedAttemptsByDeviceBetween(UUID deviceId, LocalDateTime start, LocalDateTime end);
 }

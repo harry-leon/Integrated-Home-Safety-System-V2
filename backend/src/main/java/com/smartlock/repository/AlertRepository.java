@@ -20,4 +20,8 @@ public interface AlertRepository extends JpaRepository<Alert, UUID>, JpaSpecific
     List<Alert> findAllWithDevice();
 
     List<Alert> findByDeviceIdAndCreatedAtBetween(UUID deviceId, LocalDateTime start, LocalDateTime end);
+
+    long countByDeviceIdAndCreatedAtBetween(UUID deviceId, LocalDateTime start, LocalDateTime end);
+    long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
+    long countByCreatedAtBetweenAndSeverity(LocalDateTime start, LocalDateTime end, String severity);
 }
