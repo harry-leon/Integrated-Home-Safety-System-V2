@@ -1,10 +1,19 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useLang } from '../contexts/LangContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const Sidebar = () => {
   const { t } = useLang();
   const location = useLocation();
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  const handleLogout = (e) => {
+    e.preventDefault();
+    logout();
+    navigate('/login');
+  };
 
   const navItems = [
     { name: t('dashboard'), icon: 'dashboard', path: '/' },
@@ -50,10 +59,10 @@ const Sidebar = () => {
           <span className="material-symbols-outlined" aria-hidden="true">help</span>
           <span>{t('support')}</span>
         </Link>
-        <Link aria-label={t('logout')} to="/login" className="flex items-center gap-3 px-4 py-3 text-outline hover:text-error hover:bg-error/10 transition-all duration-300 font-['Manrope'] text-sm font-medium rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-error">
+        <button aria-label={t('logout')} onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-outline hover:text-error hover:bg-error/10 transition-all duration-300 font-['Manrope'] text-sm font-medium rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-error">
           <span className="material-symbols-outlined" aria-hidden="true">logout</span>
           <span>{t('logout')}</span>
-        </Link>
+        </button>
       </div>
     </aside>
   );

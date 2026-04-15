@@ -4,9 +4,14 @@
  * Custom fetch wrapper to handle JSON responses and errors.
  */
 async function fetchApi(url, options = {}) {
+  const token = localStorage.getItem('sentinel_token');
   const defaultHeaders = {
     'Content-Type': 'application/json',
   };
+
+  if (token) {
+    defaultHeaders['Authorization'] = `Bearer ${token}`; // Hoặc định dạng khác nếu BE yêu cầu
+  }
 
   try {
     const response = await fetch(url, {
@@ -18,6 +23,12 @@ async function fetchApi(url, options = {}) {
     });
 
     if (!response.ok) {
+      if (response.status === 401) {
+        // Token might be invalid or expired, clear it
+        localStorage.removeItem('sentinel_token');
+        localStorage.removeItem('sentinel_user');
+        window.location.href = '/login';
+      }
       const errorText = await response.text();
       let errorMessage = response.statusText;
       try {

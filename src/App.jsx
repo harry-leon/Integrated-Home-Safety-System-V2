@@ -3,6 +3,8 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { LangProvider } from './contexts/LangContext';
 import { TimeWeatherProvider } from './contexts/TimeWeatherContext';
+import { AuthProvider } from './contexts/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import RemoteControl from './pages/RemoteControl';
@@ -26,24 +28,28 @@ const App = () => {
     <ThemeProvider>
       <LangProvider>
         <TimeWeatherProvider>
-          <BrowserRouter>
-            <Routes>
-              {/* Auth Routes */}
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              
-              {/* App Routes */}
-              <Route path="/" element={<Layout />}>
-                <Route index element={<Dashboard />} />
-                <Route path="remote" element={<RemoteControl />} />
-                <Route path="fingerprints" element={<Fingerprints />} />
-                <Route path="logs" element={<Logs />} />
-                <Route path="analytics" element={<Analytics />} />
-                <Route path="settings" element={<Settings />} />
-                <Route path="support" element={<Placeholder title="Support Page" />} />
-              </Route>
-            </Routes>
-          </BrowserRouter>
+          <AuthProvider>
+            <BrowserRouter>
+              <Routes>
+                {/* Auth Routes */}
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                
+                {/* App Routes */}
+                <Route element={<ProtectedRoute />}>
+                  <Route path="/" element={<Layout />}>
+                    <Route index element={<Dashboard />} />
+                    <Route path="remote" element={<RemoteControl />} />
+                    <Route path="fingerprints" element={<Fingerprints />} />
+                    <Route path="logs" element={<Logs />} />
+                    <Route path="analytics" element={<Analytics />} />
+                    <Route path="settings" element={<Settings />} />
+                    <Route path="support" element={<Placeholder title="Support Page" />} />
+                  </Route>
+                </Route>
+              </Routes>
+            </BrowserRouter>
+          </AuthProvider>
         </TimeWeatherProvider>
       </LangProvider>
     </ThemeProvider>
