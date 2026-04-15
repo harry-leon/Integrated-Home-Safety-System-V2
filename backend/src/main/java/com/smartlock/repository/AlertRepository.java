@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -20,6 +21,8 @@ public interface AlertRepository extends JpaRepository<Alert, UUID>, JpaSpecific
     List<Alert> findAllWithDevice();
 
     List<Alert> findByDeviceIdAndCreatedAtBetween(UUID deviceId, LocalDateTime start, LocalDateTime end);
+    Optional<Alert> findTopByDeviceIdAndAlertTypeOrderByCreatedAtDesc(UUID deviceId, AlertType alertType);
+    Optional<Alert> findTopByDeviceIdAndAlertTypeAndIsResolvedFalseOrderByCreatedAtDesc(UUID deviceId, AlertType alertType);
 
     long countByDeviceIdAndCreatedAtBetween(UUID deviceId, LocalDateTime start, LocalDateTime end);
     long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);

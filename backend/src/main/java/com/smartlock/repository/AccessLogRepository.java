@@ -42,4 +42,7 @@ public interface AccessLogRepository extends JpaRepository<AccessLog, UUID>, Jpa
 
     @org.springframework.data.jpa.repository.Query("SELECT COUNT(a) FROM AccessLog a WHERE a.device.id = :deviceId AND a.action = 'DENIED' AND a.createdAt BETWEEN :start AND :end")
     long countFailedAttemptsByDeviceBetween(UUID deviceId, LocalDateTime start, LocalDateTime end);
+
+    @EntityGraph(attributePaths = {"device", "user", "fingerprint"})
+    java.util.Optional<AccessLog> findTopByDeviceIdOrderByCreatedAtDesc(UUID deviceId);
 }

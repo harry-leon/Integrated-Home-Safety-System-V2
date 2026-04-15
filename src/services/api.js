@@ -79,6 +79,15 @@ export const smartLockApi = {
     return fetchApi('/api/devices');
   },
 
+  sendLockToggle: async (deviceId, token) => {
+    return fetchApi(`/api/devices/${deviceId}/lock/toggle`, {
+      method: 'POST',
+      headers: {
+        'X-Verification-Token': token,
+      },
+    });
+  },
+
   getAccessLogs: async (params = {}) => {
     const queryStr = new URLSearchParams(cleanParams(params)).toString();
     const url = `/api/access-logs${queryStr ? `?${queryStr}` : ''}`;

@@ -7,6 +7,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import com.smartlock.model.enums.AccessAction;
 import com.smartlock.model.enums.AccessMethod;
@@ -21,6 +25,30 @@ public class FingerprintController {
     private final com.smartlock.repository.DeviceRepository deviceRepository;
     private final com.smartlock.repository.UserRepository userRepository;
     private final com.smartlock.service.AuditLogService auditLogService;
+
+    @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'MEMBER', 'VIEWER')")
+    public ResponseEntity<List<Map<String, Object>>> getFingerprints(
+            @RequestParam(required = false) UUID deviceId
+    ) {
+        return ResponseEntity.ok(
+                fingerprintRepository.findAll().stream()
+                        .filter(fp -> deviceId == null || (fp.getDevice() != null && deviceId.equals(fp.getDevice().getId())))
+                        .sorted(Comparator.comparing(com.smartlock.model.Fingerprint::getFingerSlotId, Comparator.nullsLast(Integer::compareTo)))
+                        .map(fp -> Map.<String, Object>ofEntries(
+                                Map.entry("id", fp.getId()),
+                                Map.entry("fingerSlotId", fp.getFingerSlotId()),
+                                Map.entry("deviceId", fp.getDevice() != null ? fp.getDevice().getId() : null),
+                                Map.entry("personName", fp.getPersonName() != null ? fp.getPersonName() : ""),
+                                Map.entry("accessLevel", fp.getAccessLevel() != null ? fp.getAccessLevel() : "STANDARD"),
+                                Map.entry("isActive", fp.isActive()),
+                                Map.entry("registeredAt", fp.getRegisteredAt() != null ? fp.getRegisteredAt() : LocalDateTime.now()),
+                                Map.entry("lastAccess", fp.getLastAccess() != null ? fp.getLastAccess() : fp.getRegisteredAt() != null ? fp.getRegisteredAt() : LocalDateTime.now()),
+                                Map.entry("totalAccessCount", fp.getTotalAccessCount() != null ? fp.getTotalAccessCount() : 0)
+                        ))
+                        .toList()
+        );
+    }
 
     @PostMapping("/enroll")
     @PreAuthorize("hasAnyRole('ADMIN', 'MEMBER')")

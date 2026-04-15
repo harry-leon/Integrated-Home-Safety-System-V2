@@ -2,7 +2,10 @@ package com.smartlock.service;
 
 import com.smartlock.model.Device;
 import com.smartlock.model.DeviceCommand;
+import com.smartlock.model.enums.AccessAction;
+import com.smartlock.model.enums.AccessMethod;
 import com.smartlock.model.enums.CommandStatus;
+import com.smartlock.repository.AccessLogRepository;
 import com.smartlock.repository.DeviceCommandRepository;
 import com.smartlock.repository.DeviceRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,10 +16,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
-
-import com.smartlock.model.enums.AccessAction;
-import com.smartlock.model.enums.AccessMethod;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +28,7 @@ public class CommandService {
 
     private final DeviceCommandRepository commandRepository;
     private final DeviceRepository deviceRepository;
+    private final AccessLogRepository accessLogRepository;
     private final SimpMessagingTemplate messagingTemplate;
     private final BlynkService blynkService;
     private final AuditLogService auditLogService;
@@ -32,9 +36,6 @@ public class CommandService {
     private static final int MAX_RETRIES = 3;
     private static final int TIMEOUT_SECONDS = 15;
 
-    /**
-     * Step 1: User sends command from Web UI.
-     */
     @Transactional
     public UUID sendCommand(UUID deviceId, String commandType, String payloadJson) {
         Device device = deviceRepository.findById(deviceId)
@@ -49,7 +50,7 @@ public class CommandService {
                 .build();
 
         DeviceCommand savedCommand = commandRepository.save(command);
-        
+
         if (device.isOnline()) {
             executeCommand(savedCommand);
         } else {
@@ -60,42 +61,53 @@ public class CommandService {
         return savedCommand.getId();
     }
 
-    /**
-     * Physical execution of the command via Blynk.
-     */
+    @Transactional
     public void executeCommand(DeviceCommand command) {
-        try {
-            // Mapping: Gửi CommandID và Payload tới Pin V10 (hoặc pin tùy chỉnh)
-            // Ví dụ: "commandId:LOCK_TOGGLE"
-            String blynkPayload = command.getId().toString() + ":" + command.getCommandType();
-            blynkService.updateVirtualPin(10, blynkPayload); 
+        boolean openDoor = resolveTargetDoorState(command);
+        boolean dispatched = blynkService.sendDoorCommand(command.getDevice(), openDoor);
 
-            command.setStatus(CommandStatus.SENT);
-            command.setSentAt(LocalDateTime.now());
-            commandRepository.save(command);
-            notifyStatusUpdate(command);
-            log.info("Command {} sent to Blynk for device {}", command.getId(), command.getDevice().getDeviceCode());
-        } catch (Exception e) {
-            log.error("Failed to send command {} to Blynk: {}", command.getId(), e.getMessage());
+        command.setSentAt(LocalDateTime.now());
+        if (dispatched) {
+            command.setAcknowledgedAt(LocalDateTime.now());
+            command.setCompletedAt(LocalDateTime.now());
+            command.setStatus(CommandStatus.SUCCESS);
+            command.setFailureReason(null);
+            log.info(
+                    "Command {} sent to Blynk pin V{} with value {} for device {}",
+                    command.getId(),
+                    BlynkService.DOOR_CONTROL_PIN,
+                    openDoor ? 1 : 0,
+                    command.getDevice().getDeviceCode()
+            );
+            if ("LOCK_TOGGLE".equals(command.getCommandType())) {
+                auditLogService.logAction(
+                        command.getDevice(),
+                        openDoor ? AccessAction.UNLOCKED : AccessAction.LOCKED,
+                        AccessMethod.REMOTE,
+                        "Dieu khien tu xa thanh cong qua Blynk V20"
+                );
+            }
+        } else {
+            command.setStatus(CommandStatus.RETRYING);
+            command.setFailureReason("Failed to send command to Blynk pin V20");
+            log.warn("Failed to send command {} to Blynk. Marked for retry.", command.getId());
         }
+
+        commandRepository.save(command);
+        notifyStatusUpdate(command);
     }
 
-    /**
-     * HÀNG ĐỢI OFFLINE: Khi thiết bị Online trở lại, gửi ngay các lệnh đang chờ.
-     */
     @Transactional
     public void processOfflineCommands(Device device) {
         commandRepository.findAllByDeviceAndStatus(device, CommandStatus.PENDING_OFFLINE)
-            .forEach(command -> {
-                log.info("Processing offline command {} for now-online device {}", command.getId(), device.getDeviceCode());
-                command.setStatus(CommandStatus.QUEUED);
-                executeCommand(command);
-            });
+                .forEach(command -> {
+                    log.info("Processing offline command {} for now-online device {}", command.getId(), device.getDeviceCode());
+                    command.setStatus(CommandStatus.QUEUED);
+                    commandRepository.save(command);
+                    executeCommand(command);
+                });
     }
 
-    /**
-     * Step 2: ESP32 acknowledges receiving/executing the command.
-     */
     @Transactional
     public void acknowledgeCommand(UUID commandId, boolean isSuccess, String failureReason) {
         commandRepository.findById(commandId).ifPresent(command -> {
@@ -105,13 +117,13 @@ public class CommandService {
             command.setFailureReason(failureReason);
 
             commandRepository.save(command);
-            
+
             if (isSuccess && "LOCK_TOGGLE".equals(command.getCommandType())) {
                 auditLogService.logAction(
-                    command.getDevice(), 
-                    AccessAction.UNLOCKED, 
-                    AccessMethod.REMOTE, 
-                    "Điều khiển từ xa thành công"
+                        command.getDevice(),
+                        AccessAction.UNLOCKED,
+                        AccessMethod.REMOTE,
+                        "Dieu khien tu xa thanh cong"
                 );
             }
 
@@ -120,23 +132,19 @@ public class CommandService {
         });
     }
 
-    /**
-     * RETRY & TIMEOUT HANDLING: 
-     * Tự động quét và thử lại nếu chưa nhận được phản hồi.
-     */
     @Scheduled(fixedRate = 10000)
     @Transactional
     public void handleCommandTimeouts() {
         LocalDateTime timeoutThreshold = LocalDateTime.now().minusSeconds(TIMEOUT_SECONDS);
-        
-        commandRepository.findByStatusIn(java.util.List.of(CommandStatus.SENT, CommandStatus.RETRYING)).stream()
-                .filter(c -> (c.getStatus() == CommandStatus.SENT || c.getStatus() == CommandStatus.RETRYING))
-                .filter(c -> c.getSentAt() != null && c.getSentAt().isBefore(timeoutThreshold))
+
+        commandRepository.findByStatusIn(List.of(CommandStatus.SENT, CommandStatus.RETRYING)).stream()
+                .filter(command -> command.getSentAt() != null && command.getSentAt().isBefore(timeoutThreshold))
                 .forEach(command -> {
                     if (command.getRetryCount() < MAX_RETRIES) {
                         log.info("Retrying command {} (Attempt {})", command.getId(), command.getRetryCount() + 1);
                         command.setRetryCount(command.getRetryCount() + 1);
                         command.setStatus(CommandStatus.RETRYING);
+                        commandRepository.save(command);
                         executeCommand(command);
                     } else {
                         command.setStatus(CommandStatus.TIMEOUT);
@@ -148,14 +156,32 @@ public class CommandService {
                 });
     }
 
+    private boolean resolveTargetDoorState(DeviceCommand command) {
+        if (!"LOCK_TOGGLE".equals(command.getCommandType())) {
+            return false;
+        }
+
+        boolean isDoorCurrentlyOpen = accessLogRepository
+                .findTopByDeviceIdOrderByCreatedAtDesc(command.getDevice().getId())
+                .map(accessLog -> accessLog.getAction() == AccessAction.UNLOCKED)
+                .orElse(false);
+
+        return !isDoorCurrentlyOpen;
+    }
+
     private void notifyStatusUpdate(DeviceCommand command) {
         String destination = "/topic/devices/" + command.getDevice().getDeviceCode() + "/commands";
-        java.util.Map<String, Object> payload = new java.util.HashMap<>();
+        Map<String, Object> payload = new HashMap<>();
         payload.put("commandId", command.getId());
-        payload.put("type", command.getCommandType());
-        payload.put("status", command.getStatus());
+        payload.put("deviceCode", command.getDevice().getDeviceCode());
+        payload.put("commandType", command.getCommandType());
+        payload.put("status", command.getStatus() == null ? "UNKNOWN" : command.getStatus().name());
         payload.put("retryCount", command.getRetryCount());
+        payload.put("failureReason", command.getFailureReason() == null ? "" : command.getFailureReason());
+        payload.put("requestedAt", command.getRequestedAt());
+        payload.put("sentAt", command.getSentAt());
+        payload.put("acknowledgedAt", command.getAcknowledgedAt());
+        payload.put("completedAt", command.getCompletedAt());
         messagingTemplate.convertAndSend(destination, payload);
     }
 }
-
