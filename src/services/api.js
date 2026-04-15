@@ -5,9 +5,12 @@
  */
 async function fetchApi(url, options = {}) {
   const token = localStorage.getItem('sentinel_token');
-  const defaultHeaders = {
-    'Content-Type': 'application/json',
-  };
+  const isFormData = options.body instanceof FormData;
+  const defaultHeaders = {};
+
+  if (!isFormData) {
+    defaultHeaders['Content-Type'] = 'application/json';
+  }
 
   if (token) {
     defaultHeaders['Authorization'] = `Bearer ${token}`; // Hoặc định dạng khác nếu BE yêu cầu
@@ -33,7 +36,7 @@ async function fetchApi(url, options = {}) {
       let errorMessage = response.statusText;
       try {
         const errorJson = JSON.parse(errorText);
-        errorMessage = errorJson.message || errorText;
+        errorMessage = errorJson.message || errorJson.error || errorText;
       } catch (e) {
         // Not a JSON error response
       }
@@ -125,6 +128,13 @@ export const smartLockApi = {
     return fetchApi('/api/settings/notifications');
   },
 
+  reAuthenticate: async (password) => {
+    return fetchApi('/api/auth/re-auth', {
+      method: 'POST',
+      body: JSON.stringify({ password }),
+    });
+  },
+
   updateNotificationSettings: async (settings, token) => {
     return fetchApi('/api/settings/notifications', {
       method: 'PATCH',
@@ -135,6 +145,36 @@ export const smartLockApi = {
 
   getWeeklySnapshot: async () => {
     return fetchApi('/api/analytics/snapshot/weekly');
+  },
+
+  getCurrentProfile: async () => {
+    return fetchApi('/api/me/profile');
+  },
+
+  updateCurrentProfile: async (payload) => {
+    return fetchApi('/api/me/profile', {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  uploadAvatar: async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return fetchApi('/api/me/profile/avatar', {
+      method: 'POST',
+      body: formData,
+    });
+  },
+
+  getLoginActivity: async () => {
+    return fetchApi('/api/me/logins');
+  },
+
+  logout: async () => {
+    return fetchApi('/api/auth/logout', {
+      method: 'POST',
+    });
   },
 
   exportAlerts: async (params = {}) => {
