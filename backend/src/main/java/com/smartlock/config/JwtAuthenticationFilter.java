@@ -1,6 +1,7 @@
 package com.smartlock.config;
 
 import com.smartlock.service.JwtService;
+import com.smartlock.service.UserLoginSessionService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,6 +24,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    private final UserLoginSessionService userLoginSessionService;
 
     @Override
     protected void doFilterInternal(
@@ -51,6 +53,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         new WebAuthenticationDetailsSource().buildDetails(request)
                 );
                 SecurityContextHolder.getContext().setAuthentication(authToken);
+                if (userDetails instanceof com.smartlock.model.User user) {
+                    userLoginSessionService.touchSession(user, jwt, request);
+                }
             }
         }
         filterChain.doFilter(request, response);

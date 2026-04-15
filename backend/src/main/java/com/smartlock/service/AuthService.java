@@ -7,6 +7,7 @@ import com.smartlock.dto.RegisterRequestDTO;
 import com.smartlock.model.User;
 import com.smartlock.model.enums.UserRole;
 import com.smartlock.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,8 +28,10 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final com.smartlock.common.security.LoginRateLimiterService rateLimiterService;
+    private final UserProfileService userProfileService;
+    private final UserLoginSessionService userLoginSessionService;
 
-    public LoginResponseDTO register(RegisterRequestDTO request) {
+    public LoginResponseDTO register(RegisterRequestDTO request, HttpServletRequest httpServletRequest) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new RuntimeException("Email already exists");
         }
@@ -45,10 +48,10 @@ public class AuthService {
         LoginRequestDTO loginRequest = new LoginRequestDTO();
         loginRequest.setEmail(request.getEmail());
         loginRequest.setPassword(request.getPassword());
-        return login(loginRequest);
+        return login(loginRequest, httpServletRequest);
     }
 
-    public LoginResponseDTO login(LoginRequestDTO request) {
+    public LoginResponseDTO login(LoginRequestDTO request, HttpServletRequest httpServletRequest) {
         if (rateLimiterService.isBlocked(request.getEmail())) {
             throw new RuntimeException("Account is temporarily locked due to too many failed attempts. Please try again in 15 minutes.");
         }
@@ -73,14 +76,18 @@ public class AuthService {
         userRepository.save(user);
 
         var jwtToken = jwtService.generateToken(user);
-        
+        userProfileService.getCurrentProfile(user.getEmail());
+        userLoginSessionService.recordLogin(user, jwtToken, httpServletRequest);
+        var profile = userProfileService.getCurrentProfile(user.getEmail());
+
         LoginResponseDTO response = new LoginResponseDTO();
         response.setAccessToken(jwtToken);
         response.setUserId(user.getId());
-        response.setFullName(user.getFullName());
+        response.setFullName(profile.getFullName());
         response.setEmail(user.getEmail());
         response.setRole(user.getRole());
-        
+        response.setAvatarUrl(profile.getAvatarUrl());
+
         return response;
     }
 
@@ -101,5 +108,10 @@ public class AuthService {
         claims.put("type", "VERIFICATION");
         // Verification token expires in 5 minutes
         return jwtService.generateToken(claims, user);
+    }
+
+    public void logout(String email, String rawToken) {
+        var user = userRepository.findByEmail(email).orElseThrow();
+        userLoginSessionService.logout(user, rawToken);
     }
 }

@@ -9,9 +9,9 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
 
-  const handleLogout = (e) => {
+  const handleLogout = async (e) => {
     e.preventDefault();
-    logout();
+    await logout();
     navigate('/login');
   };
 
