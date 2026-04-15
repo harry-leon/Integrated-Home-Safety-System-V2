@@ -2,9 +2,12 @@ package com.smartlock.service;
 
 import com.smartlock.dto.AlertResponseDTO;
 import com.smartlock.model.Alert;
+import com.smartlock.model.Device;
+import com.smartlock.model.DeviceSettings;
 import com.smartlock.model.User;
 import com.smartlock.model.enums.AlertType;
 import com.smartlock.repository.AlertRepository;
+import com.smartlock.repository.DeviceSettingsRepository;
 import com.smartlock.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -23,7 +26,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AlertService {
 
+    private static final int DEFAULT_GAS_THRESHOLD = 1400;
+
     private final AlertRepository alertRepository;
+    private final DeviceSettingsRepository deviceSettingsRepository;
     private final UserRepository userRepository;
 
     public Page<AlertResponseDTO> getAlerts(UUID deviceId, AlertType type, String severity, Boolean isResolved, LocalDateTime start, LocalDateTime end, Pageable pageable) {
@@ -67,6 +73,33 @@ public class AlertService {
             alert.setResolvedBy(user);
             alertRepository.save(alert);
         }
+    }
+
+    public void processTelemetryAlerts(Device device, Integer gasValue, boolean pirTriggered) {
+        DeviceSettings settings = deviceSettingsRepository.findByDeviceId(device.getId()).orElse(null);
+
+        int gasThreshold = settings != null && settings.getGasThreshold() != null
+                ? settings.getGasThreshold()
+                : DEFAULT_GAS_THRESHOLD;
+        boolean gasAlertEnabled = settings == null || settings.isGasAlertEnabled();
+        boolean gasTriggered = gasAlertEnabled && gasValue != null && gasValue > gasThreshold;
+
+        if (gasTriggered) {
+            createAlertIfAbsent(
+                    device,
+                    AlertType.GAS_LEAK,
+                    "CRITICAL",
+                    "Abnormal gas levels detected! Value: " + gasValue,
+                    gasValue
+            );
+        } else {
+            resolveOpenAlert(device, AlertType.GAS_LEAK);
+        }
+
+        // Raw PIR telemetry alone does not necessarily mean an intruder alert.
+        // We resolve any previously open PIR alert here and leave future alert
+        // creation to a dedicated explicit signal when the firmware provides one.
+        resolveOpenAlert(device, AlertType.INTRUDER_ALERT);
     }
 
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
@@ -121,6 +154,34 @@ public class AlertService {
             escapedData = "\"" + data + "\"";
         }
         return escapedData;
+    }
+
+    private void createAlertIfAbsent(Device device, AlertType alertType, String severity, String message, Integer sensorValue) {
+        boolean hasOpenAlert = alertRepository
+                .findTopByDeviceIdAndAlertTypeAndIsResolvedFalseOrderByCreatedAtDesc(device.getId(), alertType)
+                .isPresent();
+
+        if (hasOpenAlert) {
+            return;
+        }
+
+        alertRepository.save(Alert.builder()
+                .device(device)
+                .alertType(alertType)
+                .severity(severity)
+                .message(message)
+                .sensorValue(sensorValue)
+                .isResolved(false)
+                .build());
+    }
+
+    private void resolveOpenAlert(Device device, AlertType alertType) {
+        alertRepository.findTopByDeviceIdAndAlertTypeAndIsResolvedFalseOrderByCreatedAtDesc(device.getId(), alertType)
+                .ifPresent(alert -> {
+                    alert.setResolved(true);
+                    alert.setResolvedAt(LocalDateTime.now());
+                    alertRepository.save(alert);
+                });
     }
 
     private AlertResponseDTO mapToDTO(Alert alert) {
