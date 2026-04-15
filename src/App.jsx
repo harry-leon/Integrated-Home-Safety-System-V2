@@ -8,7 +8,6 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import RemoteControl from './pages/RemoteControl';
-
 import Fingerprints from './pages/Fingerprints';
 import Logs from './pages/Logs';
 import Analytics from './pages/Analytics';
@@ -16,7 +15,6 @@ import Settings from './pages/Settings';
 import Login from './pages/Login';
 import Register from './pages/Register';
 
-// Placeholder Pages
 const Placeholder = ({ title }) => (
   <div className="flex bg-surface-container items-center justify-center h-full min-h-[400px] border border-outline-variant/10 rounded-3xl animate-in zoom-in duration-300">
     <h2 className="text-3xl font-bold font-headline text-on-surface">{title}</h2>
@@ -31,11 +29,8 @@ const App = () => {
           <AuthProvider>
             <BrowserRouter>
               <Routes>
-                {/* Auth Routes */}
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
-                
-                {/* App Routes */}
                 <Route element={<ProtectedRoute />}>
                   <Route path="/" element={<Layout />}>
                     <Route index element={<Dashboard />} />
