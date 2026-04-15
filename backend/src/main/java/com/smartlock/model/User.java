@@ -53,6 +53,9 @@ public class User implements UserDetails {
 
     private LocalDateTime lastLogin;
 
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+    private UserDetail detail;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
