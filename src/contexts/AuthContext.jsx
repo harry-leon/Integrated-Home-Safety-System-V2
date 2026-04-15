@@ -10,7 +10,7 @@ export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true); // loading while verifying stored token
 
   /**
-   * Verify a stored token on mount. If invalid/expired, clear session.
+   * Verify a stored token on mount. If invalid/expired, clear session.s
    */
   useEffect(() => {
     const storedToken = localStorage.getItem('sentinel_token');
@@ -18,7 +18,7 @@ export const AuthProvider = ({ children }) => {
     if (storedToken && storedUser) {
       try {
         // Basic JWT expiry check (payload is base64-encoded)
-        const payload = JSON.parse(atob(storedToken.split('.')[1]));
+        const payload = JSON.parse(atob(storedToken.split('.')[1])); 
         if (payload.exp && payload.exp * 1000 < Date.now()) {
           // Token has expired
           clearSession();
