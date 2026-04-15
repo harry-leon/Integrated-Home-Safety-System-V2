@@ -120,13 +120,354 @@ body {
   background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-fixed-dim) 100%);
 }
 
-/* Tubes Cursor Styles */
-.tubes-cursor {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+/* ── Scrollbar ────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-outline-variant); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-primary); }
+
+/* ── Card hover glow ─────────────────────────────────────────────── */
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 24px color-mix(in srgb, var(--color-primary) 15%, transparent);
+}
+
+/* ── Lock pulse ring ─────────────────────────────────────────────── */
+@keyframes lock-pulse {
+  0%   { box-shadow: 0 0 0 0px color-mix(in srgb, var(--color-primary) 50%, transparent); }
+  70%  { box-shadow: 0 0 0 18px transparent; }
+  100% { box-shadow: 0 0 0 0px transparent; }
+}
+.lock-pulse { animation: lock-pulse 2.4s ease-out infinite; }
+
+/* ── Neon glow button ────────────────────────────────────────────── */
+@keyframes glow-btn {
+  0%, 100% { box-shadow: 0 0 10px color-mix(in srgb, var(--color-primary) 40%, transparent); }
+  50%       { box-shadow: 0 0 24px color-mix(in srgb, var(--color-primary) 60%, transparent); }
+}
+.glow-btn { animation: glow-btn 2.5s ease-in-out infinite; }
+
+/* ── Sidebar active item shine ───────────────────────────────────── */
+@keyframes active-shine {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+/* ── Smooth page transitions ─────────────────────────────────────── */
+.page-enter { animation: page-in 0.35s cubic-bezier(0.22,1,0.36,1) both; }
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Selection highlight ─────────────────────────────────────────── */
+::selection { background: color-mix(in srgb, var(--color-primary) 30%, transparent); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   HYPERTECH EFFECTS
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── HUD corner brackets ─────────────────────────────────────────── */
+.hud-corners {
+  position: relative;
+}
+.hud-corners::before,
+.hud-corners::after {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-color: var(--color-primary);
+  border-style: solid;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
   pointer-events: none;
-  z-index: 9999;
+  z-index: 2;
+}
+.hud-corners::before {
+  top: 6px; left: 6px;
+  border-width: 2px 0 0 2px;
+  border-radius: 2px 0 0 0;
+}
+.hud-corners::after {
+  bottom: 6px; right: 6px;
+  border-width: 0 2px 2px 0;
+  border-radius: 0 0 2px 0;
+}
+.hud-corners:hover::before,
+.hud-corners:hover::after { opacity: 1; }
+
+/* ── Neon border glow ────────────────────────────────────────────── */
+@keyframes neon-border-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-primary) 25%, transparent),
+                inset 0 0 0 1px color-mix(in srgb, var(--color-primary) 8%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-primary) 60%, transparent),
+                0 0 20px color-mix(in srgb, var(--color-primary) 15%, transparent),
+                inset 0 0 12px color-mix(in srgb, var(--color-primary) 5%, transparent);
+  }
+}
+.neon-border {
+  animation: neon-border-pulse 3s ease-in-out infinite;
+}
+
+/* ── Scan line sweep ─────────────────────────────────────────────── */
+@keyframes scanline-sweep {
+  0%   { top: -4px; opacity: 0.6; }
+  100% { top: 100%; opacity: 0; }
+}
+.scanline-sweep::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--color-primary), transparent);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10;
+  animation: scanline-sweep 4s linear infinite;
+}
+
+/* ── Subtle scanlines overlay ────────────────────────────────────── */
+.scanlines {
+  position: relative;
+}
+.scanlines::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.03) 2px,
+    rgba(0, 0, 0, 0.03) 4px
+  );
+  pointer-events: none;
+  z-index: 1;
+  border-radius: inherit;
+}
+
+/* ── Cyber grid background ───────────────────────────────────────── */
+.cyber-grid {
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--color-primary) 5%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--color-primary) 5%, transparent) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* ── Data pulse dot ──────────────────────────────────────────────── */
+@keyframes data-pulse {
+  0%   { transform: scale(1);   opacity: 1; }
+  50%  { transform: scale(1.6); opacity: 0.4; }
+  100% { transform: scale(1);   opacity: 1; }
+}
+.data-pulse { animation: data-pulse 1.8s ease-in-out infinite; }
+
+@keyframes data-pulse-slow {
+  0%   { transform: scale(1);   opacity: 0.8; }
+  50%  { transform: scale(2.2); opacity: 0;   }
+  100% { transform: scale(1);   opacity: 0.8; }
+}
+.data-pulse-slow { animation: data-pulse-slow 3s ease-in-out infinite; }
+
+/* ── Neon text glow ──────────────────────────────────────────────── */
+@keyframes neon-text {
+  0%, 100% { text-shadow: 0 0 4px color-mix(in srgb, var(--color-primary) 60%, transparent); }
+  50%       { text-shadow: 0 0 12px color-mix(in srgb, var(--color-primary) 90%, transparent),
+                            0 0 24px color-mix(in srgb, var(--color-primary) 40%, transparent); }
+}
+.neon-text { animation: neon-text 2.5s ease-in-out infinite; }
+
+/* ── Terminal cursor blink ───────────────────────────────────────── */
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+.terminal-cursor::after {
+  content: '█';
+  font-size: 0.7em;
+  margin-left: 2px;
+  animation: cursor-blink 1s step-end infinite;
+  color: var(--color-primary);
+}
+
+/* ── Glitch shimmer on text ──────────────────────────────────────── */
+@keyframes glitch-shift {
+  0%        { clip-path: inset(0 0 100% 0); transform: skewX(0deg); }
+  5%        { clip-path: inset(30% 0 50% 0); transform: skewX(-4deg); }
+  10%       { clip-path: inset(60% 0 20% 0); transform: skewX(2deg); }
+  15%       { clip-path: inset(0 0 100% 0); transform: skewX(0deg); }
+  100%      { clip-path: inset(0 0 100% 0); transform: skewX(0deg); }
+}
+.glitch-text {
+  position: relative;
+}
+.glitch-text::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0; left: 0;
+  color: #4af;
+  opacity: 0.5;
+  animation: glitch-shift 6s steps(1) infinite;
+  pointer-events: none;
+}
+
+/* ── Cyber card ──────────────────────────────────────────────────── */
+.cyber-card {
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+.cyber-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 32px color-mix(in srgb, var(--color-primary) 18%, transparent),
+              0 4px 16px rgba(0,0,0,0.2);
+}
+.cyber-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--color-primary) 80%, transparent) 30%,
+    color-mix(in srgb, var(--color-primary) 100%, transparent) 50%,
+    color-mix(in srgb, var(--color-primary) 80%, transparent) 70%,
+    transparent 100%
+  );
+  opacity: 0.5;
+  transition: opacity 0.3s;
+  border-radius: inherit;
+  pointer-events: none;
+}
+.cyber-card:hover::before { opacity: 1; }
+
+/* ── Neon separator line ─────────────────────────────────────────── */
+.neon-sep {
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent,
+    color-mix(in srgb, var(--color-primary) 60%, transparent),
+    transparent
+  );
+}
+
+/* ── Circuit trace line animation (sidebar accent) ───────────────── */
+@keyframes circuit-trace {
+  0%   { width: 0%;   opacity: 1; }
+  80%  { width: 100%; opacity: 1; }
+  100% { width: 100%; opacity: 0; }
+}
+.circuit-trace::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0;
+  height: 1px;
+  background: var(--color-primary);
+  animation: circuit-trace 2.5s ease-in-out infinite;
+}
+
+/* ── Status online pulse (double ring) ───────────────────────────── */
+@keyframes online-ring {
+  0%   { box-shadow: 0 0 0 0   color-mix(in srgb, #22c55e 60%, transparent); }
+  70%  { box-shadow: 0 0 0 8px color-mix(in srgb, #22c55e 0%,  transparent); }
+  100% { box-shadow: 0 0 0 0   color-mix(in srgb, #22c55e 0%,  transparent); }
+}
+.online-ping { animation: online-ring 2s ease-out infinite; }
+
+/* ── Data stream ticker ──────────────────────────────────────────── */
+@keyframes ticker-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.ticker-inner { animation: ticker-scroll 20s linear infinite; }
+
+/* ── Neon lock ring (enhanced) ───────────────────────────────────── */
+@keyframes neon-lock-pulse {
+  0%   {
+    box-shadow: 0 0 0 0   color-mix(in srgb, var(--color-primary) 70%, transparent),
+                0 0 16px  color-mix(in srgb, var(--color-primary) 30%, transparent);
+  }
+  50%  {
+    box-shadow: 0 0 0 14px color-mix(in srgb, var(--color-primary) 0%, transparent),
+                0 0 32px   color-mix(in srgb, var(--color-primary) 50%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 0   color-mix(in srgb, var(--color-primary) 70%, transparent),
+                0 0 16px  color-mix(in srgb, var(--color-primary) 30%, transparent);
+  }
+}
+.neon-lock-pulse {
+  animation: neon-lock-pulse 2.4s ease-in-out infinite;
+}
+
+/* ── Typing line animation for status text ───────────────────────── */
+@keyframes type-in {
+  from { width: 0; }
+  to   { width: 100%; }
+}
+.type-in {
+  overflow: hidden;
+  white-space: nowrap;
+  animation: type-in 1.2s steps(30) forwards;
+}
+
+/* ── Hex dot pattern (light) ─────────────────────────────────────── */
+.hex-dots {
+  background-image: radial-gradient(
+    color-mix(in srgb, var(--color-primary) 20%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 24px 24px;
+}
+
+/* ── Sidebar nav active glow ─────────────────────────────────────── */
+.nav-active-glow {
+  box-shadow: inset 3px 0 0 var(--color-primary),
+              0 0 16px color-mix(in srgb, var(--color-primary) 12%, transparent);
+}
+
+/* ── Holographic shimmer ─────────────────────────────────────────── */
+@keyframes holo-shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+.holo-shimmer {
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    color-mix(in srgb, var(--color-primary) 20%, transparent) 50%,
+    transparent 60%
+  );
+  background-size: 200% 100%;
+  animation: holo-shimmer 3s ease-in-out infinite;
+}
+
+/* ── Flicker animation ───────────────────────────────────────────── */
+@keyframes flicker {
+  0%, 95%, 100% { opacity: 1; }
+  96%           { opacity: 0.6; }
+  97%           { opacity: 1; }
+  98%           { opacity: 0.7; }
+}
+.flicker { animation: flicker 5s step-end infinite; }
+
+/* ── Version tag ─────────────────────────────────────────────────── */
+.version-tag {
+  font-family: 'Inter', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  opacity: 0.4;
+}
+
+/* ── Enhanced card hover ─────────────────────────────────────────── */
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 32px color-mix(in srgb, var(--color-primary) 18%, transparent),
+              0 4px 12px rgba(0,0,0,0.15);
 }

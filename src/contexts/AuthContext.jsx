@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }) => {
       let msg = 'Đăng nhập thất bại.';
       try {
         const err = JSON.parse(errorText);
-        msg = err.message || msg;
+        msg = err.message || err.error || msg;
       } catch { /* not JSON */ }
       throw new Error(msg);
     }
@@ -82,7 +82,7 @@ export const AuthProvider = ({ children }) => {
       let msg = 'Đăng ký thất bại.';
       try {
         const err = JSON.parse(errorText);
-        msg = err.message || msg;
+        msg = err.message || err.error || msg;
       } catch { /* not JSON */ }
       throw new Error(msg);
     }
