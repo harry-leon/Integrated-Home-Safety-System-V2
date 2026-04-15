@@ -1,9 +1,40 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useLang } from '../contexts/LangContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const Login = () => {
   const { t } = useLang();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { login, isAuthenticated } = useAuth();
+  
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  // Redirect if already logged in
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      await login(email, password);
+      const from = location.state?.from?.pathname || "/";
+      navigate(from, { replace: true });
+    } catch (err) {
+      setError(err.message || 'Đăng nhập thất bại.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="bg-background text-on-surface font-body min-h-screen flex items-center justify-center overflow-hidden relative">
@@ -54,7 +85,12 @@ const Login = () => {
               <p className="text-outline text-sm">{t('Vui lòng nhập thông tin để truy cập hệ thống.')}</p>
             </div>
             
-            <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); window.location.href = '/'; }}>
+            <form className="space-y-6" onSubmit={handleSubmit}>
+              {error && (
+                <div className="bg-error/10 text-error px-4 py-3 rounded-xl text-sm font-medium border border-error/20">
+                  {error}
+                </div>
+              )}
               <div className="space-y-2">
                 <label className="text-xs font-semibold text-outline tracking-wider uppercase ml-1" htmlFor="email">{t('Email Hệ Thống')}</label>
                 <div className="relative group/input">
@@ -62,9 +98,12 @@ const Login = () => {
                   <input 
                     className="w-full bg-surface-container-highest border-none rounded-xl py-4 pl-12 pr-4 text-on-surface placeholder:text-outline/50 focus:ring-2 focus:ring-primary/50 transition-all font-label outline-none shadow-sm" 
                     id="email" 
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     placeholder="name@sentinel.security" 
                     type="email" 
                     required 
+                    disabled={loading}
                   />
                 </div>
               </div>
@@ -79,9 +118,12 @@ const Login = () => {
                   <input 
                     className="w-full bg-surface-container-highest border-none rounded-xl py-4 pl-12 pr-12 text-on-surface placeholder:text-outline/50 focus:ring-2 focus:ring-primary/50 transition-all font-label outline-none shadow-sm" 
                     id="password" 
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••" 
                     type="password" 
                     required 
+                    disabled={loading}
                   />
                   <button className="absolute right-4 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface transition-colors" type="button">
                     <span className="material-symbols-outlined text-lg">visibility</span>
@@ -99,11 +141,12 @@ const Login = () => {
               </div>
               
               <button 
-                className="w-full py-4 rounded-xl font-bold text-lg shadow-sm hover:shadow-primary/20 hover:scale-[1.01] active:scale-[0.98] transition-all flex items-center justify-center gap-3 bg-gradient-to-br from-primary-container to-primary text-on-primary-container" 
+                className="w-full py-4 rounded-xl font-bold text-lg shadow-sm hover:shadow-primary/20 hover:scale-[1.01] active:scale-[0.98] transition-all flex items-center justify-center gap-3 bg-gradient-to-br from-primary-container to-primary text-on-primary-container disabled:opacity-50 disabled:pointer-events-none" 
                 type="submit"
+                disabled={loading}
               >
-                {t('Đăng nhập')}
-                <span className="material-symbols-outlined text-xl">arrow_forward</span>
+                {loading ? t('Đang xử lý...') : t('Đăng nhập')}
+                {!loading && <span className="material-symbols-outlined text-xl">arrow_forward</span>}
               </button>
             </form>
             

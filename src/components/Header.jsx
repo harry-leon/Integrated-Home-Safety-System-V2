@@ -2,11 +2,13 @@ import React from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 import { useLang } from '../contexts/LangContext';
 import { useTimeWeather } from '../contexts/TimeWeatherContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const Header = () => {
   const { theme, toggleTheme } = useTheme();
   const { toggleLang, t } = useLang();
   const { timeStr, dateStr } = useTimeWeather();
+  const { user } = useAuth();
 
   return (
     <header className="w-full sticky top-0 z-40 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/20 flex justify-between items-center px-8 py-4 font-['Manrope'] antialiased tracking-tight transition-colors duration-300">
@@ -48,8 +50,8 @@ const Header = () => {
         
         <div className="flex items-center gap-3 pl-6 border-l border-outline-variant/20">
           <div className="text-right hidden sm:block">
-            <p className="text-sm font-bold text-on-surface">{t('admin')}</p>
-            <p className="text-xs text-outline">{t('admin_sub')}</p>
+            <p className="text-sm font-bold text-on-surface">{user?.fullName || t('admin')}</p>
+            <p className="text-xs text-outline w-32 truncate" title={user?.email}>{user?.email || t('admin_sub')}</p>
           </div>
           <img className="w-10 h-10 rounded-full object-cover border border-outline-variant/20" alt="Admin Avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB0W6fRALKTF9hZUnU0dGoofTFJYoyA6XRsdFNaqJZoYKeGWAY0vjkNfr0CHNshgwRniAOjZvkMDFkUnwOisPywNOFrJtiTUrLkdAwJblflKbUIg1Xt7g-96Ed7jUkskDSzCzz64OrTBrucYs7caqAx0LLKcRZ6jdGTFXBt0VFAwb5WQ23C6Q6_CU0QmVJ0ophnY74jT1d75FHy0ELqW2kTtcNw5xGQI_5oX3jd8WsBfwz-985EMDO3nhr7RwXZhquC6HMfPSp6tGZP" />
         </div>
