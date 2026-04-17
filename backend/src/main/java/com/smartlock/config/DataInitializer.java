@@ -12,11 +12,13 @@ import com.smartlock.repository.AlertRepository;
 import com.smartlock.repository.DeviceRepository;
 import com.smartlock.repository.UserDeviceRepository;
 import com.smartlock.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -27,19 +29,17 @@ public class DataInitializer implements CommandLineRunner {
     private final AlertRepository alertRepository;
     private final UserRepository userRepository;
     private final UserDeviceRepository userDeviceRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public void run(String... args) {
+        seedTestAccounts();
+
         if (deviceRepository.count() > 0 && accessLogRepository.count() > 0) {
             return;
         }
 
-        System.out.println("No devices found, creating demo data...");
-
-        var adminUser = userRepository.findAll().stream()
-                .filter(user -> user.getRole() == UserRole.ADMIN)
-                .findFirst()
-                .orElse(null);
+        var adminUser = userRepository.findByEmail("admin@smartlock.com").orElse(null);
 
         Device device = Device.builder()
                 .deviceName("Khoa Cua Chinh (Demo)")
@@ -94,7 +94,32 @@ public class DataInitializer implements CommandLineRunner {
 
         alertRepository.save(alert1);
         alertRepository.save(alert2);
-
         System.out.println("Demo data initialized successfully!");
+    }
+
+    private void seedTestAccounts() {
+        String commonPassword = passwordEncoder.encode("password");
+
+        createIfMissing("admin@smartlock.com", "Admin User", UserRole.ADMIN, commonPassword);
+        createIfMissing("user@smartlock.com", "Standard User", UserRole.MEMBER, commonPassword);
+        createIfMissing("owner@smartlock.com", "Olivia Owner", UserRole.MEMBER, commonPassword);
+        createIfMissing("control@smartlock.com", "Chris Control", UserRole.MEMBER, commonPassword);
+        createIfMissing("viewer@smartlock.com", "Vera Viewer", UserRole.VIEWER, commonPassword);
+        createIfMissing("nogrant@smartlock.com", "Nina No Grant", UserRole.MEMBER, commonPassword);
+    }
+
+    private void createIfMissing(String email, String fullName, UserRole role, String passwordHash) {
+        if (userRepository.findByEmail(email).isEmpty()) {
+            System.out.println("Seeding account: " + email);
+            userRepository.save(com.smartlock.model.User.builder()
+                    .email(email)
+                    .passwordHash(passwordHash)
+                    .fullName(fullName)
+                    .role(role)
+                    .isActive(true)
+                    .createdAt(LocalDateTime.now())
+                    .updatedAt(LocalDateTime.now())
+                    .build());
+        }
     }
 }
