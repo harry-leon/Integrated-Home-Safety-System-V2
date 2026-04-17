@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useLang } from '../contexts/LangContext';
+import { useTheme } from '../contexts/ThemeContext';
 import UserAvatar from './UserAvatar';
 
 const actionBase =
@@ -9,7 +11,12 @@ const actionBase =
 const ProfileMenu = ({ user, onClose }) => {
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const { t } = useLang();
+  const { theme } = useTheme();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const menuSurface = theme === 'dark' ? 'bg-[#0b1d2a] border-cyan-950/60' : 'bg-surface-container border-outline-variant/20';
+  const itemHover = theme === 'dark' ? 'hover:bg-[#102434] hover:border-cyan-900/60' : 'hover:border-primary/20 hover:bg-surface-container-high';
+  const actionClass = `${actionBase} ${itemHover}`;
 
   const goTo = (section, mode) => {
     const params = new URLSearchParams();
@@ -31,14 +38,14 @@ const ProfileMenu = ({ user, onClose }) => {
   };
 
   return (
-    <div className="absolute right-0 top-[calc(100%+1rem)] w-[22rem] rounded-[1.75rem] border border-outline-variant/20 bg-surface-container/95 backdrop-blur-2xl shadow-[0_24px_60px_rgba(0,0,0,0.28)] overflow-hidden z-50">
+    <div className={`absolute right-0 top-[calc(100%+1rem)] z-50 w-[22rem] overflow-hidden rounded-[1.75rem] border shadow-[0_24px_60px_rgba(0,0,0,0.28)] ${menuSurface}`}>
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
 
       <div className="p-5 border-b border-outline-variant/15">
         <div className="flex items-start gap-4">
           <UserAvatar src={user?.avatarUrl} name={user?.fullName} size="w-16 h-16" />
           <div className="min-w-0 flex-1">
-            <p className="text-base font-black text-on-surface truncate">{user?.fullName || 'Sentinel User'}</p>
+            <p className="text-base font-black text-on-surface truncate">{user?.fullName || t('sentinel_user')}</p>
             <p className="text-xs text-outline truncate mt-1">{user?.email}</p>
             <div className="mt-3 flex items-center gap-2">
               <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 text-primary px-2.5 py-1 text-[10px] font-bold tracking-[0.2em] uppercase">
@@ -54,35 +61,35 @@ const ProfileMenu = ({ user, onClose }) => {
       </div>
 
       <div className="p-3 space-y-1.5">
-        <button type="button" onClick={() => goTo('profile')} className={actionBase}>
+        <button type="button" onClick={() => goTo('profile')} className={actionClass}>
           <span className="material-symbols-outlined text-[20px] text-primary">person</span>
           <div>
-            <div className="font-semibold text-on-surface">View profile</div>
-            <div className="text-[11px] text-outline">Review your account details</div>
+            <div className="font-semibold text-on-surface">{t('profile_view')}</div>
+            <div className="text-[11px] text-outline">{t('profile_view_desc')}</div>
           </div>
         </button>
 
-        <button type="button" onClick={() => goTo('profile', 'edit')} className={actionBase}>
+        <button type="button" onClick={() => goTo('profile', 'edit')} className={actionClass}>
           <span className="material-symbols-outlined text-[20px] text-primary">edit_square</span>
           <div>
-            <div className="font-semibold text-on-surface">Edit profile</div>
-            <div className="text-[11px] text-outline">Update avatar and personal info</div>
+            <div className="font-semibold text-on-surface">{t('profile_edit')}</div>
+            <div className="text-[11px] text-outline">{t('profile_edit_desc')}</div>
           </div>
         </button>
 
-        <button type="button" onClick={() => goTo('preferences')} className={actionBase}>
+        <button type="button" onClick={() => goTo('preferences')} className={actionClass}>
           <span className="material-symbols-outlined text-[20px] text-primary">settings</span>
           <div>
-            <div className="font-semibold text-on-surface">Settings</div>
-            <div className="text-[11px] text-outline">Appearance and account preferences</div>
+            <div className="font-semibold text-on-surface">{t('preferences')}</div>
+            <div className="text-[11px] text-outline">{t('preferences_desc')}</div>
           </div>
         </button>
 
-        <button type="button" onClick={() => goTo('logins')} className={actionBase}>
+        <button type="button" onClick={() => goTo('logins')} className={actionClass}>
           <span className="material-symbols-outlined text-[20px] text-primary">devices</span>
           <div>
-            <div className="font-semibold text-on-surface">Login activity</div>
-            <div className="text-[11px] text-outline">Recent sessions and devices</div>
+            <div className="font-semibold text-on-surface">{t('login_activity')}</div>
+            <div className="text-[11px] text-outline">{t('login_activity_desc')}</div>
           </div>
         </button>
       </div>
@@ -97,12 +104,12 @@ const ProfileMenu = ({ user, onClose }) => {
           {isLoggingOut ? (
             <>
               <span className="w-4 h-4 border-2 border-error/30 border-t-error rounded-full animate-spin" />
-              Signing out...
+              {t('signing_out')}
             </>
           ) : (
             <>
               <span className="material-symbols-outlined text-[18px]">logout</span>
-              Logout
+              {t('logout')}
             </>
           )}
         </button>

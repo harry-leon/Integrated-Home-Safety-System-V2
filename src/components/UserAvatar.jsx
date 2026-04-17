@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import defaultAvatar from '../assets/default-avatar.svg';
 
 const UserAvatar = ({
   src,
@@ -8,12 +9,8 @@ const UserAvatar = ({
   className = '',
   ringClassName = '',
 }) => {
-  const initials = (name || 'User')
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join('') || 'U';
+  const [hasImageError, setHasImageError] = useState(false);
+  const avatarSrc = !hasImageError && src ? src : defaultAvatar;
 
   return (
     <div className={`relative inline-flex items-center justify-center rounded-full p-[1.5px] ${className}`}>
@@ -22,13 +19,12 @@ const UserAvatar = ({
         style={{ boxShadow: '0 0 18px color-mix(in srgb, var(--color-primary) 35%, transparent)' }}
       />
       <div className={`relative ${size} rounded-full overflow-hidden bg-surface-container-highest border border-white/10`}>
-        {src ? (
-          <img src={src} alt={name || 'User avatar'} className={`w-full h-full object-cover ${innerClassName}`} />
-        ) : (
-          <div className="w-full h-full bg-gradient-to-br from-primary-container via-primary-fixed to-secondary-fixed flex items-center justify-center text-on-primary-container">
-            <span className="text-xs font-black tracking-wide">{initials}</span>
-          </div>
-        )}
+        <img
+          src={avatarSrc}
+          alt={name || 'User avatar'}
+          className={`w-full h-full object-cover ${innerClassName}`}
+          onError={() => setHasImageError(true)}
+        />
       </div>
     </div>
   );
