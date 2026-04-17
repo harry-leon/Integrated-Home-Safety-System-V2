@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
-import { LangProvider } from './contexts/LangContext';
+import { LangProvider, useLang } from './contexts/LangContext';
 import { TimeWeatherProvider } from './contexts/TimeWeatherContext';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -21,29 +21,37 @@ const Placeholder = ({ title }) => (
   </div>
 );
 
+const AppRoutes = () => {
+  const { t } = useLang();
+
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="remote" element={<RemoteControl />} />
+            <Route path="fingerprints" element={<Fingerprints />} />
+            <Route path="logs" element={<Logs />} />
+            <Route path="analytics" element={<Analytics />} />
+            <Route path="settings" element={<Settings />} />
+            <Route path="support" element={<Placeholder title={t('support_page')} />} />
+          </Route>
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  );
+};
+
 const App = () => {
   return (
     <ThemeProvider>
       <LangProvider>
         <TimeWeatherProvider>
           <AuthProvider>
-            <BrowserRouter>
-              <Routes>
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route element={<ProtectedRoute />}>
-                  <Route path="/" element={<Layout />}>
-                    <Route index element={<Dashboard />} />
-                    <Route path="remote" element={<RemoteControl />} />
-                    <Route path="fingerprints" element={<Fingerprints />} />
-                    <Route path="logs" element={<Logs />} />
-                    <Route path="analytics" element={<Analytics />} />
-                    <Route path="settings" element={<Settings />} />
-                    <Route path="support" element={<Placeholder title="Support Page" />} />
-                  </Route>
-                </Route>
-              </Routes>
-            </BrowserRouter>
+            <AppRoutes />
           </AuthProvider>
         </TimeWeatherProvider>
       </LangProvider>

@@ -3,7 +3,19 @@
 /**
  * Custom fetch wrapper to handle JSON responses and errors.
  */
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+
+const isAbsoluteUrl = (value) => /^https?:\/\//i.test(value);
+
+const resolveUrl = (url) => {
+  if (!url) return url;
+  if (isAbsoluteUrl(url)) return url;
+  if (url.startsWith('/')) return `${API_BASE_URL}${url}`;
+  return url;
+};
+
 async function fetchApi(url, options = {}) {
+  const resolvedUrl = resolveUrl(url);
   const token = localStorage.getItem('sentinel_token');
   const isFormData = options.body instanceof FormData;
   const defaultHeaders = {};
@@ -17,7 +29,7 @@ async function fetchApi(url, options = {}) {
   }
 
   try {
-    const response = await fetch(url, {
+    const response = await fetch(resolvedUrl, {
       ...options,
       headers: {
         ...defaultHeaders,
@@ -56,7 +68,7 @@ async function fetchApi(url, options = {}) {
 
     return JSON.parse(text);
   } catch (error) {
-    console.error(`API Error on ${url}:`, error);
+    console.error(`API Error on ${resolvedUrl}:`, error);
     throw error;
   }
 }
@@ -75,6 +87,20 @@ const cleanParams = (params) => {
 };
 
 export const smartLockApi = {
+  login: async (email, password) => {
+    return fetchApi('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    });
+  },
+
+  register: async (fullName, email, password) => {
+    return fetchApi('/api/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({ fullName, email, password }),
+    });
+  },
+
   getDevices: async () => {
     return fetchApi('/api/devices');
   },

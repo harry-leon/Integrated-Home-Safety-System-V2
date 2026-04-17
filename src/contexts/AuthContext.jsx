@@ -3,8 +3,6 @@ import { smartLockApi } from '../services/api';
 
 const AuthContext = createContext(null);
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
-
 const normalizeUser = (profile) => ({
   userId: profile?.userId,
   fullName: profile?.fullName || 'Sentinel User',
@@ -40,11 +38,14 @@ export const AuthProvider = ({ children }) => {
     return normalized;
   }, []);
 
-  const applyUserProfile = useCallback((profile) => {
-    const currentToken = localStorage.getItem('sentinel_token');
-    if (!currentToken) return null;
-    return persistSession(currentToken, profile);
-  }, [persistSession]);
+  const applyUserProfile = useCallback(
+    (profile) => {
+      const currentToken = localStorage.getItem('sentinel_token');
+      if (!currentToken) return null;
+      return persistSession(currentToken, profile);
+    },
+    [persistSession],
+  );
 
   const refreshProfile = useCallback(async () => {
     const currentToken = localStorage.getItem('sentinel_token');
@@ -82,67 +83,38 @@ export const AuthProvider = ({ children }) => {
           clearSession();
         }
       }
+
       setIsLoading(false);
     };
 
     bootstrap();
   }, [clearSession, refreshProfile]);
 
-  const login = useCallback(async (email, password) => {
-    const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
+  const login = useCallback(
+    async (email, password) => {
+      const data = await smartLockApi.login(email, password);
+      const nextToken = data.accessToken;
+      localStorage.setItem('sentinel_token', nextToken);
+      setToken(nextToken);
+      const profile = await smartLockApi.getCurrentProfile();
+      persistSession(nextToken, profile);
+      return data;
+    },
+    [persistSession],
+  );
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      let msg = 'Đăng nhập thất bại.';
-      try {
-        const err = JSON.parse(errorText);
-        msg = err.message || err.error || msg;
-      } catch {
-        // ignore non-JSON error bodies
-      }
-      throw new Error(msg);
-    }
-
-    const data = await response.json();
-    const nextToken = data.accessToken;
-    localStorage.setItem('sentinel_token', nextToken);
-    setToken(nextToken);
-    const profile = await smartLockApi.getCurrentProfile();
-    persistSession(nextToken, profile);
-    return data;
-  }, [persistSession]);
-
-  const register = useCallback(async (fullName, email, password) => {
-    const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ fullName, email, password }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      let msg = 'Đăng ký thất bại.';
-      try {
-        const err = JSON.parse(errorText);
-        msg = err.message || err.error || msg;
-      } catch {
-        // ignore non-JSON error bodies
-      }
-      throw new Error(msg);
-    }
-
-    const data = await response.json();
-    const nextToken = data.accessToken;
-    localStorage.setItem('sentinel_token', nextToken);
-    setToken(nextToken);
-    const profile = await smartLockApi.getCurrentProfile();
-    persistSession(nextToken, profile);
-    return data;
-  }, [persistSession]);
+  const register = useCallback(
+    async (fullName, email, password) => {
+      const data = await smartLockApi.register(fullName, email, password);
+      const nextToken = data.accessToken;
+      localStorage.setItem('sentinel_token', nextToken);
+      setToken(nextToken);
+      const profile = await smartLockApi.getCurrentProfile();
+      persistSession(nextToken, profile);
+      return data;
+    },
+    [persistSession],
+  );
 
   const logout = useCallback(async () => {
     try {
@@ -182,3 +154,4 @@ export const useAuth = () => {
   if (!ctx) throw new Error('useAuth must be used within an AuthProvider');
   return ctx;
 };
+

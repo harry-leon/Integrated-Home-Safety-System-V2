@@ -1,492 +1,783 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useLang } from '../contexts/LangContext';
 import { useTimeWeather } from '../contexts/TimeWeatherContext';
+import ReAuthModal from '../components/ReAuthModal';
 import { smartLockApi } from '../services/api';
+
+const formatAlertType = (alertType) => {
+  switch (alertType) {
+    case 'GAS_LEAK':
+      return 'Canh bao khi gas';
+    case 'INTRUDER_ALERT':
+      return 'Canh bao dot nhap';
+    case 'FIRE_ALARM':
+      return 'Canh bao chay';
+    case 'WRONG_PASSWORD':
+      return 'Sai mat khau';
+    case 'TAMPER_ALERT':
+      return 'Canh bao pha hoai';
+    case 'BATTERY_LOW':
+      return 'Pin yeu';
+    case 'OFFLINE_ALERT':
+      return 'Thiet bi offline';
+    default:
+      return alertType || 'Canh bao';
+  }
+};
+
+const getAlertIcon = (alertType) => {
+  switch (alertType) {
+    case 'GAS_LEAK':
+      return 'detector_alarm';
+    case 'INTRUDER_ALERT':
+      return 'motion_sensor_active';
+    case 'FIRE_ALARM':
+      return 'local_fire_department';
+    case 'BATTERY_LOW':
+      return 'battery_alert';
+    case 'OFFLINE_ALERT':
+      return 'wifi_off';
+    default:
+      return 'warning';
+  }
+};
+
+const getSeverityStyle = (severity) => {
+  if (severity === 'CRITICAL') {
+    return {
+      tone: 'border-error/30 bg-error/8 text-error',
+      badge: 'bg-error text-white',
+      iconWrap: 'bg-error/14 text-error',
+      label: 'Nguy cap',
+    };
+  }
+
+  if (severity === 'HIGH') {
+    return {
+      tone: 'border-amber-500/30 bg-amber-500/8 text-amber-700',
+      badge: 'bg-amber-500 text-slate-950',
+      iconWrap: 'bg-amber-500/14 text-amber-600',
+      label: 'Can chu y',
+    };
+  }
+
+  return {
+    tone: 'border-primary/20 bg-primary/6 text-primary',
+    badge: 'bg-primary text-white',
+    iconWrap: 'bg-primary/12 text-primary',
+    label: 'Theo doi',
+  };
+};
+
+const formatRelativeTime = (value) => {
+  if (!value) return 'Chua cap nhat';
+
+  const diff = Date.now() - new Date(value).getTime();
+  const minutes = Math.max(1, Math.round(diff / 60000));
+
+  if (minutes < 60) return `${minutes} phut truoc`;
+  const hours = Math.round(minutes / 60);
+  if (hours < 24) return `${hours} gio truoc`;
+  const days = Math.round(hours / 24);
+  return `${days} ngay truoc`;
+};
+
+const formatDateTime = (value) => {
+  if (!value) return 'Chua co du lieu';
+  return new Date(value).toLocaleString('vi-VN', {
+    dateStyle: 'short',
+    timeStyle: 'short',
+  });
+};
+
+const normalizeSpeech = (value) =>
+  (value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
 
 const Dashboard = () => {
   const { t } = useLang();
+  const navigate = useNavigate();
   const { weather } = useTimeWeather();
-  const [wifiSignal, setWifiSignal] = useState(92);
   const [alerts, setAlerts] = useState([]);
   const [weeklySnap, setWeeklySnap] = useState(null);
   const [devices, setDevices] = useState([]);
-  const [lockState, setLockState] = useState('locked');
-  const [isLoadingAlerts, setIsLoadingAlerts] = useState(true);
-  const [isLoadingSnap, setIsLoadingSnap] = useState(true);
-
-  const primaryDevice = devices[0] || null;
-  const recentAlerts = alerts
-    .filter((alert) => !alert.resolved)
-    .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
-    .slice(0, 3);
+  const [accessLogs, setAccessLogs] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [verificationState, setVerificationState] = useState({ token: '', expiresAt: 0 });
+  const [verificationDialog, setVerificationDialog] = useState({
+    isOpen: false,
+    title: '',
+    description: '',
+  });
+  const [verificationError, setVerificationError] = useState('');
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [isVoiceSupported, setIsVoiceSupported] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [isVoiceExecuting, setIsVoiceExecuting] = useState(false);
+  const [voiceTranscript, setVoiceTranscript] = useState('');
+  const [voiceCommand, setVoiceCommand] = useState(null);
+  const [voiceFeedback, setVoiceFeedback] = useState('Use voice to lock, unlock, or jump to another workspace.');
+  const [voiceError, setVoiceError] = useState('');
+  const verificationPromiseRef = useRef(null);
+  const recognitionRef = useRef(null);
+  const transcriptRef = useRef('');
 
   useEffect(() => {
-    let isMounted = true;
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      setIsVoiceSupported(false);
+      return undefined;
+    }
 
-    const wInterval = setInterval(() => {
-      setWifiSignal((prev) => {
-        const next = prev + Math.floor(Math.random() * 5) - 2;
-        return Math.min(100, Math.max(50, next));
-      });
-    }, 5000);
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.continuous = false;
+    recognition.interimResults = true;
+
+    recognition.onstart = () => {
+      setIsListening(true);
+      setVoiceError('');
+      setVoiceFeedback('Listening for a dashboard command...');
+    };
+
+    recognition.onresult = (event) => {
+      const transcript = Array.from(event.results)
+        .map((result) => result[0]?.transcript || '')
+        .join(' ')
+        .trim();
+      transcriptRef.current = transcript;
+      setVoiceTranscript(transcript);
+    };
+
+    recognition.onerror = (event) => {
+      setIsListening(false);
+      setVoiceError(event.error === 'not-allowed' ? 'Microphone permission was denied.' : 'Voice recognition failed. Try again.');
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+
+    recognitionRef.current = recognition;
+    setIsVoiceSupported(true);
+
+    return () => {
+      recognition.stop();
+      recognitionRef.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
 
     const fetchData = async () => {
-      if (!isMounted) return;
       try {
         const [alertsData, snapData, deviceData, logData] = await Promise.all([
           smartLockApi.getAlerts().catch(() => []),
           smartLockApi.getWeeklySnapshot().catch(() => null),
           smartLockApi.getDevices().catch(() => []),
-          smartLockApi.getAccessLogs().catch(() => []),
+          smartLockApi.getAccessLogs({ page: 0, size: 6 }).catch(() => []),
         ]);
 
-        if (!isMounted) return;
+        if (!active) return;
 
         setAlerts(Array.isArray(alertsData) ? alertsData : []);
         setWeeklySnap(snapData);
         setDevices(Array.isArray(deviceData) ? deviceData : []);
-
-        const latestLockAction = Array.isArray(logData)
-          ? logData.find((log) => log.action === 'LOCKED' || log.action === 'UNLOCKED')
-          : null;
-        setLockState(latestLockAction?.action === 'UNLOCKED' ? 'unlocked' : 'locked');
-      } catch (err) {
-        console.error('Dashboard fetch error:', err);
+        setAccessLogs(Array.isArray(logData) ? logData : []);
       } finally {
-        if (isMounted) {
-          setIsLoadingAlerts(false);
-          setIsLoadingSnap(false);
+        if (active) {
+          setIsLoading(false);
         }
       }
     };
 
-    setIsLoadingAlerts(true);
-    setIsLoadingSnap(true);
     fetchData();
-    const dataInterval = setInterval(fetchData, 2000);
+    const intervalId = setInterval(fetchData, 6000);
 
     return () => {
-      isMounted = false;
-      clearInterval(wInterval);
-      clearInterval(dataInterval);
+      active = false;
+      clearInterval(intervalId);
     };
   }, []);
 
-  const formatAlertType = (alertType) => {
-    switch (alertType) {
-      case 'GAS_LEAK':
-        return 'Canh bao khi gas';
-      case 'INTRUDER_ALERT':
-        return 'Canh bao chuyen dong';
-      case 'FIRE_ALARM':
-        return 'Canh bao chay';
-      case 'WRONG_PASSWORD':
-        return 'Sai mat khau';
-      case 'TAMPER_ALERT':
-        return 'Canh bao cay pha';
-      case 'BATTERY_LOW':
-        return 'Pin yeu';
-      case 'OFFLINE_ALERT':
-        return 'Thiet bi ngoai tuyen';
-      default:
-        return alertType || 'Canh bao';
+  useEffect(() => {
+    return () => {
+      if (verificationPromiseRef.current) {
+        verificationPromiseRef.current.reject(new Error('Confirmation was cancelled.'));
+      }
+    };
+  }, []);
+
+  const primaryDevice = devices[0] || null;
+  const activeAlerts = useMemo(
+    () => alerts.filter((alert) => !alert.resolved).sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)),
+    [alerts],
+  );
+  const topAlert = activeAlerts[0] || null;
+  const recentEvents = accessLogs.slice(0, 4);
+  const latestLockAction = accessLogs.find((log) => log.action === 'LOCKED' || log.action === 'UNLOCKED');
+  const isLocked = latestLockAction?.action !== 'UNLOCKED';
+
+  const requestVerificationToken = async ({ title, description }) => {
+    if (verificationState.token && verificationState.expiresAt > Date.now()) {
+      return verificationState.token;
+    }
+
+    setVerificationError('');
+    setVerificationDialog({
+      isOpen: true,
+      title,
+      description,
+    });
+
+    return new Promise((resolve, reject) => {
+      verificationPromiseRef.current = { resolve, reject };
+    });
+  };
+
+  const closeVerificationDialog = () => {
+    if (isVerifying) return;
+
+    setVerificationDialog((current) => ({ ...current, isOpen: false }));
+    setVerificationError('');
+
+    if (verificationPromiseRef.current) {
+      verificationPromiseRef.current.reject(new Error('Confirmation was cancelled.'));
+      verificationPromiseRef.current = null;
     }
   };
 
-  const getAlertIcon = (alertType) => {
-    switch (alertType) {
-      case 'GAS_LEAK':
-        return 'detector_alarm';
-      case 'INTRUDER_ALERT':
-        return 'motion_sensor_active';
-      case 'FIRE_ALARM':
-        return 'local_fire_department';
-      case 'BATTERY_LOW':
-        return 'battery_alert';
-      default:
-        return 'warning';
+  const handleVerificationConfirm = async (password) => {
+    setIsVerifying(true);
+    setVerificationError('');
+
+    try {
+      const verification = await smartLockApi.reAuthenticate(password);
+      const nextState = {
+        token: verification.verificationToken,
+        expiresAt: Date.now() + 4 * 60 * 1000,
+      };
+
+      setVerificationState(nextState);
+      setVerificationDialog((current) => ({ ...current, isOpen: false }));
+
+      if (verificationPromiseRef.current) {
+        verificationPromiseRef.current.resolve(nextState.token);
+        verificationPromiseRef.current = null;
+      }
+    } catch (error) {
+      setVerificationError(error.message || 'Unable to verify your password.');
+    } finally {
+      setIsVerifying(false);
     }
   };
 
-  const getAlertMessage = (alert) => {
-    if (alert.alertType === 'GAS_LEAK' && alert.sensorValue != null) {
-      return `Phat hien khi gas vuot nguong: ${alert.sensorValue}`;
+  const buildVoiceCommand = (transcript) => {
+    const normalized = normalizeSpeech(transcript);
+    if (!normalized) return null;
+
+    if (/(unlock|open|mo khoa|mo cua)/.test(normalized)) {
+      return {
+        type: 'lock',
+        targetState: 'unlocked',
+        label: 'Unlock the main device',
+        detail: 'This will send an unlock command for the primary dashboard device.',
+      };
     }
-    if (alert.alertType === 'INTRUDER_ALERT') {
-      return 'Phat hien chuyen dong tu cam bien PIR.';
+
+    if (/(lock|secure|khoa cua|dong cua)/.test(normalized)) {
+      return {
+        type: 'lock',
+        targetState: 'locked',
+        label: 'Lock the main device',
+        detail: 'This will send a lock command for the primary dashboard device.',
+      };
     }
-    return alert.message || 'Khong co mo ta.';
+
+    if (/(control|remote|dieu khien)/.test(normalized)) {
+      return {
+        type: 'navigate',
+        path: '/remote',
+        label: 'Open control page',
+        detail: 'Navigate to the full device control workspace.',
+      };
+    }
+
+    if (/(log|nhat ky|history)/.test(normalized)) {
+      return {
+        type: 'navigate',
+        path: '/logs',
+        label: 'Open logs',
+        detail: 'Navigate to the recent events and audit log page.',
+      };
+    }
+
+    if (/(analytics|analysis|bao cao|phan tich)/.test(normalized)) {
+      return {
+        type: 'navigate',
+        path: '/analytics',
+        label: 'Open analytics',
+        detail: 'Navigate to the weekly insights and system analytics page.',
+      };
+    }
+
+    return null;
   };
+
+  useEffect(() => {
+    if (!voiceTranscript.trim()) {
+      setVoiceCommand(null);
+      return;
+    }
+
+    const nextCommand = buildVoiceCommand(voiceTranscript);
+    setVoiceCommand(nextCommand);
+
+    if (nextCommand) {
+      setVoiceFeedback(`Command recognized: ${nextCommand.label}`);
+      setVoiceError('');
+    } else {
+      setVoiceFeedback('Voice captured, but no supported dashboard command was found.');
+    }
+  }, [voiceTranscript]);
+
+  const startVoiceRecognition = () => {
+    if (!recognitionRef.current) {
+      setVoiceError('Voice recognition is not supported in this browser.');
+      return;
+    }
+
+    transcriptRef.current = '';
+    setVoiceTranscript('');
+    setVoiceCommand(null);
+    setVoiceError('');
+    recognitionRef.current.start();
+  };
+
+  const stopVoiceRecognition = () => {
+    recognitionRef.current?.stop();
+    setIsListening(false);
+  };
+
+  const runVoiceCommand = async () => {
+    if (!voiceCommand) return;
+
+    setIsVoiceExecuting(true);
+    setVoiceError('');
+
+    try {
+      if (voiceCommand.type === 'navigate') {
+        navigate(voiceCommand.path);
+        return;
+      }
+
+      if (!primaryDevice) {
+        throw new Error('No primary device is available on the dashboard.');
+      }
+
+      if (!primaryDevice.online) {
+        throw new Error('The primary device is offline. Reconnect it before sending a command.');
+      }
+
+      if (voiceCommand.type === 'lock') {
+        if (voiceCommand.targetState === 'locked' && isLocked) {
+          setVoiceFeedback('The primary device is already locked.');
+          return;
+        }
+
+        if (voiceCommand.targetState === 'unlocked' && !isLocked) {
+          setVoiceFeedback('The primary device is already unlocked.');
+          return;
+        }
+
+        const verificationToken = await requestVerificationToken({
+          title: voiceCommand.targetState === 'locked' ? 'Lock door from dashboard' : 'Unlock door from dashboard',
+          description: `Enter your password to ${voiceCommand.targetState === 'locked' ? 'lock' : 'unlock'} ${primaryDevice.deviceName || 'the primary device'} from dashboard voice control.`,
+        });
+
+        const commandId = await smartLockApi.sendLockToggle(primaryDevice.id, verificationToken);
+        setVoiceFeedback(`Command queued successfully. Reference: ${commandId}`);
+      }
+    } catch (error) {
+      setVoiceError(error.message || 'Unable to run the voice command.');
+    } finally {
+      setIsVoiceExecuting(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!voiceCommand || isListening) return;
+    runVoiceCommand();
+  }, [voiceCommand, isListening]);
+
+  const heroStatus = topAlert
+    ? {
+        eyebrow: 'Can xu ly ngay',
+        title: formatAlertType(topAlert.alertType),
+        description: topAlert.message || 'He thong dang phat hien su kien can kiem tra.',
+        tone: 'border-error/30 bg-error/8',
+        accent: 'text-error',
+      }
+    : {
+        eyebrow: 'He thong on dinh',
+        title: isLocked ? 'Cua dang khoa' : 'Cua dang mo',
+        description: primaryDevice?.online
+          ? `${primaryDevice.deviceName || 'Thiet bi chinh'} dang ket noi binh thuong.`
+          : 'Chua co thiet bi online. Kiem tra ket noi truoc khi dieu khien.',
+        tone: 'border-primary/20 bg-primary/6',
+        accent: 'text-primary',
+      };
+
+  const statusChips = [
+    {
+      label: 'Trang thai cua',
+      value: isLocked ? 'Da khoa' : 'Dang mo',
+      tone: isLocked ? 'text-primary' : 'text-amber-600',
+    },
+    {
+      label: 'Canh bao kich hoat',
+      value: `${activeAlerts.length}`,
+      tone: activeAlerts.length > 0 ? 'text-error' : 'text-green-600',
+    },
+    {
+      label: 'Thiet bi',
+      value: primaryDevice?.online ? 'Online' : 'Offline',
+      tone: primaryDevice?.online ? 'text-green-600' : 'text-error',
+    },
+  ];
+
+  const environmentCards = [
+    {
+      label: 'Thoi tiet',
+      value: primaryDevice?.temperature != null ? `${primaryDevice.temperature}°C` : `${weather.temp}°C`,
+      detail: primaryDevice?.weatherDesc || weather.desc,
+      icon: weather.icon,
+      summary: 'Du lieu bo tro hien tai',
+    },
+    {
+      label: 'Anh sang',
+      value: primaryDevice?.ldrValue != null ? `${primaryDevice.ldrValue} lx` : 'N/A',
+      detail: primaryDevice?.ldrValue != null ? `Nguong canh bao: ${primaryDevice.ldrValue > 700 ? 'Qua sang' : 'On dinh'}` : 'Chua co du lieu tu cam bien',
+      icon: 'light_mode',
+      summary: 'Cam bien LDR',
+    },
+    {
+      label: 'Gas',
+      value: primaryDevice?.gasValue != null ? `${primaryDevice.gasValue} ppm` : 'N/A',
+      detail: primaryDevice?.gasValue != null ? `Nguong hien tai: ${primaryDevice.gasValue >= 300 ? 'Can chu y' : 'An toan'}` : 'Chua co du lieu tu cam bien',
+      icon: 'gas_meter',
+      summary: primaryDevice?.pirTriggered ? 'Dang phat hien chuyen dong' : 'Khong co xam nhap',
+    },
+  ];
+
+  const weeklyCards = [
+    {
+      label: 'Luot truy cap',
+      value: weeklySnap?.totalAccessThisWeek ?? '--',
+      detail: weeklySnap?.accessChangeRate ? `${weeklySnap.accessChangeRate.toFixed(1)}% so voi tuan truoc` : 'Khong co thay doi lon',
+      icon: 'login',
+    },
+    {
+      label: 'Canh bao moi',
+      value: weeklySnap?.alertsThisWeek ?? '--',
+      detail: weeklySnap?.alertsThisWeek > 0 ? 'Can xem lai nhat ky va xu ly' : 'Khong co canh bao moi',
+      icon: 'warning',
+    },
+    {
+      label: 'Muc nguy cap',
+      value: weeklySnap?.criticalAlertsThisWeek ?? '--',
+      detail: weeklySnap?.criticalAlertsThisWeek > 0 ? 'Can uu tien xu ly' : 'He thong van on dinh',
+      icon: 'crisis_alert',
+    },
+  ];
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      <section className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <div
-          className="
-          cyber-card hud-corners neon-border scanlines
-          lg:col-span-8 bg-surface-container rounded-[2rem] p-10
-          relative overflow-hidden flex flex-col justify-between min-h-[400px]
-          shadow-sm border border-outline-variant/10
-        "
-        >
-          <div className="absolute inset-0 cyber-grid opacity-[0.25] pointer-events-none rounded-[2rem]" />
-          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
-          <div className="absolute left-8 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-primary/20 to-transparent pointer-events-none" />
+    <div className="space-y-6 animate-in fade-in duration-500">
+      <section>
+        <div className="overflow-hidden rounded-[2rem] border border-outline-variant/12 bg-surface-container shadow-sm">
+          <div className="grid items-stretch gap-8 p-6 sm:p-8 lg:grid-cols-[minmax(0,1.35fr)_minmax(300px,0.95fr)] lg:p-10">
+            <div className="flex h-full flex-col justify-between gap-7">
+              <div className="space-y-7">
+                <div className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold ${heroStatus.tone} ${heroStatus.accent}`}>
+                  <span className={`h-2 w-2 rounded-full ${topAlert ? 'bg-error animate-pulse' : 'bg-primary'}`} />
+                  {heroStatus.eyebrow}
+                </div>
 
-          <div className="relative z-10">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="w-2 h-2 rounded-full bg-green-400 data-pulse shadow-[0_0_8px_#4ade80]" />
-              <span className="text-primary font-bold tracking-[0.25em] uppercase text-[10px]">
-                {t('sys_status')} · SECURE
-              </span>
-            </div>
+                <div className="space-y-3">
+                  <p className="text-sm font-semibold text-outline">Tong quan 3 giay</p>
+                  <h1 className="max-w-2xl text-4xl font-black tracking-tight text-on-surface sm:text-5xl">
+                    {heroStatus.title}
+                  </h1>
+                  <p className="max-w-2xl text-base leading-7 text-outline">
+                    {heroStatus.description}
+                  </p>
+                </div>
 
-            <h2
-              className="text-6xl font-black font-headline mt-2 tracking-tighter text-on-surface glitch-text"
-              data-text={lockState === 'locked' ? t('locked') : t('unlocked')}
-            >
-              {lockState === 'locked' ? t('locked') : t('unlocked')}
-            </h2>
-            <p className="text-outline/70 mt-2 max-w-md text-sm">
-              {primaryDevice
-                ? `${primaryDevice.deviceName} · ${primaryDevice.online ? 'Ket noi on dinh' : 'Thiet bi dang offline'}`
-                : t('sys_desc')}
-            </p>
-          </div>
-
-          <div className="flex gap-10 mt-10 relative z-10">
-            <div className="flex flex-col">
-              <span className="text-outline/60 text-[9px] font-bold mb-1 uppercase tracking-[0.2em]">{t('wifi')}</span>
-              <div className="flex items-center gap-2 text-on-surface">
-                <span className="material-symbols-outlined text-primary text-[18px]">wifi</span>
-                <span className="font-bold tabular-nums">{wifiSignal}%</span>
-                <div className="flex items-end gap-0.5 h-4">
-                  {[25, 50, 75, 100].map((threshold, i) => (
-                    <div
-                      key={i}
-                      className={`w-1 rounded-sm transition-all duration-500 ${
-                        wifiSignal >= threshold ? 'bg-primary' : 'bg-outline/20'
-                      }`}
-                      style={{ height: `${(i + 1) * 4}px` }}
-                    />
+                <div className="grid gap-3 sm:grid-cols-3">
+                  {statusChips.map((item) => (
+                    <div key={item.label} className="rounded-2xl bg-surface-container-high px-4 py-4">
+                      <p className="text-sm text-outline">{item.label}</p>
+                      <p className={`mt-2 text-lg font-bold ${item.tone}`}>{item.value}</p>
+                    </div>
                   ))}
                 </div>
-              </div>
-            </div>
 
-            <div className="flex flex-col">
-              <span className="text-outline/60 text-[9px] font-bold mb-1 uppercase tracking-[0.2em]">{t('battery')}</span>
-              <div className="flex items-center gap-2 text-on-surface">
-                <span className="material-symbols-outlined text-tertiary text-[18px]">battery_full</span>
-                <span className="font-bold">{primaryDevice?.online ? 'On dinh' : '--'}</span>
-              </div>
-            </div>
-
-            <div className="flex flex-col">
-              <span className="text-outline/60 text-[9px] font-bold mb-1 uppercase tracking-[0.2em]">UPTIME</span>
-              <div className="flex items-center gap-2 text-on-surface">
-                <span className="material-symbols-outlined text-green-400 text-[18px]">schedule</span>
-                <span className="font-bold tabular-nums terminal-cursor">{primaryDevice?.lastCommandStatus || 'READY'}</span>
-              </div>
-            </div>
-          </div>
-
-          <button
-            className="
-            absolute bottom-10 right-10
-            w-24 h-24 rounded-full
-            status-gradient neon-lock-pulse
-            flex items-center justify-center
-            hover:scale-110 active:scale-95 transition-transform duration-200
-            border border-primary/30
-          "
-          >
-            <span
-              className="material-symbols-outlined text-4xl text-white"
-              style={{ fontVariationSettings: "'FILL' 1" }}
-            >
-              {lockState === 'locked' ? 'lock' : 'lock_open'}
-            </span>
-          </button>
-        </div>
-
-        <div
-          className="
-          cyber-card hud-corners
-          lg:col-span-4 bg-surface-container-high rounded-[2rem] p-8
-          flex flex-col shadow-sm border border-outline-variant/10 relative overflow-hidden
-        "
-        >
-          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
-
-          <h3 className="text-sm font-bold tracking-[0.15em] uppercase text-outline/80 mb-5 flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary text-[16px]">sensors</span>
-            {t('environment')}
-          </h3>
-
-          <div className="space-y-3 flex-1 text-on-surface">
-            {[
-              {
-                icon: weather.icon,
-                color: 'text-tertiary',
-                label: t('weather'),
-                value: primaryDevice?.temperature != null ? `${primaryDevice.temperature}°C` : `${weather.temp}°C`,
-                sub: primaryDevice?.weatherDesc || weather.desc,
-              },
-              {
-                icon: 'light_mode',
-                color: 'text-primary',
-                label: t('brightness'),
-                value: primaryDevice?.ldrValue != null ? `${primaryDevice.ldrValue} lx` : 'N/A',
-                sub: t('indoor'),
-              },
-              {
-                icon: 'co2',
-                color: 'text-green-500',
-                label: t('gas'),
-                value: primaryDevice?.gasValue != null ? `${primaryDevice.gasValue}` : 'N/A',
-                sub: primaryDevice?.pirTriggered ? 'Motion detected' : t('safe'),
-              },
-            ].map((item, i) => (
-              <div
-                key={i}
-                className="
-                  cyber-card bg-surface-container p-4 rounded-xl
-                  flex items-center justify-between
-                  border border-outline-variant/10
-                "
-              >
-                <div className="flex items-center gap-3">
-                  <span className={`material-symbols-outlined ${item.color} text-[20px]`}>{item.icon}</span>
-                  <div>
-                    <p className="text-[9px] text-outline/60 uppercase font-bold tracking-[0.15em]">{item.label}</p>
-                    <p className="font-semibold text-sm">{item.sub}</p>
-                  </div>
+                <div className="flex flex-wrap gap-3">
+                  <Link
+                    to="/remote"
+                    className="inline-flex items-center gap-2 rounded-2xl bg-primary px-5 py-3 text-sm font-bold text-white transition-transform hover:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">
+                      {isLocked ? 'lock_open' : 'lock'}
+                    </span>
+                    {isLocked ? 'Mo khoa ngay' : 'Khoa cua ngay'}
+                  </Link>
+                  <Link
+                    to={topAlert ? '/logs' : '/analytics'}
+                    className="inline-flex items-center gap-2 rounded-2xl border border-outline-variant/20 bg-surface px-5 py-3 text-sm font-semibold text-on-surface transition-colors hover:border-primary/30 hover:text-primary"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">
+                      {topAlert ? 'warning' : 'analytics'}
+                    </span>
+                    {topAlert ? 'Xem canh bao chi tiet' : 'Xem bao cao tuan'}
+                  </Link>
                 </div>
-                <span className="text-lg font-black tabular-nums">{item.value}</span>
               </div>
-            ))}
+              <div className="hidden lg:block" />
+            </div>
+
+            <div className="relative flex h-full flex-col overflow-hidden rounded-[1.75rem] bg-surface-container-high p-5 text-center">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(15,98,254,0.16),transparent_42%)]" />
+              <div className="relative z-10 flex h-full flex-col items-center justify-center">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-outline">Voice control</p>
+                <h3 className="mt-3 text-2xl font-black tracking-tight text-on-surface">
+                  Tap the mic
+                </h3>
+                <p className="mt-2 max-w-xs text-sm leading-6 text-outline">
+                  Nhấn để điều khiển nhanh bằng giọng nói ngay trên dashboard.
+                </p>
+
+                <button
+                  type="button"
+                  onClick={isListening ? stopVoiceRecognition : startVoiceRecognition}
+                  disabled={!isVoiceSupported || isVoiceExecuting}
+                  className={`relative mx-auto mt-7 flex h-32 w-32 items-center justify-center rounded-full border-[8px] transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50 sm:h-36 sm:w-36 ${
+                    isListening
+                      ? 'border-green-400/30 bg-green-500 text-white shadow-[0_0_0_12px_rgba(34,197,94,0.14),0_22px_48px_rgba(34,197,94,0.28)] scale-105'
+                      : 'border-primary/18 bg-primary text-white shadow-[0_0_0_12px_rgba(15,98,254,0.10),0_22px_48px_rgba(15,98,254,0.22)]'
+                  }`}
+                >
+                  {isListening && (
+                    <span className="absolute inset-0 rounded-full border-4 border-green-300/45 animate-ping" aria-hidden="true" />
+                  )}
+                  <img
+                    src="https://images.icon-icons.com/259/PNG/128/ic_mic_128_28646.png"
+                    alt="Microphone"
+                    className={`relative z-10 h-14 w-14 object-contain transition-transform duration-300 sm:h-16 sm:w-16 ${
+                      isListening ? 'animate-pulse scale-110 brightness-0 invert saturate-0' : ''
+                    }`}
+                  />
+                </button>
+
+                <p className="mt-5 text-sm font-semibold text-on-surface">
+                  {isListening
+                    ? 'Listening...'
+                    : isVoiceExecuting
+                      ? 'Running command...'
+                      : 'Press to start voice control'}
+                </p>
+
+                {(voiceTranscript || voiceFeedback) && (
+                  <p className="mx-auto mt-2 max-w-xs text-xs leading-5 text-outline">
+                    {isListening ? voiceTranscript || 'Speak now.' : voiceError || voiceFeedback}
+                  </p>
+                )}
+
+                {voiceError ? (
+                  <p className="mt-2 text-xs font-medium text-error" role="alert">
+                    {voiceError}
+                  </p>
+                ) : null}
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      <section
-        className="
-        cyber-card hud-corners neon-border
-        bg-surface-container rounded-[2rem] p-8
-        shadow-sm border border-outline-variant/10 relative overflow-hidden
-      "
-      >
-        <div className="absolute inset-0 cyber-grid opacity-[0.15] pointer-events-none rounded-[2rem]" />
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
-
-        <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-          <div>
-            <h3 className="text-base font-bold tracking-[0.1em] uppercase text-on-surface flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary text-[18px]">analytics</span>
-              Bao cao tuan · 7 ngay qua
-            </h3>
-            <p className="text-xs text-outline/60 mt-1 font-['Inter'] italic">
-              {isLoadingSnap ? 'Dang tong hop...' : (weeklySnap?.progressSummary || 'Chua co du lieu.')}
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-primary data-pulse" />
-            <span className="px-3 py-1.5 bg-primary/5 border border-primary/15 rounded-lg text-[9px] font-bold text-primary uppercase tracking-[0.2em]">
-              LIVE DATA
-            </span>
-          </div>
-        </div>
-
-        <div className="relative z-10 grid grid-cols-1 md:grid-cols-4 gap-5">
-          {[
-            { label: 'Tong truy cap', val: weeklySnap?.totalAccessThisWeek, rate: weeklySnap?.accessChangeRate, icon: 'login' },
-            { label: 'Canh bao', val: weeklySnap?.alertsThisWeek, rate: weeklySnap?.alertChangeRate, icon: 'warning' },
-            { label: 'Nguy cap', val: weeklySnap?.criticalAlertsThisWeek, isError: weeklySnap?.criticalAlertsThisWeek > 0, icon: 'crisis_alert' },
-          ].map((item, idx) => (
-            <div
-              key={idx}
-              className="
-                cyber-card hud-corners
-                bg-surface-container-low p-5 rounded-2xl
-                border border-outline-variant/10 relative overflow-hidden
-              "
-            >
-              <div className="flex items-center gap-2 mb-3">
-                <span className={`material-symbols-outlined text-[16px] ${item.isError ? 'text-error' : 'text-primary/60'}`}>
-                  {item.icon}
-                </span>
-                <p className="text-[9px] text-outline/60 uppercase font-black tracking-[0.2em]">{item.label}</p>
+      <section className="grid items-stretch gap-6 lg:grid-cols-12">
+        <div className="lg:col-span-7">
+          <div className="flex h-full flex-col rounded-[2rem] border border-outline-variant/12 bg-surface-container p-6 shadow-sm">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-sm font-semibold text-on-surface">Su kien gan day</p>
+                <p className="mt-1 text-sm text-outline">Tra loi nhanh: cua da khoa chua, ai vua thao tac, co su co nao moi khong.</p>
               </div>
-              <div className="flex items-baseline gap-2">
-                <span className={`text-3xl font-black tabular-nums ${item.isError ? 'text-error' : 'text-on-surface'}`}>
-                  {isLoadingSnap ? '--' : (item.val ?? '--')}
-                </span>
-                {!isLoadingSnap && item.rate !== undefined && item.rate !== 0 && (
-                  <span className={`text-[9px] font-bold ${item.rate > 0 ? 'text-green-400' : 'text-error'}`}>
-                    {item.rate > 0 ? '↑' : '↓'} {Math.abs(item.rate).toFixed(1)}%
-                  </span>
-                )}
-              </div>
+              <Link to="/logs" className="text-sm font-semibold text-primary hover:underline">
+                Xem toan bo
+              </Link>
             </div>
-          ))}
 
-          <div className="cyber-card bg-surface-container-low p-5 rounded-2xl border border-outline-variant/10">
-            <p className="text-[9px] text-outline/60 uppercase font-black tracking-[0.2em] mb-3">Xu huong 7 ngay</p>
-            <div className="flex items-end gap-1 h-12 mt-1">
-              {isLoadingSnap ? (
-                <div className="w-full h-2 bg-outline-variant/10 rounded-full animate-pulse" />
+            <div className="mt-5 flex-1 space-y-3">
+              {isLoading ? (
+                <div className="rounded-2xl bg-surface-container-high px-4 py-6 text-sm text-outline">Dang tai su kien...</div>
+              ) : recentEvents.length === 0 ? (
+                <div className="rounded-2xl bg-surface-container-high px-4 py-6 text-sm text-outline">Chua co su kien nao trong nhat ky.</div>
               ) : (
-                Object.entries(weeklySnap?.dailyAccessTrend || {}).map(([day, val], idx) => {
-                  const values = Object.values(weeklySnap?.dailyAccessTrend || {});
-                  const max = Math.max(...values, 1);
-                  const h = (val / max) * 100;
-                  return (
-                    <div key={idx} className="flex-1 flex flex-col items-center gap-1">
-                      <div className="w-full bg-primary/5 rounded-sm relative overflow-hidden h-10">
-                        <div
-                          className="absolute bottom-0 left-0 right-0 bg-primary/50 rounded-sm transition-all"
-                          style={{ height: `${h}%`, boxShadow: h > 50 ? '0 0 6px var(--color-primary)' : 'none' }}
-                        />
-                      </div>
-                      <span className="text-[8px] font-bold text-outline/50 uppercase">{day}</span>
+                recentEvents.map((event) => (
+                  <div key={event.id} className="grid gap-2 rounded-2xl bg-surface-container-high px-4 py-4 md:grid-cols-[150px_minmax(0,1fr)_120px] md:items-center">
+                    <div>
+                      <p className="text-sm font-semibold text-on-surface">{event.action}</p>
+                      <p className="mt-1 text-xs text-outline">{event.method || 'REMOTE'}</p>
                     </div>
-                  );
-                })
+                    <div className="min-w-0">
+                      <p className="truncate text-sm text-on-surface">{event.detail || `${event.action} qua ${event.method}`}</p>
+                      <p className="mt-1 text-xs text-outline">
+                        {event.personName || event.userName || event.deviceName || 'He thong'}
+                      </p>
+                    </div>
+                    <p className="text-xs text-outline md:text-right">{formatDateTime(event.createdAt)}</p>
+                  </div>
+                ))
               )}
             </div>
           </div>
         </div>
-      </section>
 
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div
-          className="
-          cyber-card hud-corners
-          md:col-span-2 bg-surface-container rounded-[2rem] p-8
-          shadow-sm border border-outline-variant/10 relative overflow-hidden
-        "
-        >
-          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-error/40 to-transparent" />
-
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-sm font-bold tracking-[0.15em] uppercase text-on-surface flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-error data-pulse shadow-[0_0_8px_var(--color-error)]" />
-              {t('alerts')}
-            </h3>
-            <Link to="/logs" className="text-primary/70 text-[9px] font-bold hover:text-primary uppercase tracking-[0.2em] transition-colors">
-              {t('view_all')} →
-            </Link>
-          </div>
-
-          <div className="space-y-3">
-            {isLoadingAlerts ? (
-              <div className="p-8 text-center text-outline/50 animate-pulse text-sm">
-                Dang tai canh bao...
+        <div className="lg:col-span-5">
+          <div className="flex h-full flex-col rounded-[2rem] border border-outline-variant/12 bg-surface-container p-6 shadow-sm">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-sm font-semibold text-on-surface">{t('environment')}</p>
+                <p className="mt-1 text-sm text-outline">Gia tri hien tai, don vi va muc canh bao co ban.</p>
               </div>
-            ) : recentAlerts.length === 0 ? (
-              <div className="p-8 text-center border border-dashed border-outline-variant/20 rounded-2xl">
-                <span className="material-symbols-outlined text-green-400 text-3xl block mb-2">verified_user</span>
-                <p className="text-outline/60 font-medium text-sm">He thong an toan. Khong co canh bao.</p>
-              </div>
-            ) : (
-              recentAlerts.map((alert) => (
-                <div
-                  key={alert.id}
-                  className="
-                    cyber-card flex items-center p-4
-                    bg-surface-container-low border border-outline-variant/10 rounded-xl
-                  "
-                >
-                  <div
-                    className={`
-                    w-10 h-10 rounded-lg flex items-center justify-center mr-4
-                    ${alert.severity === 'CRITICAL' ? 'bg-error/10 border border-error/20' : 'bg-tertiary/10 border border-tertiary/20'}
-                  `}
-                  >
-                    <span className={`material-symbols-outlined text-[18px] ${alert.severity === 'CRITICAL' ? 'text-error' : 'text-tertiary'}`}>
-                      {getAlertIcon(alert.alertType)}
-                    </span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex justify-between items-center">
-                      <h4 className="font-bold text-on-surface text-xs uppercase tracking-wider">{formatAlertType(alert.alertType)}</h4>
-                      <span className="text-[9px] font-bold text-outline/50 tabular-nums ml-2 shrink-0">
-                        {new Date(alert.createdAt).toLocaleTimeString('vi-VN')}
-                      </span>
+              <Link to="/remote" className="text-sm font-semibold text-primary hover:underline">
+                Xem thiet bi
+              </Link>
+            </div>
+
+            <div className="mt-5 flex flex-1 flex-col gap-3">
+              {environmentCards.map((item) => (
+                <div key={item.label} className="flex flex-1 flex-col justify-between rounded-2xl bg-surface-container-high px-4 py-4">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-start gap-3">
+                      <div className="rounded-xl bg-background p-2 text-primary">
+                        <span className="material-symbols-outlined text-[18px]">{item.icon}</span>
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-on-surface">{item.label}</p>
+                        <p className="mt-1 text-xs uppercase tracking-[0.18em] text-outline">{item.summary}</p>
+                      </div>
                     </div>
-                    <p className="text-xs text-outline/60 mt-0.5 truncate">{getAlertMessage(alert)}</p>
+                    <p className="text-lg font-black text-on-surface">{item.value}</p>
                   </div>
-                  <span
-                    className={`
-                    ml-3 px-2 py-0.5 rounded text-[8px] font-black tracking-wider uppercase shrink-0
-                    ${alert.severity === 'CRITICAL' ? 'bg-error/10 text-error' : 'bg-tertiary/10 text-tertiary'}
-                  `}
-                  >
-                    {alert.severity}
-                  </span>
+                  <p className="mt-3 text-sm text-outline">{item.detail}</p>
                 </div>
-              ))
-            )}
-          </div>
-        </div>
-
-        <div className="cyber-card bg-surface-container rounded-[2rem] overflow-hidden flex flex-col shadow-sm border border-outline-variant/10 relative">
-          <div className="relative h-64 scanlines">
-            <img
-              className="w-full h-full object-cover"
-              alt="Entrance"
-              src="https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&q=80&w=800"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-            <div className="absolute top-3 left-3 w-5 h-5 border-t-2 border-l-2 border-primary/70" />
-            <div className="absolute top-3 right-3 w-5 h-5 border-t-2 border-r-2 border-primary/70" />
-            <div className="absolute bottom-3 left-3 w-5 h-5 border-b-2 border-l-2 border-primary/70" />
-            <div className="absolute bottom-3 right-3 w-5 h-5 border-b-2 border-r-2 border-primary/70" />
-
-            <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur px-3 py-1 rounded-full flex items-center gap-1.5 border border-error/30">
-              <span className="w-1.5 h-1.5 bg-error rounded-full animate-pulse" />
-              <span className="text-[9px] font-black text-error tracking-[0.3em] uppercase">LIVE</span>
-            </div>
-
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-              <div className="absolute left-0 right-0 h-0.5 bg-primary/30 scanline-sweep" />
-            </div>
-          </div>
-
-          <div className="p-5 relative">
-            <div className="flex items-center justify-between mb-4">
-              <h4 className="font-bold text-on-surface uppercase tracking-wider text-xs">{t('front_door')}</h4>
-              <span className="text-[9px] text-green-400 font-bold uppercase tracking-wider">
-                ● {primaryDevice?.online ? 'ARMED' : 'OFFLINE'}
-              </span>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                className="
-                py-3 bg-surface-container-low border border-outline-variant/10 rounded-xl
-                flex flex-col items-center gap-1.5
-                hover:bg-primary/5 hover:border-primary/20 transition-all group
-              "
-              >
-                <span className="material-symbols-outlined text-outline/60 group-hover:text-primary text-[18px] transition-colors">videocam</span>
-                <span className="text-[9px] font-black text-on-surface/70 tracking-wider uppercase">{t('playback')}</span>
-              </button>
-              <button
-                className="
-                py-3 bg-surface-container-low border border-outline-variant/10 rounded-xl
-                flex flex-col items-center gap-1.5
-                hover:bg-primary/5 hover:border-primary/20 transition-all group
-              "
-              >
-                <span className="material-symbols-outlined text-outline/60 group-hover:text-primary text-[18px] transition-colors">mic</span>
-                <span className="text-[9px] font-black text-on-surface/70 tracking-wider uppercase">{t('talk')}</span>
-              </button>
+              ))}
             </div>
           </div>
         </div>
       </section>
+
+      <section className="grid items-stretch gap-6 lg:grid-cols-12">
+        <div className="lg:col-span-7">
+          <div className="flex h-full flex-col rounded-[2rem] border border-outline-variant/12 bg-surface-container p-6 shadow-sm">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-sm font-semibold text-on-surface">Bao cao tuan</p>
+                <p className="mt-1 text-sm text-outline">
+                  {isLoading ? 'Dang tong hop xu huong 7 ngay qua.' : weeklySnap?.progressSummary || 'Tong hop nhanh de xem he thong co on dinh hay khong.'}
+                </p>
+              </div>
+              <Link to="/analytics" className="text-sm font-semibold text-primary hover:underline">
+                Xem phan tich
+              </Link>
+            </div>
+
+            <div className="mt-5 grid gap-3 md:grid-cols-3">
+              {weeklyCards.map((item) => (
+                <div key={item.label} className="flex h-full flex-col rounded-2xl bg-surface-container-high px-4 py-4">
+                  <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-primary text-[18px]">{item.icon}</span>
+                    <p className="text-sm font-semibold text-on-surface">{item.label}</p>
+                  </div>
+                  <p className="mt-4 text-3xl font-black tracking-tight text-on-surface">{item.value}</p>
+                  <p className="mt-2 text-sm text-outline">{item.detail}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-5 rounded-2xl bg-surface-container-high px-4 py-4">
+              <p className="text-sm font-semibold text-on-surface">Insight nhanh</p>
+              <p className="mt-2 text-sm leading-6 text-outline">
+                {weeklySnap?.criticalAlertsThisWeek > 0
+                  ? 'Tuan nay co canh bao nguy cap. Uu tien vao trang Nhat ky de kiem tra nguyen nhan va thoi diem xay ra.'
+                  : weeklySnap?.alertsThisWeek > 0
+                    ? 'Co canh bao moi trong tuan nhung chua o muc nguy cap. Nen xem lai nhat ky de dam bao da xu ly day du.'
+                    : 'He thong van on dinh trong 7 ngay qua. Tiep tuc theo doi ket noi thiet bi va log truy cap.'}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="lg:col-span-5">
+          <div className="flex h-full flex-col overflow-hidden rounded-[2rem] border border-outline-variant/12 bg-surface-container shadow-sm">
+            <div className="relative h-72 bg-slate-950">
+              <img
+                src="https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&q=80&w=1000"
+                alt="Thiet bi cua chinh"
+                className="h-full w-full object-cover opacity-80"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
+              <div className="absolute left-5 top-5 rounded-full bg-black/45 px-3 py-1 text-xs font-semibold text-white backdrop-blur">
+                {primaryDevice?.online ? 'Hinh anh thiet bi' : 'Preview thiet bi'}
+              </div>
+              <div className="absolute bottom-5 left-5 right-5">
+                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white/80">{t('front_door')}</p>
+                <p className="mt-2 text-2xl font-black tracking-tight text-white">
+                  {primaryDevice?.deviceName || 'Thiet bi cua chinh'}
+                </p>
+                <p className="mt-2 max-w-md text-sm leading-6 text-white/80">
+                  Day la khung preview thiet bi, khong phai live camera. Neu can goc nhin truc tiep, nen tach thanh module camera rieng voi trang thai ket noi ro rang.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-auto grid gap-3 p-5 sm:grid-cols-2">
+              <Link
+                to="/remote"
+                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-primary px-4 py-3 text-sm font-bold text-white transition-transform hover:scale-[0.98]"
+              >
+                <span className="material-symbols-outlined text-[18px]">settings_remote</span>
+                Dieu khien thiet bi
+              </Link>
+              <Link
+                to="/logs"
+                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-outline-variant/20 bg-surface px-4 py-3 text-sm font-semibold text-on-surface transition-colors hover:border-primary/30 hover:text-primary"
+              >
+                <span className="material-symbols-outlined text-[18px]">history</span>
+                Mo nhat ky
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <ReAuthModal
+        isOpen={verificationDialog.isOpen}
+        title={verificationDialog.title}
+        description={verificationDialog.description}
+        confirmLabel="Verify"
+        cancelLabel="Cancel"
+        isSubmitting={isVerifying}
+        error={verificationError}
+        onConfirm={handleVerificationConfirm}
+        onClose={closeVerificationDialog}
+      />
     </div>
   );
 };
