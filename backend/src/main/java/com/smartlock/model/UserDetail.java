@@ -35,8 +35,7 @@ public class UserDetail {
     @Column(length = 1000)
     private String bio;
 
-    @Lob
-    @Column(columnDefinition = "CLOB")
+    @Column(columnDefinition = "TEXT")
     private String avatarUrl;
 
     @CreationTimestamp
