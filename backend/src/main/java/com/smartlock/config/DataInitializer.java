@@ -112,7 +112,6 @@ public class DataInitializer implements CommandLineRunner {
         if (userRepository.findByEmail(email).isEmpty()) {
             System.out.println("Seeding account: " + email);
             userRepository.save(com.smartlock.model.User.builder()
-                    .id(UUID.randomUUID().toString())
                     .email(email)
                     .passwordHash(passwordHash)
                     .fullName(fullName)
