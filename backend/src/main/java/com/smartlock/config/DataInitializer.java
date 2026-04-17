@@ -12,11 +12,13 @@ import com.smartlock.repository.AlertRepository;
 import com.smartlock.repository.DeviceRepository;
 import com.smartlock.repository.UserDeviceRepository;
 import com.smartlock.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -27,19 +29,30 @@ public class DataInitializer implements CommandLineRunner {
     private final AlertRepository alertRepository;
     private final UserRepository userRepository;
     private final UserDeviceRepository userDeviceRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public void run(String... args) {
+        var adminUser = userRepository.findByEmail("admin@smartlock.com").orElse(null);
+
+        if (adminUser == null) {
+            System.out.println("No admin found, creating default admin account...");
+            adminUser = com.smartlock.model.User.builder()
+                    .id(UUID.randomUUID().toString())
+                    .email("admin@smartlock.com")
+                    .passwordHash(passwordEncoder.encode("admin123"))
+                    .fullName("Admin System")
+                    .role(UserRole.ADMIN)
+                    .isActive(true)
+                    .createdAt(LocalDateTime.now())
+                    .updatedAt(LocalDateTime.now())
+                    .build();
+            adminUser = userRepository.save(adminUser);
+        }
+
         if (deviceRepository.count() > 0 && accessLogRepository.count() > 0) {
             return;
         }
-
-        System.out.println("No devices found, creating demo data...");
-
-        var adminUser = userRepository.findAll().stream()
-                .filter(user -> user.getRole() == UserRole.ADMIN)
-                .findFirst()
-                .orElse(null);
 
         Device device = Device.builder()
                 .deviceName("Khoa Cua Chinh (Demo)")
