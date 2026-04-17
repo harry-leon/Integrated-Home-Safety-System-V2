@@ -144,7 +144,7 @@ const Fingerprints = () => {
       <div className="overflow-x-auto rounded-xl border border-outline-variant/10 bg-surface-container shadow-sm">
         <table className="min-w-[800px] w-full border-collapse text-left">
           <thead>
-            <tr className="border-b border-outline-variant/10 bg-surface-container-high/50 text-[11px] uppercase tracking-widest text-outline">
+            <tr className="border-b border-outline-variant/10 bg-surface-container-high/50 text-[10px] sm:text-[11px] uppercase tracking-widest text-outline">
               <th className="px-8 py-5 font-semibold">{t('fingerprints_table_slot')}</th>
               <th className="px-8 py-5 font-semibold">{t('fingerprints_table_user')}</th>
               <th className="px-8 py-5 font-semibold">{t('fingerprints_table_access')}</th>
@@ -259,164 +259,191 @@ const Fingerprints = () => {
       </div>
 
       {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 px-4 py-8 backdrop-blur-sm">
-          <div className="relative w-full max-w-[1220px] overflow-hidden rounded-[1.75rem] border border-outline-variant/12 bg-surface-container shadow-[0_32px_90px_rgba(0,0,0,0.28)]">
-            <div className="grid gap-0 lg:grid-cols-[minmax(0,1.15fr)_280px]">
-              <div className="p-5 sm:p-6">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">{t('fingerprints_enrollment_label')}</p>
-                    <h3 className="mt-3 text-2xl font-black tracking-tight text-on-surface sm:text-3xl">{t('fingerprints_add_modal_title')}</h3>
-                    <p className="mt-2 max-w-xl text-sm leading-6 text-outline">{t('fingerprints_add_modal_desc')}</p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 py-4 backdrop-blur-md">
+          <div className="relative w-full max-w-5xl max-h-[92vh] overflow-hidden rounded-[2.5rem] border border-white/10 bg-[#0c0c0e] shadow-[0_40px_100px_rgba(0,0,0,0.6)] flex flex-col">
+            <div className="flex-1 overflow-y-auto custom-scrollbar">
+              <div className="grid gap-0 lg:grid-cols-[1fr_320px]">
+                <div className="p-6 sm:p-10">
+                  <div className="flex items-start justify-between gap-6">
+                    <div>
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="w-8 h-px bg-primary/40"></div>
+                        <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-primary">{t('fingerprints_enrollment_label')}</p>
+                      </div>
+                      <h2 className="text-2xl font-black tracking-tight text-white sm:text-3xl lg:text-4xl">{t('fingerprints_add_modal_title')}</h2>
+                      <p className="mt-3 max-w-xl text-xs sm:text-sm leading-7 text-outline opacity-80">{t('fingerprints_add_modal_desc')}</p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={closeAddModal}
+                      className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/5 bg-white/5 text-white transition-all hover:bg-white/10 hover:scale-105 active:scale-95 shadow-sm"
+                      aria-label={t('fingerprints_close_modal')}
+                    >
+                      <span className="material-symbols-outlined text-[22px]">close</span>
+                    </button>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={closeAddModal}
-                    className="flex h-11 w-11 items-center justify-center rounded-2xl border border-outline-variant/16 bg-background text-on-surface transition-colors hover:border-primary/30 hover:text-primary"
-                    aria-label={t('fingerprints_close_modal')}
-                  >
-                    <span className="material-symbols-outlined">close</span>
-                  </button>
-                </div>
-
-                <div className="mt-6 grid gap-5 md:grid-cols-2">
-                  <label className="block">
-                    <span className="text-sm font-semibold text-on-surface">{t('fingerprints_form_name')}</span>
-                    <input
-                      type="text"
-                      value={draftFingerprint.personName}
-                      onChange={(event) => handleDraftChange('personName', event.target.value)}
-                      placeholder={t('fingerprints_form_name_placeholder')}
-                      className="mt-2 w-full rounded-2xl border border-outline-variant/14 bg-background px-4 py-3 text-sm text-on-surface outline-none transition-colors placeholder:text-outline focus:border-primary/40"
-                    />
-                  </label>
-
-                  <label className="block">
-                    <span className="text-sm font-semibold text-on-surface">{t('fingerprints_form_access')}</span>
-                    <select
-                      value={draftFingerprint.accessLevel}
-                      onChange={(event) => handleDraftChange('accessLevel', event.target.value)}
-                      className="mt-2 w-full rounded-2xl border border-outline-variant/14 bg-background px-4 py-3 text-sm text-on-surface outline-none transition-colors focus:border-primary/40"
-                    >
-                      <option value="STANDARD">{t('fingerprints_level_standard')}</option>
-                      <option value="ADMIN">{t('fingerprints_level_admin')}</option>
-                      <option value="GUEST">{t('fingerprints_level_guest')}</option>
-                    </select>
-                  </label>
-
-                  <label className="block">
-                    <span className="text-sm font-semibold text-on-surface">{t('fingerprints_form_slot')}</span>
-                    <input
-                      type="number"
-                      min="1"
-                      max="128"
-                      value={draftFingerprint.fingerSlotId}
-                      onChange={(event) => handleDraftChange('fingerSlotId', event.target.value)}
-                      placeholder={t('fingerprints_form_slot_placeholder')}
-                      className="mt-2 w-full rounded-2xl border border-outline-variant/14 bg-background px-4 py-3 text-sm text-on-surface outline-none transition-colors placeholder:text-outline focus:border-primary/40"
-                    />
-                  </label>
-
-                  <div className="rounded-[1.5rem] border border-outline-variant/12 bg-background px-4 py-4">
-                    <p className="text-sm font-semibold text-on-surface">{t('fingerprints_sensor_status')}</p>
-                    <div className="mt-3 flex items-center justify-between gap-3">
-                      <div>
-                        <p className="text-sm font-medium text-on-surface">{t('fingerprints_sensor_ready')}</p>
-                        <p className="mt-1 text-xs text-outline">{t('fingerprints_sensor_ready_desc')}</p>
+                  <div className="mt-10 grid gap-6 md:grid-cols-2">
+                    <label className="block group">
+                      <span className="text-xs font-bold uppercase tracking-wider text-outline group-focus-within:text-primary transition-colors ml-1">{t('fingerprints_form_name')}</span>
+                      <div className="relative mt-2">
+                        <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[18px] text-outline group-focus-within:text-primary">person</span>
+                        <input
+                          type="text"
+                          value={draftFingerprint.personName}
+                          onChange={(event) => handleDraftChange('personName', event.target.value)}
+                          placeholder={t('fingerprints_form_name_placeholder')}
+                          className="w-full rounded-2xl border border-white/5 bg-white/5 pl-11 pr-4 py-3.5 text-sm text-white outline-none transition-all focus:border-primary/50 focus:bg-white/[0.08] shadow-sm"
+                        />
                       </div>
-                      <span className="rounded-full bg-green-500/12 px-3 py-1 text-xs font-bold text-green-700">
+                    </label>
+
+                    <label className="block group">
+                      <span className="text-xs font-bold uppercase tracking-wider text-outline group-focus-within:text-primary transition-colors ml-1">{t('fingerprints_form_access')}</span>
+                      <div className="relative mt-2">
+                        <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[18px] text-outline group-focus-within:text-primary">shield</span>
+                        <select
+                          value={draftFingerprint.accessLevel}
+                          onChange={(event) => handleDraftChange('accessLevel', event.target.value)}
+                          className="w-full rounded-2xl border border-white/5 bg-white/5 pl-11 pr-4 py-3.5 text-sm text-white outline-none transition-all focus:border-primary/50 focus:bg-white/[0.08] shadow-sm appearance-none"
+                        >
+                          <option value="STANDARD">{t('fingerprints_level_standard')}</option>
+                          <option value="ADMIN">{t('fingerprints_level_admin')}</option>
+                          <option value="GUEST">{t('fingerprints_level_guest')}</option>
+                        </select>
+                        <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-outline pointer-events-none">expand_more</span>
+                      </div>
+                    </label>
+
+                    <label className="block group">
+                      <span className="text-xs font-bold uppercase tracking-wider text-outline group-focus-within:text-primary transition-colors ml-1">{t('fingerprints_form_slot')}</span>
+                      <div className="relative mt-2">
+                        <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[18px] text-outline group-focus-within:text-primary">tag</span>
+                        <input
+                          type="number"
+                          min="1"
+                          max="128"
+                          value={draftFingerprint.fingerSlotId}
+                          onChange={(event) => handleDraftChange('fingerSlotId', event.target.value)}
+                          placeholder={t('fingerprints_form_slot_placeholder')}
+                          className="w-full rounded-2xl border border-white/5 bg-white/5 pl-11 pr-4 py-3.5 text-sm text-white outline-none transition-all focus:border-primary/50 focus:bg-white/[0.08] shadow-sm"
+                        />
+                      </div>
+                    </label>
+
+                    <div className="rounded-3xl border border-emerald-500/10 bg-emerald-500/5 px-5 py-4 flex items-center justify-between group hover:border-emerald-500/20 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600">
+                          <span className="material-symbols-outlined text-[22px]">sensors</span>
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-white">{t('fingerprints_sensor_ready')}</p>
+                          <p className="text-[11px] text-outline mt-0.5">{t('fingerprints_sensor_ready_desc')}</p>
+                        </div>
+                      </div>
+                      <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500 text-white text-[10px] font-black uppercase tracking-wider shadow-lg shadow-emerald-500/20">
+                        <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
                         {t('online')}
                       </span>
                     </div>
                   </div>
-                </div>
 
-                <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(320px,0.9fr)]">
-                  <label className="block">
-                    <span className="text-sm font-semibold text-on-surface">{t('fingerprints_form_note')}</span>
-                    <textarea
-                      rows="3"
-                      value={draftFingerprint.note}
-                      onChange={(event) => handleDraftChange('note', event.target.value)}
-                      placeholder={t('fingerprints_form_note_placeholder')}
-                      className="mt-2 w-full rounded-[1.5rem] border border-outline-variant/14 bg-background px-4 py-3 text-sm text-on-surface outline-none transition-colors placeholder:text-outline focus:border-primary/40"
-                    />
-                  </label>
+                  <div className="mt-8 grid gap-6 xl:grid-cols-2">
+                    <label className="block group">
+                      <span className="text-xs font-bold uppercase tracking-wider text-outline group-focus-within:text-primary transition-colors ml-1">{t('fingerprints_form_note')}</span>
+                      <textarea
+                        rows="3"
+                        value={draftFingerprint.note}
+                        onChange={(event) => handleDraftChange('note', event.target.value)}
+                        placeholder={t('fingerprints_form_note_placeholder')}
+                        className="mt-2 w-full rounded-2xl border border-white/5 bg-white/5 px-5 py-4 text-sm text-white outline-none transition-all focus:border-primary/50 focus:bg-white/[0.08] shadow-sm resize-none"
+                      />
+                    </label>
 
-                  <div className="rounded-[1.5rem] border border-primary/14 bg-primary/6 p-4">
-                    <div className="flex items-start gap-3">
-                      <div className="rounded-2xl bg-primary/10 p-3 text-primary">
-                        <span className="material-symbols-outlined text-[22px]">touch_app</span>
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold text-on-surface">{t('fingerprints_process_title')}</p>
-                        <p className="mt-2 text-sm leading-6 text-outline">{t('fingerprints_process_desc')}</p>
+                    <div className="rounded-3xl border border-primary/10 bg-primary/5 p-5 flex flex-col justify-center">
+                      <div className="flex items-start gap-4">
+                        <div className="rounded-2xl bg-primary text-white p-2.5 shadow-lg shadow-primary/20">
+                          <span className="material-symbols-outlined text-[20px]">touch_app</span>
+                        </div>
+                        <div>
+                          <p className="text-[11px] font-black text-white uppercase tracking-wider">{t('fingerprints_process_title')}</p>
+                          <p className="mt-2 text-[13px] leading-relaxed text-outline opacity-80">{t('fingerprints_process_desc')}</p>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-6 flex flex-wrap justify-end gap-3">
-                  <button
-                    type="button"
-                    onClick={closeAddModal}
-                    className="rounded-2xl border border-outline-variant/16 bg-background px-5 py-3 text-sm font-semibold text-on-surface transition-colors hover:border-primary/30 hover:text-primary"
-                  >
-                    {t('fingerprints_close')}
-                  </button>
-                  <button
-                    type="button"
-                    className="rounded-2xl bg-primary px-5 py-3 text-sm font-bold text-white transition-transform hover:scale-[0.98]"
-                  >
-                    {t('fingerprints_start_enrollment')}
-                  </button>
-                </div>
+                <aside className="border-t border-white/5 bg-white/[0.02] p-6 sm:p-8 lg:border-l lg:border-t-0 flex flex-col">
+                  <div className="flex items-center gap-2 mb-6">
+                    <span className="material-symbols-outlined text-outline text-[18px]">visibility</span>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-outline">{t('fingerprints_preview')}</p>
+                  </div>
+
+                  <div className="flex-1 space-y-5">
+                    <div className="rounded-[2rem] border border-white/5 bg-white/[0.03] p-6 shadow-sm">
+                      <div className="flex flex-col items-center text-center pb-6 border-b border-white/5">
+                        <div className="flex h-20 w-20 items-center justify-center rounded-[1.75rem] bg-gradient-to-br from-primary to-primary-container text-white shadow-xl shadow-primary/20 mb-4">
+                          <span className="material-symbols-outlined text-[36px]">fingerprint</span>
+                        </div>
+                        <p className="text-xl font-black text-white">
+                          {draftFingerprint.personName || t('fingerprints_new_user')}
+                        </p>
+                        <span className={`mt-2 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${getLevelClass(draftFingerprint.accessLevel)}`}>
+                          {mapAccessLevel(draftFingerprint.accessLevel)}
+                        </span>
+                      </div>
+
+                      <div className="mt-6 space-y-4">
+                        <div className="flex items-center justify-between">
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-outline">{t('fingerprints_expected_slot')}</p>
+                          <p className="text-sm font-black text-primary">
+                            {draftFingerprint.fingerSlotId
+                              ? `#${String(draftFingerprint.fingerSlotId).padStart(3, '0')}`
+                              : t('fingerprints_not_selected')}
+                          </p>
+                        </div>
+
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-outline">{t('fingerprints_progress')}</p>
+                            <p className="text-[10px] font-bold text-primary">33%</p>
+                          </div>
+                          <div className="h-2 overflow-hidden rounded-full bg-white/5">
+                            <div className="h-full w-1/3 rounded-full bg-primary shadow-[0_0_12px_rgba(15,98,254,0.4)]" />
+                          </div>
+                          <p className="text-[10px] leading-relaxed text-outline text-center px-2">{t('fingerprints_progress_desc')}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5">
+                      <div className="flex items-center gap-2 mb-2 text-amber-500">
+                        <span className="material-symbols-outlined text-[18px]">lightbulb</span>
+                        <p className="text-xs font-bold uppercase tracking-tight">{t('fingerprints_note_title')}</p>
+                      </div>
+                      <p className="text-xs leading-5 text-outline opacity-90">{t('fingerprints_note_desc')}</p>
+                    </div>
+                  </div>
+                </aside>
               </div>
+            </div>
 
-              <aside className="border-t border-outline-variant/12 bg-surface-container-high p-5 lg:border-l lg:border-t-0">
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-outline">{t('fingerprints_preview')}</p>
-
-                <div className="mt-4 rounded-[1.5rem] border border-outline-variant/12 bg-background p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                      <span className="material-symbols-outlined text-[26px]">fingerprint</span>
-                    </div>
-                    <div>
-                      <p className="text-base font-bold text-on-surface">
-                        {draftFingerprint.personName || t('fingerprints_new_user')}
-                      </p>
-                      <p className="mt-1 text-xs uppercase tracking-[0.18em] text-outline">
-                        {mapAccessLevel(draftFingerprint.accessLevel)}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 space-y-2.5">
-                    <div className="rounded-2xl bg-surface-container px-4 py-3">
-                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-outline">{t('fingerprints_expected_slot')}</p>
-                      <p className="mt-2 text-lg font-black text-on-surface">
-                        {draftFingerprint.fingerSlotId
-                          ? `#${String(draftFingerprint.fingerSlotId).padStart(3, '0')}`
-                          : t('fingerprints_not_selected')}
-                      </p>
-                    </div>
-
-                    <div className="rounded-2xl bg-surface-container px-4 py-3">
-                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-outline">{t('fingerprints_progress')}</p>
-                      <div className="mt-3 h-2 overflow-hidden rounded-full bg-surface-container-high">
-                        <div className="h-full w-1/3 rounded-full bg-primary" />
-                      </div>
-                      <p className="mt-2 text-xs leading-5 text-outline">{t('fingerprints_progress_desc')}</p>
-                    </div>
-
-                    <div className="rounded-2xl border border-amber-500/18 bg-amber-500/8 px-4 py-3">
-                      <p className="text-sm font-semibold text-amber-700">{t('fingerprints_note_title')}</p>
-                      <p className="mt-1 text-xs leading-5 text-outline">{t('fingerprints_note_desc')}</p>
-                    </div>
-                  </div>
-                </div>
-              </aside>
+            <div className="mt-auto flex flex-wrap justify-end gap-3 p-6 sm:px-10 border-t border-white/5 bg-[#0c0c0e]">
+              <button
+                type="button"
+                onClick={closeAddModal}
+                className="rounded-2xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-white/10 active:scale-95"
+              >
+                {t('fingerprints_close')}
+              </button>
+              <button
+                type="button"
+                className="rounded-2xl bg-primary px-8 py-3 text-sm font-bold text-white transition-all hover:scale-[1.02] hover:shadow-xl hover:shadow-primary/20 active:scale-95"
+              >
+                {t('fingerprints_start_enrollment')}
+              </button>
             </div>
           </div>
         </div>

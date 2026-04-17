@@ -12,6 +12,7 @@ import Fingerprints from './pages/Fingerprints';
 import Logs from './pages/Logs';
 import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
+import UserManagement from './pages/UserManagement';
 import Login from './pages/Login';
 import Register from './pages/Register';
 
@@ -36,6 +37,7 @@ const AppRoutes = () => {
             <Route path="fingerprints" element={<Fingerprints />} />
             <Route path="logs" element={<Logs />} />
             <Route path="analytics" element={<Analytics />} />
+            <Route path="users" element={<UserManagement />} />
             <Route path="settings" element={<Settings />} />
             <Route path="support" element={<Placeholder title={t('support_page')} />} />
           </Route>

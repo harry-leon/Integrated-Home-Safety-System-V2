@@ -128,16 +128,16 @@ const Register = () => {
             ))}
           </div>
 
-          {/* privilege tier */}
+          {/* access model */}
           <div className="bg-white/[0.03] border border-orange-500/10 rounded-2xl p-4">
-            <p className="text-[9px] text-orange-400/60 uppercase tracking-[0.25em] font-bold mb-3">PRIVILEGE TIER GRANTED</p>
+            <p className="text-[9px] text-orange-400/60 uppercase tracking-[0.25em] font-bold mb-3">DEFAULT ACCOUNT ACCESS</p>
             <div className="flex gap-3">
-              {['READ', 'WRITE', 'EXECUTE', 'ADMIN'].map((tier, i) => (
+              {['MEMBER', 'VIEW_ONLY', 'CONTROL', 'OWNER'].map((tier, i) => (
                 <div key={tier} className={`
                   flex-1 text-center py-2 rounded-lg border text-[8px] font-black tracking-wider uppercase
-                  ${i < 3
+                  ${i < 2
                     ? 'border-orange-500/20 text-orange-400/60 bg-orange-500/5'
-                    : 'border-orange-400/40 text-orange-300 bg-orange-500/10'
+                    : 'border-orange-400/20 text-orange-500/50 bg-orange-500/5'
                   }
                 `}>
                   {tier}
@@ -306,7 +306,7 @@ const Register = () => {
                   ) : (
                     <>
                       <span className="material-symbols-outlined text-lg">person_add</span>
-                      Cấp quyền Admin
+                      Tạo tài khoản Member
                     </>
                   )}
                 </span>

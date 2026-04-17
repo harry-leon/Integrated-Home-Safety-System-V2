@@ -5,10 +5,17 @@ import com.smartlock.dto.DeviceResponseDTO;
 import com.smartlock.model.Device;
 import com.smartlock.model.DeviceCommand;
 import com.smartlock.model.SensorData;
+import com.smartlock.model.User;
+import com.smartlock.model.UserDevice;
+import com.smartlock.model.enums.UserDevicePermission;
+import com.smartlock.model.enums.UserRole;
 import com.smartlock.repository.DeviceCommandRepository;
 import com.smartlock.repository.DeviceRepository;
 import com.smartlock.repository.SensorDataRepository;
+import com.smartlock.repository.UserDeviceRepository;
+import com.smartlock.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,17 +34,32 @@ public class DeviceService {
     private final SensorDataRepository sensorDataRepository;
     private final DeviceCommandRepository deviceCommandRepository;
     private final AlertService alertService;
+    private final DeviceAccessService deviceAccessService;
+    private final UserRepository userRepository;
+    private final UserDeviceRepository userDeviceRepository;
 
     @Transactional
-    public List<DeviceResponseDTO> getAllDevices() {
+    public List<DeviceResponseDTO> getAllDevices(Authentication authentication) {
         ensureDemoDeviceExists();
-        return deviceRepository.findAll().stream()
+        List<Device> devices;
+        if (deviceAccessService.isAdmin(authentication)) {
+            devices = deviceRepository.findAll();
+        } else {
+            List<UUID> accessibleDeviceIds = deviceAccessService.getAccessibleDeviceIds(authentication);
+            if (accessibleDeviceIds.isEmpty()) {
+                return List.of();
+            }
+            devices = deviceRepository.findAllById(accessibleDeviceIds);
+        }
+
+        return devices.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public DeviceResponseDTO getDeviceById(UUID id) {
+    public DeviceResponseDTO getDeviceById(UUID id, Authentication authentication) {
+        deviceAccessService.requireView(id, authentication);
         Device device = deviceRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Device not found"));
         return convertToDTO(device);
@@ -71,13 +93,27 @@ public class DeviceService {
             return;
         }
 
-        deviceRepository.save(Device.builder()
+        User adminUser = userRepository.findAll().stream()
+                .filter(user -> user.getRole() == UserRole.ADMIN)
+                .findFirst()
+                .orElse(null);
+
+        Device device = deviceRepository.save(Device.builder()
                 .deviceName("Smart Lock Demo")
                 .deviceCode(DEMO_DEVICE_CODE)
                 .providerType("BLYNK")
                 .location("Front Door")
                 .isOnline(false)
+                .owner(adminUser)
                 .build());
+
+        if (adminUser != null) {
+            userDeviceRepository.save(UserDevice.builder()
+                    .user(adminUser)
+                    .device(device)
+                    .permission(UserDevicePermission.OWNER)
+                    .build());
+        }
     }
 
     private Device getOrCreateDeviceByCode(String deviceCode) {

@@ -3,6 +3,7 @@ package com.smartlock.controller;
 import com.smartlock.common.security.VerificationService;
 import com.smartlock.dto.DeviceSettingsDTO;
 import com.smartlock.dto.NotificationSettingsDTO;
+import com.smartlock.service.DeviceAccessService;
 import com.smartlock.service.SettingsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,22 +23,26 @@ public class SettingsController {
 
     private final VerificationService verificationService;
     private final SettingsService settingsService;
+    private final DeviceAccessService deviceAccessService;
     private final com.smartlock.service.AuditLogService auditLogService;
     private final com.smartlock.repository.DeviceRepository deviceRepository;
 
     @GetMapping("/device/{deviceId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MEMBER', 'VIEWER')")
-    public ResponseEntity<DeviceSettingsDTO> getDeviceSettings(@PathVariable UUID deviceId) {
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<DeviceSettingsDTO> getDeviceSettings(@PathVariable UUID deviceId, Authentication authentication) {
+        deviceAccessService.requireView(deviceId, authentication);
         return ResponseEntity.ok(settingsService.getDeviceSettings(deviceId));
     }
 
     @PatchMapping("/device/{deviceId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MEMBER')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> updateDeviceSettings(
             @PathVariable UUID deviceId,
             @RequestBody DeviceSettingsDTO settings,
-            @RequestHeader(value = "X-Verification-Token", required = false) String verificationToken
+            @RequestHeader(value = "X-Verification-Token", required = false) String verificationToken,
+            Authentication authentication
     ) {
+        deviceAccessService.requireControl(deviceId, authentication);
         if (!verificationService.isVerified(verificationToken)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Step-up verification required for this action");
         }
@@ -52,13 +57,13 @@ public class SettingsController {
     }
 
     @GetMapping("/notifications")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MEMBER', 'VIEWER')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<NotificationSettingsDTO> getNotificationSettings(Authentication authentication) {
         return ResponseEntity.ok(settingsService.getNotificationSettings(authentication.getName()));
     }
 
     @PatchMapping("/notifications")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MEMBER')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> updateNotificationSettings(
             @RequestBody NotificationSettingsDTO settings,
             @RequestHeader(value = "X-Verification-Token", required = false) String verificationToken,

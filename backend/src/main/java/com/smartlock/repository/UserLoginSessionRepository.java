@@ -10,4 +10,5 @@ import java.util.UUID;
 public interface UserLoginSessionRepository extends JpaRepository<UserLoginSession, UUID> {
     Optional<UserLoginSession> findBySessionTokenHash(String sessionTokenHash);
     List<UserLoginSession> findTop10ByUserIdOrderByLastActiveAtDesc(UUID userId);
+    List<UserLoginSession> findAllByOrderByCreatedAtDesc();
 }

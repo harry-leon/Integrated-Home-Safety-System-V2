@@ -1,16 +1,24 @@
 -- V2__seed_data.sql
 
--- 1. Seed Users (password for both is 'password')
+-- 1. Seed Users (password for all accounts is 'password')
 INSERT INTO users (id, email, password_hash, full_name, avatar_url, role, is_active, created_at, updated_at) 
 VALUES 
 ('11111111-1111-1111-1111-111111111111', 'admin@smartlock.com', '$2a$10$EaQVNkkIFUdWPmXN5CAVQucljs2ujPmofSwiDaAZ8Rm/YzL5iQ.qi', 'Admin User', 'https://avatar.iran.liara.run/public/1', 'ADMIN', TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('22222222-2222-2222-2222-222222222222', 'user@smartlock.com', '$2a$10$EaQVNkkIFUdWPmXN5CAVQucljs2ujPmofSwiDaAZ8Rm/YzL5iQ.qi', 'John Doe', 'https://avatar.iran.liara.run/public/2', 'MEMBER', TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+('22222222-2222-2222-2222-222222222222', 'user@smartlock.com', '$2a$10$EaQVNkkIFUdWPmXN5CAVQucljs2ujPmofSwiDaAZ8Rm/YzL5iQ.qi', 'John Doe', 'https://avatar.iran.liara.run/public/2', 'MEMBER', TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('22222222-2222-2222-2222-222222222223', 'owner@smartlock.com', '$2a$10$EaQVNkkIFUdWPmXN5CAVQucljs2ujPmofSwiDaAZ8Rm/YzL5iQ.qi', 'Olivia Owner', 'https://avatar.iran.liara.run/public/3', 'MEMBER', TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('22222222-2222-2222-2222-222222222224', 'control@smartlock.com', '$2a$10$EaQVNkkIFUdWPmXN5CAVQucljs2ujPmofSwiDaAZ8Rm/YzL5iQ.qi', 'Chris Control', 'https://avatar.iran.liara.run/public/4', 'MEMBER', TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('22222222-2222-2222-2222-222222222225', 'viewer@smartlock.com', '$2a$10$EaQVNkkIFUdWPmXN5CAVQucljs2ujPmofSwiDaAZ8Rm/YzL5iQ.qi', 'Vera Viewer', 'https://avatar.iran.liara.run/public/5', 'VIEWER', TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('22222222-2222-2222-2222-222222222226', 'nogrant@smartlock.com', '$2a$10$EaQVNkkIFUdWPmXN5CAVQucljs2ujPmofSwiDaAZ8Rm/YzL5iQ.qi', 'Nina No Grant', 'https://avatar.iran.liara.run/public/6', 'MEMBER', TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- 2. Seed Notification Settings
 INSERT INTO notification_settings (id, user_id, web_push_enabled, email_enabled, gas_alert_enabled, intruder_alert_enabled, wrong_pass_alert_enabled, fingerprint_alert_enabled, updated_at)
 VALUES
 ('aaaa1111-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, CURRENT_TIMESTAMP),
-('aaaa2222-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '22222222-2222-2222-2222-222222222222', TRUE, FALSE, TRUE, TRUE, TRUE, FALSE, CURRENT_TIMESTAMP);
+('aaaa2222-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '22222222-2222-2222-2222-222222222222', TRUE, FALSE, TRUE, TRUE, TRUE, FALSE, CURRENT_TIMESTAMP),
+('aaaa2222-aaaa-aaaa-aaaa-aaaaaaaaaaab', '22222222-2222-2222-2222-222222222223', TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, CURRENT_TIMESTAMP),
+('aaaa2222-aaaa-aaaa-aaaa-aaaaaaaaaaac', '22222222-2222-2222-2222-222222222224', TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, CURRENT_TIMESTAMP),
+('aaaa2222-aaaa-aaaa-aaaa-aaaaaaaaaaad', '22222222-2222-2222-2222-222222222225', TRUE, FALSE, TRUE, TRUE, TRUE, FALSE, CURRENT_TIMESTAMP),
+('aaaa2222-aaaa-aaaa-aaaa-aaaaaaaaaaae', '22222222-2222-2222-2222-222222222226', FALSE, FALSE, TRUE, TRUE, TRUE, FALSE, CURRENT_TIMESTAMP);
 
 -- 3. Seed Devices
 INSERT INTO devices (id, device_name, device_code, provider_type, provider_token, location, latitude, longitude, is_online, owner_id, created_at, updated_at)
@@ -21,7 +29,12 @@ VALUES
 -- 4. Seed User Devices (Sharing devices)
 INSERT INTO user_devices (id, user_id, device_id, permission, granted_at)
 VALUES
-('55555555-5555-5555-5555-555555555555', '22222222-2222-2222-2222-222222222222', '33333333-3333-3333-3333-333333333333', 'READ', CURRENT_TIMESTAMP);
+('55555555-5555-5555-5555-555555555555', '11111111-1111-1111-1111-111111111111', '33333333-3333-3333-3333-333333333333', 'OWNER', CURRENT_TIMESTAMP),
+('55555555-5555-5555-5555-555555555556', '22222222-2222-2222-2222-222222222222', '33333333-4444-4444-4444-444444444444', 'OWNER', CURRENT_TIMESTAMP),
+('55555555-5555-5555-5555-555555555557', '22222222-2222-2222-2222-222222222222', '33333333-3333-3333-3333-333333333333', 'VIEW_ONLY', CURRENT_TIMESTAMP),
+('55555555-5555-5555-5555-555555555558', '22222222-2222-2222-2222-222222222223', '33333333-3333-3333-3333-333333333333', 'OWNER', CURRENT_TIMESTAMP),
+('55555555-5555-5555-5555-555555555559', '22222222-2222-2222-2222-222222222224', '33333333-3333-3333-3333-333333333333', 'CONTROL', CURRENT_TIMESTAMP),
+('55555555-5555-5555-5555-55555555555a', '22222222-2222-2222-2222-222222222225', '33333333-3333-3333-3333-333333333333', 'VIEW_ONLY', CURRENT_TIMESTAMP);
 
 -- 5. Seed Device Settings
 INSERT INTO device_settings (id, device_id, lock_password_hash, gas_threshold, ldr_threshold, auto_lock_delay, auto_lock_enabled, gas_alert_enabled, pir_alert_enabled, max_pass_fail, keypad_lock_duration, light_duration, updated_at)

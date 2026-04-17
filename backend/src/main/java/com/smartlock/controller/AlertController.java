@@ -1,8 +1,10 @@
 package com.smartlock.controller;
 
+import com.smartlock.common.security.VerificationService;
 import com.smartlock.dto.AlertResponseDTO;
 import com.smartlock.model.enums.AlertType;
 import com.smartlock.service.AlertService;
+import com.smartlock.service.DeviceAccessService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,9 +27,11 @@ import java.util.UUID;
 public class AlertController {
 
     private final AlertService alertService;
+    private final DeviceAccessService deviceAccessService;
+    private final VerificationService verificationService;
 
     @GetMapping
-    // @PreAuthorize("hasAnyRole('ADMIN', 'MEMBER', 'VIEWER')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Page<AlertResponseDTO>> getAlerts(
             @RequestParam(required = false) UUID deviceId,
             @RequestParam(required = false) AlertType type,
@@ -35,27 +39,62 @@ public class AlertController {
             @RequestParam(required = false) Boolean isResolved,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end,
+            Authentication authentication,
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        
-        Page<AlertResponseDTO> alerts = alertService.getAlerts(deviceId, type, severity, isResolved, start, end, pageable);
+        if (deviceId != null) {
+            deviceAccessService.requireView(deviceId, authentication);
+        }
+
+        Page<AlertResponseDTO> alerts = alertService.getAlerts(
+                deviceId,
+                deviceAccessService.getAccessibleDeviceIds(authentication),
+                deviceAccessService.isAdmin(authentication),
+                type,
+                severity,
+                isResolved,
+                start,
+                end,
+                pageable
+        );
         return ResponseEntity.ok(alerts);
     }
 
     @PostMapping("/{id}/resolve")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MEMBER')")
-    public ResponseEntity<Void> resolveAlert(@PathVariable UUID id, Authentication authentication) {
-        alertService.resolveAlert(id, authentication.getName());
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> resolveAlert(
+            @PathVariable UUID id,
+            @RequestHeader(value = "X-Verification-Token", required = false) String verificationToken,
+            Authentication authentication
+    ) {
+        if (!verificationService.isVerified(verificationToken)) {
+            return ResponseEntity.status(403).body("Step-up verification required for this action");
+        }
+        alertService.resolveAlert(id, authentication.getName(), authentication);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/export")
-    // @PreAuthorize("hasAnyRole('ADMIN', 'MEMBER', 'VIEWER')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<byte[]> exportAlerts(
             @RequestParam(required = false) UUID deviceId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
-        
-        String csvData = alertService.exportAlertsToCSV(deviceId, start, end);
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end,
+            @RequestHeader(value = "X-Verification-Token", required = false) String verificationToken,
+            Authentication authentication) {
+        if (deviceId != null) {
+            deviceAccessService.requireView(deviceId, authentication);
+        }
+        if (!verificationService.isVerified(verificationToken)) {
+            return ResponseEntity.status(403).body(new byte[0]);
+        }
+
+        String csvData = alertService.exportAlertsToCSV(
+                deviceId,
+                deviceAccessService.getAccessibleDeviceIds(authentication),
+                deviceAccessService.isAdmin(authentication),
+                start,
+                end
+        );
         byte[] output = csvData.getBytes();
 
         HttpHeaders headers = new HttpHeaders();

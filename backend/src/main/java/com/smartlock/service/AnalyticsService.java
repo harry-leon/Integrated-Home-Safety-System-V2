@@ -9,6 +9,7 @@ import com.smartlock.repository.AlertRepository;
 import com.smartlock.repository.DeviceRepository;
 import com.smartlock.repository.WeeklyReportRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -29,20 +30,32 @@ public class AnalyticsService {
     private final AlertRepository alertRepository;
     private final AccessLogRepository accessLogRepository;
 
-    public WeeklySnapshotDTO getWeeklySnapshot() {
+    public WeeklySnapshotDTO getWeeklySnapshot(Authentication authentication) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime sevenDaysAgo = now.minusDays(7);
         LocalDateTime fourteenDaysAgo = now.minusDays(14);
+        List<UUID> accessibleDeviceIds = deviceAccessService.getAccessibleDeviceIds(authentication);
+        boolean admin = deviceAccessService.isAdmin(authentication);
 
-        // This week metrics
-        long accessThisWeek = accessLogRepository.countByCreatedAtBetween(sevenDaysAgo, now);
-        long failedThisWeek = accessLogRepository.countFailedAttemptsBetween(sevenDaysAgo, now);
-        long alertsThisWeek = alertRepository.countByCreatedAtBetween(sevenDaysAgo, now);
-        long criticalAlerts = alertRepository.countByCreatedAtBetweenAndSeverity(sevenDaysAgo, now, "CRITICAL");
+        long accessThisWeek = admin
+                ? accessLogRepository.countByCreatedAtBetween(sevenDaysAgo, now)
+                : sum(accessibleDeviceIds, deviceId -> accessLogRepository.countByDeviceIdAndCreatedAtBetween(deviceId, sevenDaysAgo, now));
+        long failedThisWeek = admin
+                ? accessLogRepository.countFailedAttemptsBetween(sevenDaysAgo, now)
+                : sum(accessibleDeviceIds, deviceId -> accessLogRepository.countFailedAttemptsByDeviceBetween(deviceId, sevenDaysAgo, now));
+        long alertsThisWeek = admin
+                ? alertRepository.countByCreatedAtBetween(sevenDaysAgo, now)
+                : sum(accessibleDeviceIds, deviceId -> alertRepository.countByDeviceIdAndCreatedAtBetween(deviceId, sevenDaysAgo, now));
+        long criticalAlerts = admin
+                ? alertRepository.countByCreatedAtBetweenAndSeverity(sevenDaysAgo, now, "CRITICAL")
+                : countCriticalAlerts(accessibleDeviceIds, sevenDaysAgo, now);
 
-        // Last week metrics for comparison
-        long accessLastWeek = accessLogRepository.countByCreatedAtBetween(fourteenDaysAgo, sevenDaysAgo);
-        long alertsLastWeek = alertRepository.countByCreatedAtBetween(fourteenDaysAgo, sevenDaysAgo);
+        long accessLastWeek = admin
+                ? accessLogRepository.countByCreatedAtBetween(fourteenDaysAgo, sevenDaysAgo)
+                : sum(accessibleDeviceIds, deviceId -> accessLogRepository.countByDeviceIdAndCreatedAtBetween(deviceId, fourteenDaysAgo, sevenDaysAgo));
+        long alertsLastWeek = admin
+                ? alertRepository.countByCreatedAtBetween(fourteenDaysAgo, sevenDaysAgo)
+                : sum(accessibleDeviceIds, deviceId -> alertRepository.countByDeviceIdAndCreatedAtBetween(deviceId, fourteenDaysAgo, sevenDaysAgo));
 
         // Calculate rates
         double accessRate = accessLastWeek > 0 ? (double) (accessThisWeek - accessLastWeek) / accessLastWeek * 100 : 0;
@@ -58,8 +71,12 @@ public class AnalyticsService {
             LocalDateTime dayEnd = dayStart.plusDays(1).minusNanos(1);
             String label = dayStart.format(formatter);
             
-            accessTrend.put(label, accessLogRepository.countByCreatedAtBetween(dayStart, dayEnd));
-            alertTrend.put(label, alertRepository.countByCreatedAtBetween(dayStart, dayEnd));
+            accessTrend.put(label, admin
+                    ? accessLogRepository.countByCreatedAtBetween(dayStart, dayEnd)
+                    : sum(accessibleDeviceIds, deviceId -> accessLogRepository.countByDeviceIdAndCreatedAtBetween(deviceId, dayStart, dayEnd)));
+            alertTrend.put(label, admin
+                    ? alertRepository.countByCreatedAtBetween(dayStart, dayEnd)
+                    : sum(accessibleDeviceIds, deviceId -> alertRepository.countByDeviceIdAndCreatedAtBetween(deviceId, dayStart, dayEnd)));
         }
 
         String summary = String.format("Trong 7 ngày qua, hệ thống ghi nhận %d lượt truy cập (%s%.1f%% so với tuần trước) và %d cảnh báo mới.",
@@ -78,30 +95,57 @@ public class AnalyticsService {
                 .build();
     }
 
-    public List<WeeklyReportResponseDTO> getWeeklyReports(UUID deviceId) {
+    public List<WeeklyReportResponseDTO> getWeeklyReports(UUID deviceId, Authentication authentication) {
+        deviceAccessService.requireView(deviceId, authentication);
         return weeklyReportRepository.findByDeviceIdOrderByWeekStartDesc(deviceId)
                 .stream()
                 .map(this::mapToWeeklyDTO)
                 .collect(Collectors.toList());
     }
 
-    public AnalyticsSnapshotDTO getProjectSnapshot() {
+    public AnalyticsSnapshotDTO getProjectSnapshot(Authentication authentication) {
         LocalDateTime startOfToday = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
+        List<UUID> accessibleDeviceIds = deviceAccessService.getAccessibleDeviceIds(authentication);
+        boolean admin = deviceAccessService.isAdmin(authentication);
         
-        long totalDevices = deviceRepository.count();
-        long onlineDevices = deviceRepository.findAll().stream().filter(d -> d.isOnline()).count();
+        long totalDevices = admin ? deviceRepository.count() : accessibleDeviceIds.size();
+        long onlineDevices = admin
+                ? deviceRepository.findAll().stream().filter(d -> d.isOnline()).count()
+                : deviceRepository.findAllById(accessibleDeviceIds).stream().filter(d -> d.isOnline()).count();
         
-        long alertsToday = alertRepository.countByCreatedAtBetween(startOfToday, LocalDateTime.now());
-        long accessToday = accessLogRepository.countByCreatedAtBetween(startOfToday, LocalDateTime.now());
+        long alertsToday = admin
+                ? alertRepository.countByCreatedAtBetween(startOfToday, LocalDateTime.now())
+                : sum(accessibleDeviceIds, deviceId -> alertRepository.countByDeviceIdAndCreatedAtBetween(deviceId, startOfToday, LocalDateTime.now()));
+        long accessToday = admin
+                ? accessLogRepository.countByCreatedAtBetween(startOfToday, LocalDateTime.now())
+                : sum(accessibleDeviceIds, deviceId -> accessLogRepository.countByDeviceIdAndCreatedAtBetween(deviceId, startOfToday, LocalDateTime.now()));
 
         return AnalyticsSnapshotDTO.builder()
                 .totalDevices(totalDevices)
                 .onlineDevices(onlineDevices)
                 .totalAlertsToday(alertsToday)
-                .criticalAlertsToday(alertRepository.countByCreatedAtBetweenAndSeverity(startOfToday, LocalDateTime.now(), "CRITICAL"))
+                .criticalAlertsToday(admin
+                        ? alertRepository.countByCreatedAtBetweenAndSeverity(startOfToday, LocalDateTime.now(), "CRITICAL")
+                        : countCriticalAlerts(accessibleDeviceIds, startOfToday, LocalDateTime.now()))
                 .accessLogsToday(accessToday)
                 .deviceHealthScore(totalDevices > 0 ? (double) onlineDevices / totalDevices * 100 : 0)
                 .build();
+    }
+
+    private final DeviceAccessService deviceAccessService;
+
+    private long countCriticalAlerts(List<UUID> deviceIds, LocalDateTime start, LocalDateTime end) {
+        return alertRepository.findAllWithDevice().stream()
+                .filter(alert -> deviceIds.contains(alert.getDevice().getId()))
+                .filter(alert -> "CRITICAL".equals(alert.getSeverity()))
+                .filter(alert -> alert.getCreatedAt() != null
+                        && !alert.getCreatedAt().isBefore(start)
+                        && !alert.getCreatedAt().isAfter(end))
+                .count();
+    }
+
+    private long sum(List<UUID> deviceIds, java.util.function.ToLongFunction<UUID> counter) {
+        return deviceIds.stream().mapToLong(counter).sum();
     }
 
     private WeeklyReportResponseDTO mapToWeeklyDTO(WeeklyReport report) {

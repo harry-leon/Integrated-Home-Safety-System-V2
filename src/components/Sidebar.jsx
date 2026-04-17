@@ -30,13 +30,17 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
   };
 
   const navItems = [
-    { name: t('dashboard'), icon: 'dashboard', path: '/' },
-    { name: t('remote_control'), icon: 'settings_remote', path: '/remote' },
-    { name: t('fingerprints'), icon: 'fingerprint', path: '/fingerprints' },
-    { name: t('logs'), icon: 'history', path: '/logs' },
-    { name: t('analytics'), icon: 'analytics', path: '/analytics' },
-    { name: t('settings'), icon: 'settings', path: '/settings' },
+    { name: t('dashboard'), icon: 'dashboard', path: '/', roles: ['ADMIN', 'MEMBER', 'VIEWER'] },
+    { name: t('remote_control'), icon: 'settings_remote', path: '/remote', roles: ['ADMIN', 'MEMBER', 'VIEWER'] },
+    { name: t('fingerprints'), icon: 'fingerprint', path: '/fingerprints', roles: ['ADMIN', 'MEMBER'] },
+    { name: t('user_management'), icon: 'group', path: '/users', roles: ['ADMIN'] },
+    { name: t('logs'), icon: 'history', path: '/logs', roles: ['ADMIN'] },
+    { name: t('analytics'), icon: 'analytics', path: '/analytics', roles: ['ADMIN'] },
+    { name: t('settings'), icon: 'settings', path: '/settings', roles: ['ADMIN', 'MEMBER', 'VIEWER'] },
   ];
+
+  const { user } = useAuth();
+  const filteredNavItems = navItems.filter(item => !item.roles || item.roles.includes(user?.role));
 
   const activeItem = navItems.find((item) => item.path === location.pathname) || navItems[0];
 
@@ -72,7 +76,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
       </div>
 
       <nav className={`flex-1 space-y-1 ${isCollapsed ? 'px-2' : 'px-3'}`} aria-label="Primary Navigation">
-        {navItems.map((item) => {
+        {filteredNavItems.map((item) => {
           const isActive = location.pathname === item.path;
           return (
             <Link
