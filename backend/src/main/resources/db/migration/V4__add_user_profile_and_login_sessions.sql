@@ -7,7 +7,7 @@ CREATE TABLE user_details (
     date_of_birth DATE,
     address VARCHAR(255),
     bio VARCHAR(1000),
-    avatar_url CLOB,
+    avatar_url TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id)
@@ -28,7 +28,7 @@ CREATE TABLE user_login_sessions (
 );
 
 INSERT INTO user_details (id, user_id, full_name, avatar_url, created_at, updated_at)
-SELECT RANDOM_UUID(), u.id, u.full_name, u.avatar_url, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+SELECT gen_random_uuid(), u.id, u.full_name, u.avatar_url, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
 FROM users u
 WHERE NOT EXISTS (
     SELECT 1 FROM user_details ud WHERE ud.user_id = u.id
