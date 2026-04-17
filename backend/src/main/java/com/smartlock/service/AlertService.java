@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import jakarta.persistence.criteria.Predicate;
@@ -31,13 +32,30 @@ public class AlertService {
     private final AlertRepository alertRepository;
     private final DeviceSettingsRepository deviceSettingsRepository;
     private final UserRepository userRepository;
+    private final DeviceAccessService deviceAccessService;
 
-    public Page<AlertResponseDTO> getAlerts(UUID deviceId, AlertType type, String severity, Boolean isResolved, LocalDateTime start, LocalDateTime end, Pageable pageable) {
+    public Page<AlertResponseDTO> getAlerts(
+            UUID deviceId,
+            List<UUID> accessibleDeviceIds,
+            boolean admin,
+            AlertType type,
+            String severity,
+            Boolean isResolved,
+            LocalDateTime start,
+            LocalDateTime end,
+            Pageable pageable
+    ) {
         Specification<Alert> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
             
             if (deviceId != null) {
                 predicates.add(cb.equal(root.get("device").get("id"), deviceId));
+            } else if (!admin) {
+                if (accessibleDeviceIds.isEmpty()) {
+                    predicates.add(cb.disjunction());
+                } else {
+                    predicates.add(root.get("device").get("id").in(accessibleDeviceIds));
+                }
             }
             if (type != null) {
                 predicates.add(cb.equal(root.get("alertType"), type));
@@ -61,9 +79,10 @@ public class AlertService {
         return alertRepository.findAll(spec, pageable).map(this::mapToDTO);
     }
 
-    public void resolveAlert(UUID alertId, String username) {
+    public void resolveAlert(UUID alertId, String username, Authentication authentication) {
         Alert alert = alertRepository.findById(alertId)
                 .orElseThrow(() -> new RuntimeException("Alert not found"));
+        deviceAccessService.requireControl(alert.getDevice().getId(), authentication);
         User user = userRepository.findByEmail(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -103,13 +122,18 @@ public class AlertService {
     }
 
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
-    public String exportAlertsToCSV(UUID deviceId, LocalDateTime start, LocalDateTime end) {
+    public String exportAlertsToCSV(UUID deviceId, List<UUID> accessibleDeviceIds, boolean admin, LocalDateTime start, LocalDateTime end) {
         try {
             List<Alert> alerts;
             if (deviceId != null && start != null && end != null) {
                 alerts = alertRepository.findByDeviceIdAndCreatedAtBetween(deviceId, start, end);
             } else {
                 alerts = alertRepository.findAllWithDevice();
+            }
+            if (!admin) {
+                alerts = alerts.stream()
+                        .filter(alert -> accessibleDeviceIds.contains(alert.getDevice().getId()))
+                        .collect(Collectors.toList());
             }
 
             StringBuilder csvBuilder = new StringBuilder();

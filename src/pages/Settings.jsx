@@ -6,9 +6,9 @@ import { smartLockApi } from '../services/api';
 import UserAvatar from '../components/UserAvatar';
 
 const PROFILE_SECTIONS = [
-  { id: 'profile', label: 'Profile', icon: 'person' },
-  { id: 'preferences', label: 'Settings', icon: 'tune' },
-  { id: 'logins', label: 'Login activity', icon: 'devices' },
+  { id: 'profile', label: 'Profile', icon: 'person', roles: ['ADMIN', 'MEMBER', 'VIEWER'] },
+  { id: 'preferences', label: 'Settings', icon: 'tune', roles: ['ADMIN', 'MEMBER', 'VIEWER'] },
+  { id: 'logins', label: 'Login activity', icon: 'devices', roles: ['ADMIN'] },
 ];
 
 const emptyProfileForm = {
@@ -267,7 +267,7 @@ const Settings = () => {
         </div>
 
         <div className="flex flex-wrap gap-2">
-          {PROFILE_SECTIONS.map((section) => {
+          {PROFILE_SECTIONS.filter(section => !section.roles || section.roles.includes(user?.role)).map((section) => {
             const isActive = activeSection === section.id;
             return (
               <button

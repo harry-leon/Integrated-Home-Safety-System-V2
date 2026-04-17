@@ -23,8 +23,10 @@ public class AccessLogService {
 
     private final AccessLogRepository accessLogRepository;
 
-    public Page<AccessLogResponseDTO> getAccessLogs(UUID deviceId, LocalDateTime start, LocalDateTime end, Pageable pageable) {
-        List<AccessLog> logs = accessLogRepository.findLogsOptimized(deviceId, start, end);
+    public Page<AccessLogResponseDTO> getAccessLogs(UUID deviceId, List<UUID> accessibleDeviceIds, boolean admin, LocalDateTime start, LocalDateTime end, Pageable pageable) {
+        List<AccessLog> logs = accessLogRepository.findLogsOptimized(deviceId, start, end).stream()
+                .filter(log -> admin || accessibleDeviceIds.contains(log.getDevice().getId()))
+                .collect(Collectors.toList());
         
         int total = logs != null ? logs.size() : 0;
         int startIdx = (int) pageable.getOffset();
@@ -40,8 +42,10 @@ public class AccessLogService {
         return new PageImpl<>(items, pageable, total);
     }
 
-    public String exportLogsToCSV(UUID deviceId, LocalDateTime start, LocalDateTime end) {
-        List<AccessLog> logs = accessLogRepository.findLogsOptimized(deviceId, start, end);
+    public String exportLogsToCSV(UUID deviceId, List<UUID> accessibleDeviceIds, boolean admin, LocalDateTime start, LocalDateTime end) {
+        List<AccessLog> logs = accessLogRepository.findLogsOptimized(deviceId, start, end).stream()
+                .filter(log -> admin || accessibleDeviceIds.contains(log.getDevice().getId()))
+                .collect(Collectors.toList());
         if (logs == null) logs = new ArrayList<>();
 
         StringBuilder csv = new StringBuilder("ID,Device,User,Person,Method,Action,Detail,Time\n");

@@ -141,16 +141,16 @@ const Header = () => {
     },
   };
   const meta = pageMeta[location.pathname] || pageMeta['/'];
-  const darkNavSurface = theme === 'dark' ? 'bg-[#081722] border-cyan-950/60' : 'bg-surface border-outline-variant/16';
+  const darkNavSurface = theme === 'dark' ? 'bg-[#0e2231] border-cyan-950/60' : 'bg-surface border-outline-variant/16';
   const darkPanelSurface = theme === 'dark' ? 'bg-[#0b1d2a] border-cyan-950/60' : 'bg-surface-container border-outline-variant/18';
-  const darkHeaderSurface = theme === 'dark' ? 'bg-[#06131d]/96 border-cyan-950/60' : 'bg-background/88 border-outline-variant/16';
+  const darkHeaderSurface = theme === 'dark' ? 'bg-[#071521] border-cyan-950/60' : 'bg-background border-outline-variant/16';
 
   return (
-    <header className={`sticky top-0 z-40 border-b backdrop-blur-xl ${darkHeaderSurface}`}>
+    <header className={`sticky top-0 z-40 border-b ${darkHeaderSurface}`}>
       <div className="mx-auto flex max-w-7xl flex-col gap-4 px-5 py-4 sm:px-8 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Sentinel</p>
-          <h1 className="mt-2 text-2xl font-black tracking-tight text-on-surface sm:text-3xl">{meta.title}</h1>
+          <h1 className="mt-2 text-xl font-black tracking-tight text-on-surface sm:text-2xl lg:text-3xl">{meta.title}</h1>
           <p className="mt-1 max-w-2xl text-sm text-outline">{meta.subtitle}</p>
         </div>
 
@@ -245,20 +245,20 @@ const Header = () => {
             <span className="material-symbols-outlined text-[20px]">{theme === 'dark' ? 'light_mode' : 'dark_mode'}</span>
           </button>
 
-          <div className={`flex items-center gap-3 rounded-2xl border px-3 py-2 ${darkNavSurface}`}>
-            <div className="hidden text-right sm:block">
-              <p className="text-sm font-semibold text-on-surface">{user?.fullName || t('sentinel_user')}</p>
-              <p className="text-xs text-outline">{user?.role || 'MEMBER'}</p>
-            </div>
+          <div className="relative" ref={menuRef}>
+            <button
+              type="button"
+              onClick={() => setMenuOpen((current) => !current)}
+              className={`flex items-center gap-3 rounded-2xl border px-3 py-2 transition-all hover:bg-white/5 active:scale-95 ${darkNavSurface}`}
+              aria-haspopup="menu"
+              aria-expanded={menuOpen}
+            >
+              <div className="hidden text-right sm:block">
+                <p className="text-sm font-semibold text-on-surface">{user?.fullName || t('sentinel_user')}</p>
+                <p className="text-xs text-outline font-bold uppercase tracking-widest">{user?.role || 'MEMBER'}</p>
+              </div>
 
-            <div className="relative" ref={menuRef}>
-              <button
-                type="button"
-                onClick={() => setMenuOpen((current) => !current)}
-                className="relative rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
-                aria-haspopup="menu"
-                aria-expanded={menuOpen}
-              >
+              <div className="relative">
                 <UserAvatar
                   src={user?.avatarUrl}
                   name={user?.fullName}
@@ -266,10 +266,10 @@ const Header = () => {
                   className="shadow-[0_0_18px_color-mix(in_srgb,var(--color-primary)_18%,transparent)]"
                 />
                 <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-surface bg-green-500" />
-              </button>
+              </div>
+            </button>
 
-              {menuOpen && <ProfileMenu user={user} onClose={() => setMenuOpen(false)} />}
-            </div>
+            {menuOpen && <ProfileMenu user={user} onClose={() => setMenuOpen(false)} />}
           </div>
         </div>
       </div>

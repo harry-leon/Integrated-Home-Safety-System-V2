@@ -222,5 +222,26 @@ export const smartLockApi = {
     const queryStr = new URLSearchParams(cleanParams(params)).toString();
     const url = `/api/access-logs/export${queryStr ? `?${queryStr}` : ''}`;
     return fetchApi(url, { responseType: 'blob' });
+  },
+
+  // Admin Management
+  getAdminUsers: async () => {
+    return fetchApi('/api/admin/users');
+  },
+
+  getAdminSessions: async () => {
+    return fetchApi('/api/admin/sessions');
+  },
+
+  toggleUserActive: async (userId) => {
+    return fetchApi(`/api/admin/users/${userId}/toggle-active`, {
+      method: 'PATCH'
+    });
+  },
+
+  changeUserRole: async (userId, role) => {
+    return fetchApi(`/api/admin/users/${userId}/role?role=${role}`, {
+      method: 'PATCH'
+    });
   }
 };

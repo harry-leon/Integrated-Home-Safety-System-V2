@@ -3,11 +3,13 @@ package com.smartlock.controller;
 import com.smartlock.common.security.VerificationService;
 import com.smartlock.dto.DeviceResponseDTO;
 import com.smartlock.service.CommandService;
+import com.smartlock.service.DeviceAccessService;
 import com.smartlock.service.DeviceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,25 +23,29 @@ public class DeviceController {
     private final DeviceService deviceService;
     private final CommandService commandService;
     private final VerificationService verificationService;
+    private final DeviceAccessService deviceAccessService;
 
     @GetMapping
-    // @PreAuthorize("hasAnyRole('ADMIN', 'MEMBER', 'VIEWER')")
-    public ResponseEntity<List<DeviceResponseDTO>> getAllDevices() {
-        return ResponseEntity.ok(deviceService.getAllDevices());
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<DeviceResponseDTO>> getAllDevices(Authentication authentication) {
+        return ResponseEntity.ok(deviceService.getAllDevices(authentication));
     }
 
     @GetMapping("/{id}")
-    // @PreAuthorize("hasAnyRole('ADMIN', 'MEMBER', 'VIEWER')")
-    public ResponseEntity<DeviceResponseDTO> getDeviceById(@PathVariable UUID id) {
-        return ResponseEntity.ok(deviceService.getDeviceById(id));
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<DeviceResponseDTO> getDeviceById(@PathVariable UUID id, Authentication authentication) {
+        return ResponseEntity.ok(deviceService.getDeviceById(id, authentication));
     }
 
     @PostMapping("/{id}/lock/toggle")
-    // @PreAuthorize("hasAnyRole('ADMIN', 'MEMBER')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> toggleLock(
             @PathVariable UUID id,
-            @RequestHeader(value = "X-Verification-Token", required = false) String verificationToken
+            @RequestHeader(value = "X-Verification-Token", required = false) String verificationToken,
+            Authentication authentication
     ) {
+        deviceAccessService.requireControl(id, authentication);
+
         // Step-up verification check for sensitive action
         if (!verificationService.isVerified(verificationToken)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Step-up verification required for this action");

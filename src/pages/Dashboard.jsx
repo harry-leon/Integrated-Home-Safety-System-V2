@@ -435,64 +435,76 @@ const Dashboard = () => {
 
   const statusChips = [
     {
-      label: 'Trang thai cua',
-      value: isLocked ? 'Da khoa' : 'Dang mo',
-      tone: isLocked ? 'text-primary' : 'text-amber-600',
+      label: 'Trạng thái cửa',
+      value: isLocked ? 'Đã khóa' : 'Đang mở',
+      icon: isLocked ? 'lock' : 'lock_open',
+      tone: isLocked ? 'text-primary' : 'text-amber-500',
+      bgColor: isLocked ? 'bg-primary/5' : 'bg-amber-500/5',
     },
     {
-      label: 'Canh bao kich hoat',
-      value: `${activeAlerts.length}`,
-      tone: activeAlerts.length > 0 ? 'text-error' : 'text-green-600',
+      label: 'Cảnh báo',
+      value: activeAlerts.length > 0 ? `${activeAlerts.length} đang bật` : 'An toàn',
+      icon: activeAlerts.length > 0 ? 'report' : 'verified',
+      tone: activeAlerts.length > 0 ? 'text-error' : 'text-emerald-500',
+      bgColor: activeAlerts.length > 0 ? 'bg-error/5' : 'bg-emerald-500/5',
     },
     {
-      label: 'Thiet bi',
+      label: 'Thiết bị',
       value: primaryDevice?.online ? 'Online' : 'Offline',
-      tone: primaryDevice?.online ? 'text-green-600' : 'text-error',
+      icon: primaryDevice?.online ? 'sensors' : 'sensors_off',
+      tone: primaryDevice?.online ? 'text-blue-500' : 'text-error',
+      bgColor: primaryDevice?.online ? 'bg-blue-500/5' : 'bg-error/5',
     },
   ];
 
   const environmentCards = [
     {
-      label: 'Thoi tiet',
+      label: 'Thời tiết',
       value: primaryDevice?.temperature != null ? `${primaryDevice.temperature}°C` : `${weather.temp}°C`,
       detail: primaryDevice?.weatherDesc || weather.desc,
-      icon: weather.icon,
-      summary: 'Du lieu bo tro hien tai',
+      icon: 'thermostat',
+      color: 'bg-orange-500/10 text-orange-500',
+      summary: 'Dữ liệu thời gian thực',
     },
     {
-      label: 'Anh sang',
+      label: 'Ánh sáng',
       value: primaryDevice?.ldrValue != null ? `${primaryDevice.ldrValue} lx` : 'N/A',
-      detail: primaryDevice?.ldrValue != null ? `Nguong canh bao: ${primaryDevice.ldrValue > 700 ? 'Qua sang' : 'On dinh'}` : 'Chua co du lieu tu cam bien',
-      icon: 'light_mode',
-      summary: 'Cam bien LDR',
+      detail: primaryDevice?.ldrValue != null ? `Ngưỡng: ${primaryDevice.ldrValue > 700 ? 'Quá sáng' : 'Ổn định'}` : 'Chưa có dữ liệu LDR',
+      icon: 'wb_sunny',
+      color: 'bg-amber-500/10 text-amber-500',
+      summary: 'Cảm biến quang trở',
     },
     {
-      label: 'Gas',
+      label: 'Môi trường Gas',
       value: primaryDevice?.gasValue != null ? `${primaryDevice.gasValue} ppm` : 'N/A',
-      detail: primaryDevice?.gasValue != null ? `Nguong hien tai: ${primaryDevice.gasValue >= 300 ? 'Can chu y' : 'An toan'}` : 'Chua co du lieu tu cam bien',
-      icon: 'gas_meter',
-      summary: primaryDevice?.pirTriggered ? 'Dang phat hien chuyen dong' : 'Khong co xam nhap',
+      detail: primaryDevice?.gasValue != null ? `Tình trạng: ${primaryDevice.gasValue >= 300 ? 'Cảnh báo Gas' : 'An toàn'}` : 'Chưa có dữ liệu Gas',
+      icon: 'air',
+      color: 'bg-blue-500/10 text-blue-500',
+      summary: primaryDevice?.pirTriggered ? 'Phát hiện chuyển động' : 'Khu vực an toàn',
     },
   ];
 
   const weeklyCards = [
     {
-      label: 'Luot truy cap',
+      label: 'Lượt truy cập',
       value: weeklySnap?.totalAccessThisWeek ?? '--',
-      detail: weeklySnap?.accessChangeRate ? `${weeklySnap.accessChangeRate.toFixed(1)}% so voi tuan truoc` : 'Khong co thay doi lon',
-      icon: 'login',
+      detail: weeklySnap?.accessChangeRate ? `${weeklySnap.accessChangeRate.toFixed(1)}% so với tuần trước` : 'Ổn định so với tuần trước',
+      icon: 'insights',
+      color: 'bg-indigo-500/10 text-indigo-500',
     },
     {
-      label: 'Canh bao moi',
+      label: 'Cảnh báo mới',
       value: weeklySnap?.alertsThisWeek ?? '--',
-      detail: weeklySnap?.alertsThisWeek > 0 ? 'Can xem lai nhat ky va xu ly' : 'Khong co canh bao moi',
-      icon: 'warning',
+      detail: weeklySnap?.alertsThisWeek > 0 ? 'Cần kiểm tra nhật ký' : 'Không có sự cố mới',
+      icon: 'notifications_active',
+      color: 'bg-rose-500/10 text-rose-500',
     },
     {
-      label: 'Muc nguy cap',
+      label: 'Mức nguy cấp',
       value: weeklySnap?.criticalAlertsThisWeek ?? '--',
-      detail: weeklySnap?.criticalAlertsThisWeek > 0 ? 'Can uu tien xu ly' : 'He thong van on dinh',
-      icon: 'crisis_alert',
+      detail: weeklySnap?.criticalAlertsThisWeek > 0 ? 'Cần xử lý khẩn cấp' : 'Hệ thống an toàn',
+      icon: 'emergency',
+      color: 'bg-red-600/10 text-red-600',
     },
   ];
 
@@ -509,20 +521,23 @@ const Dashboard = () => {
                 </div>
 
                 <div className="space-y-3">
-                  <p className="text-sm font-semibold text-outline">Tong quan 3 giay</p>
-                  <h1 className="max-w-2xl text-4xl font-black tracking-tight text-on-surface sm:text-5xl">
+                  <p className="text-[11px] sm:text-sm font-semibold text-outline">Tong quan 3 giay</p>
+                  <h1 className="max-w-2xl text-3xl font-black tracking-tight text-on-surface sm:text-4xl lg:text-5xl">
                     {heroStatus.title}
                   </h1>
-                  <p className="max-w-2xl text-base leading-7 text-outline">
+                  <p className="max-w-2xl text-sm leading-relaxed text-outline sm:text-base sm:leading-7">
                     {heroStatus.description}
                   </p>
                 </div>
 
                 <div className="grid gap-3 sm:grid-cols-3">
                   {statusChips.map((item) => (
-                    <div key={item.label} className="rounded-2xl bg-surface-container-high px-4 py-4">
-                      <p className="text-sm text-outline">{item.label}</p>
-                      <p className={`mt-2 text-lg font-bold ${item.tone}`}>{item.value}</p>
+                    <div key={item.label} className={`rounded-2xl ${item.bgColor} border border-outline-variant/5 px-4 py-4 flex flex-col justify-between`}>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className={`material-symbols-outlined text-[18px] ${item.tone}`}>{item.icon}</span>
+                        <p className="text-[11px] font-bold uppercase tracking-wider text-outline">{item.label}</p>
+                      </div>
+                      <p className={`text-base font-black tracking-tight sm:text-lg ${item.tone}`}>{item.value}</p>
                     </div>
                   ))}
                 </div>
@@ -566,22 +581,21 @@ const Dashboard = () => {
                   type="button"
                   onClick={isListening ? stopVoiceRecognition : startVoiceRecognition}
                   disabled={!isVoiceSupported || isVoiceExecuting}
-                  className={`relative mx-auto mt-7 flex h-32 w-32 items-center justify-center rounded-full border-[8px] transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50 sm:h-36 sm:w-36 ${
+                  className={`relative mx-auto mt-7 flex h-32 w-32 items-center justify-center rounded-full border-[6px] transition-all duration-500 disabled:cursor-not-allowed disabled:opacity-50 sm:h-36 sm:w-36 ${
                     isListening
-                      ? 'border-green-400/30 bg-green-500 text-white shadow-[0_0_0_12px_rgba(34,197,94,0.14),0_22px_48px_rgba(34,197,94,0.28)] scale-105'
-                      : 'border-primary/18 bg-primary text-white shadow-[0_0_0_12px_rgba(15,98,254,0.10),0_22px_48px_rgba(15,98,254,0.22)]'
+                      ? 'border-green-400/20 bg-green-500 text-white shadow-[0_0_60px_rgba(34,197,94,0.4)] scale-105'
+                      : 'border-primary/10 bg-gradient-to-br from-primary to-primary-container text-white shadow-[0_20px_40px_rgba(15,98,254,0.25)] hover:scale-105'
                   }`}
                 >
                   {isListening && (
-                    <span className="absolute inset-0 rounded-full border-4 border-green-300/45 animate-ping" aria-hidden="true" />
+                    <>
+                      <span className="absolute inset-0 rounded-full border-2 border-green-300/45 animate-ping" aria-hidden="true" />
+                      <span className="absolute -inset-4 rounded-full border border-green-400/20 animate-pulse" aria-hidden="true" />
+                    </>
                   )}
-                  <img
-                    src="https://images.icon-icons.com/259/PNG/128/ic_mic_128_28646.png"
-                    alt="Microphone"
-                    className={`relative z-10 h-14 w-14 object-contain transition-transform duration-300 sm:h-16 sm:w-16 ${
-                      isListening ? 'animate-pulse scale-110 brightness-0 invert saturate-0' : ''
-                    }`}
-                  />
+                  <span className={`material-symbols-outlined text-5xl sm:text-6xl ${isListening ? 'animate-bounce' : ''}`}>
+                    {isListening ? 'graphic_eq' : 'mic'}
+                  </span>
                 </button>
 
                 <p className="mt-5 text-sm font-semibold text-on-surface">
@@ -665,8 +679,8 @@ const Dashboard = () => {
                 <div key={item.label} className="flex flex-1 flex-col justify-between rounded-2xl bg-surface-container-high px-4 py-4">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-start gap-3">
-                      <div className="rounded-xl bg-background p-2 text-primary">
-                        <span className="material-symbols-outlined text-[18px]">{item.icon}</span>
+                      <div className={`rounded-xl ${item.color} p-2.5 flex items-center justify-center shadow-sm`}>
+                        <span className="material-symbols-outlined text-[20px]">{item.icon}</span>
                       </div>
                       <div>
                         <p className="text-sm font-semibold text-on-surface">{item.label}</p>
@@ -700,13 +714,15 @@ const Dashboard = () => {
 
             <div className="mt-5 grid gap-3 md:grid-cols-3">
               {weeklyCards.map((item) => (
-                <div key={item.label} className="flex h-full flex-col rounded-2xl bg-surface-container-high px-4 py-4">
-                  <div className="flex items-center gap-2">
-                    <span className="material-symbols-outlined text-primary text-[18px]">{item.icon}</span>
-                    <p className="text-sm font-semibold text-on-surface">{item.label}</p>
+                <div key={item.label} className="flex h-full flex-col rounded-[1.5rem] bg-surface-container-high p-5 border border-outline-variant/5">
+                  <div className="flex items-center gap-3">
+                    <div className={`rounded-xl ${item.color} p-2 flex items-center justify-center shadow-sm`}>
+                      <span className="material-symbols-outlined text-[18px]">{item.icon}</span>
+                    </div>
+                    <p className="text-sm font-bold text-on-surface">{item.label}</p>
                   </div>
-                  <p className="mt-4 text-3xl font-black tracking-tight text-on-surface">{item.value}</p>
-                  <p className="mt-2 text-sm text-outline">{item.detail}</p>
+                  <p className="mt-5 text-3xl font-black tracking-tight text-on-surface">{item.value}</p>
+                  <p className="mt-2 text-xs font-medium text-outline">{item.detail}</p>
                 </div>
               ))}
             </div>
