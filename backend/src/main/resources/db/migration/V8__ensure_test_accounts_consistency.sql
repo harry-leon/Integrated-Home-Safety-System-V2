@@ -1,5 +1,6 @@
 -- Ensure complete profile/settings consistency for all test accounts
 -- This file is created as V8 to avoid checksum mismatch if V7 was already applied.
+-- Force update to trigger new PR: 2026-04-17 17:00
 
 -- 1. Ensure all test accounts have UserDetails (required for login profile retrieval)
 INSERT INTO user_details (id, user_id, full_name, avatar_url, created_at, updated_at)
