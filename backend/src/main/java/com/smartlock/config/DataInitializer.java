@@ -33,26 +33,13 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        var adminUser = userRepository.findByEmail("admin@smartlock.com").orElse(null);
-
-        if (adminUser == null) {
-            System.out.println("No admin found, creating default admin account...");
-            adminUser = com.smartlock.model.User.builder()
-                    .id(UUID.randomUUID().toString())
-                    .email("admin@smartlock.com")
-                    .passwordHash(passwordEncoder.encode("admin123"))
-                    .fullName("Admin System")
-                    .role(UserRole.ADMIN)
-                    .isActive(true)
-                    .createdAt(LocalDateTime.now())
-                    .updatedAt(LocalDateTime.now())
-                    .build();
-            adminUser = userRepository.save(adminUser);
-        }
+        seedTestAccounts();
 
         if (deviceRepository.count() > 0 && accessLogRepository.count() > 0) {
             return;
         }
+
+        var adminUser = userRepository.findByEmail("admin@smartlock.com").orElse(null);
 
         Device device = Device.builder()
                 .deviceName("Khoa Cua Chinh (Demo)")
@@ -107,7 +94,33 @@ public class DataInitializer implements CommandLineRunner {
 
         alertRepository.save(alert1);
         alertRepository.save(alert2);
-
         System.out.println("Demo data initialized successfully!");
+    }
+
+    private void seedTestAccounts() {
+        String commonPassword = passwordEncoder.encode("password");
+
+        createIfMissing("admin@smartlock.com", "Admin User", UserRole.ADMIN, commonPassword);
+        createIfMissing("user@smartlock.com", "Standard User", UserRole.MEMBER, commonPassword);
+        createIfMissing("owner@smartlock.com", "Olivia Owner", UserRole.MEMBER, commonPassword);
+        createIfMissing("control@smartlock.com", "Chris Control", UserRole.MEMBER, commonPassword);
+        createIfMissing("viewer@smartlock.com", "Vera Viewer", UserRole.VIEWER, commonPassword);
+        createIfMissing("nogrant@smartlock.com", "Nina No Grant", UserRole.MEMBER, commonPassword);
+    }
+
+    private void createIfMissing(String email, String fullName, UserRole role, String passwordHash) {
+        if (userRepository.findByEmail(email).isEmpty()) {
+            System.out.println("Seeding account: " + email);
+            userRepository.save(com.smartlock.model.User.builder()
+                    .id(UUID.randomUUID().toString())
+                    .email(email)
+                    .passwordHash(passwordHash)
+                    .fullName(fullName)
+                    .role(role)
+                    .isActive(true)
+                    .createdAt(LocalDateTime.now())
+                    .updatedAt(LocalDateTime.now())
+                    .build());
+        }
     }
 }
