@@ -28,7 +28,7 @@ CREATE TABLE user_login_sessions (
 );
 
 INSERT INTO user_details (id, user_id, full_name, avatar_url, created_at, updated_at)
-SELECT gen_random_uuid(), u.id, u.full_name, u.avatar_url, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+SELECT RANDOM_UUID(), u.id, u.full_name, u.avatar_url, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
 FROM users u
 WHERE NOT EXISTS (
     SELECT 1 FROM user_details ud WHERE ud.user_id = u.id
