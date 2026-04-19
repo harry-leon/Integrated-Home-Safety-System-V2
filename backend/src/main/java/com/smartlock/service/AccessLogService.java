@@ -6,12 +6,10 @@ import com.smartlock.repository.AccessLogRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -24,29 +22,24 @@ public class AccessLogService {
     private final AccessLogRepository accessLogRepository;
 
     public Page<AccessLogResponseDTO> getAccessLogs(UUID deviceId, List<UUID> accessibleDeviceIds, boolean admin, LocalDateTime start, LocalDateTime end, Pageable pageable) {
-        List<AccessLog> logs = accessLogRepository.findLogsOptimized(deviceId, start, end).stream()
-                .filter(log -> admin || accessibleDeviceIds.contains(log.getDevice().getId()))
-                .collect(Collectors.toList());
-        
-        int total = logs != null ? logs.size() : 0;
-        int startIdx = (int) pageable.getOffset();
-        
-        List<AccessLogResponseDTO> items = new ArrayList<>();
-        if (logs != null && startIdx < total) {
-            int endIdx = Math.min((startIdx + pageable.getPageSize()), total);
-            items = logs.subList(startIdx, endIdx).stream()
-                        .map(this::mapToDTO)
-                        .collect(Collectors.toList());
+        if (!admin && (accessibleDeviceIds == null || accessibleDeviceIds.isEmpty())) {
+            return Page.empty(pageable);
         }
-        
-        return new PageImpl<>(items, pageable, total);
+
+        List<UUID> deviceIds = admin ? List.of(new UUID(0L, 0L)) : accessibleDeviceIds;
+        return accessLogRepository
+                .findLogsPage(deviceId, deviceIds, admin, start, end, pageable)
+                .map(this::mapToDTO);
     }
 
     public String exportLogsToCSV(UUID deviceId, List<UUID> accessibleDeviceIds, boolean admin, LocalDateTime start, LocalDateTime end) {
+        if (!admin && (accessibleDeviceIds == null || accessibleDeviceIds.isEmpty())) {
+            return "ID,Device,User,Person,Method,Action,Detail,Time\n";
+        }
+
         List<AccessLog> logs = accessLogRepository.findLogsOptimized(deviceId, start, end).stream()
                 .filter(log -> admin || accessibleDeviceIds.contains(log.getDevice().getId()))
                 .collect(Collectors.toList());
-        if (logs == null) logs = new ArrayList<>();
 
         StringBuilder csv = new StringBuilder("ID,Device,User,Person,Method,Action,Detail,Time\n");
         for (AccessLog log : logs) {

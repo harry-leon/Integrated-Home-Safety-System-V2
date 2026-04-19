@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useLang } from '../contexts/LangContext';
+import { useVoiceCommand } from '../contexts/VoiceCommandContext';
 import GuestAccessModal from '../components/GuestAccessModal';
 import ReAuthModal from '../components/ReAuthModal';
 import { smartLockApi } from '../services/api';
@@ -16,23 +17,22 @@ const RANGE_SETTINGS = [
   { label: 'Auto-lock delay (seconds)', key: 'autoLockDelay', max: 120 },
 ];
 
-const VOICE_COMMANDS = [
-  'Lock the door',
-  'Unlock the door',
-  'Turn on auto lock',
-  'Turn off gas alert',
-  'Select device 2',
-];
-
-const normalizeSpeech = (value) =>
-  (value || '')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .trim();
-
 const RemoteControl = () => {
   const { t } = useLang();
+  const {
+    isSupported: isVoiceSupported,
+    isListening,
+    isExecuting: isVoiceExecuting,
+    transcript: voiceTranscript,
+    parsedCommand: voiceCommand,
+    feedback: voiceFeedback,
+    error: voiceError,
+    helpItems: voiceHelpItems,
+    startListening: startVoiceRecognition,
+    stopListening: stopVoiceRecognition,
+    runTranscript: runVoiceTranscript,
+    runSampleCommand,
+  } = useVoiceCommand();
   const [locked, setLocked] = useState(true);
   const [isGuestModalOpen, setIsGuestModalOpen] = useState(false);
   const [devices, setDevices] = useState([]);
@@ -51,59 +51,25 @@ const RemoteControl = () => {
   });
   const [verificationError, setVerificationError] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
-  const [isVoiceSupported, setIsVoiceSupported] = useState(false);
-  const [isListening, setIsListening] = useState(false);
-  const [voiceTranscript, setVoiceTranscript] = useState('');
-  const [voiceCommand, setVoiceCommand] = useState(null);
-  const [voiceFeedback, setVoiceFeedback] = useState('Use voice to lock, unlock, switch device, or toggle quick settings.');
-  const [voiceError, setVoiceError] = useState('');
   const isBootstrappingSettings = useRef(false);
   const verificationPromiseRef = useRef(null);
-  const recognitionRef = useRef(null);
 
-  useEffect(() => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      setIsVoiceSupported(false);
-      return undefined;
+  const requestVerificationToken = useCallback(async ({ title, description }) => {
+    if (verificationState.token && verificationState.expiresAt > Date.now()) {
+      return verificationState.token;
     }
 
-    const recognition = new SpeechRecognition();
-    recognition.lang = 'en-US';
-    recognition.continuous = false;
-    recognition.interimResults = true;
+    setVerificationError('');
+    setVerificationDialog({
+      isOpen: true,
+      title,
+      description,
+    });
 
-    recognition.onstart = () => {
-      setIsListening(true);
-      setVoiceError('');
-      setVoiceFeedback('Listening for a command...');
-    };
-
-    recognition.onresult = (event) => {
-      const transcript = Array.from(event.results)
-        .map((result) => result[0]?.transcript || '')
-        .join(' ')
-        .trim();
-      setVoiceTranscript(transcript);
-    };
-
-    recognition.onerror = (event) => {
-      setIsListening(false);
-      setVoiceError(event.error === 'not-allowed' ? 'Microphone permission was denied.' : 'Voice recognition failed. Try again.');
-    };
-
-    recognition.onend = () => {
-      setIsListening(false);
-    };
-
-    recognitionRef.current = recognition;
-    setIsVoiceSupported(true);
-
-    return () => {
-      recognition.stop();
-      recognitionRef.current = null;
-    };
-  }, []);
+    return new Promise((resolve, reject) => {
+      verificationPromiseRef.current = { resolve, reject };
+    });
+  }, [verificationState]);
 
   useEffect(() => {
     let active = true;
@@ -209,7 +175,7 @@ const RemoteControl = () => {
     }, 700);
 
     return () => window.clearTimeout(timer);
-  }, [deviceSettings, hasPendingSettingsChange, selectedDeviceId, verificationState]);
+  }, [deviceSettings, hasPendingSettingsChange, requestVerificationToken, selectedDeviceId]);
 
   useEffect(() => {
     return () => {
@@ -219,138 +185,7 @@ const RemoteControl = () => {
     };
   }, []);
 
-  const requestVerificationToken = async ({ title, description }) => {
-    if (verificationState.token && verificationState.expiresAt > Date.now()) {
-      return verificationState.token;
-    }
-
-    setVerificationError('');
-    setVerificationDialog({
-      isOpen: true,
-      title,
-      description,
-    });
-
-    return new Promise((resolve, reject) => {
-      verificationPromiseRef.current = { resolve, reject };
-    });
-  };
-
   const currentDevice = devices.find((device) => device.id === selectedDeviceId) || null;
-
-  const buildVoiceCommand = (transcript) => {
-    const normalized = normalizeSpeech(transcript);
-    if (!normalized) return null;
-
-    if (/(unlock|open|mo khoa|mo cua)/.test(normalized)) {
-      return {
-        type: 'lock',
-        targetState: 'unlocked',
-        label: 'Unlock the selected door',
-        detail: 'The command will open the current device after password verification.',
-      };
-    }
-
-    if (/(lock|secure|khoa cua|dong cua)/.test(normalized)) {
-      return {
-        type: 'lock',
-        targetState: 'locked',
-        label: 'Lock the selected door',
-        detail: 'The command will secure the current device after password verification.',
-      };
-    }
-
-    if (/(auto lock on|enable auto lock|bat auto lock|bat khoa tu dong)/.test(normalized)) {
-      return {
-        type: 'setting',
-        key: 'autoLockEnabled',
-        value: true,
-        label: 'Enable auto lock',
-        detail: 'This will update the quick setting and trigger the existing save flow.',
-      };
-    }
-
-    if (/(auto lock off|disable auto lock|tat auto lock|tat khoa tu dong)/.test(normalized)) {
-      return {
-        type: 'setting',
-        key: 'autoLockEnabled',
-        value: false,
-        label: 'Disable auto lock',
-        detail: 'This will update the quick setting and trigger the existing save flow.',
-      };
-    }
-
-    if (/(gas alert on|enable gas alert|bat canh bao gas)/.test(normalized)) {
-      return {
-        type: 'setting',
-        key: 'gasAlertEnabled',
-        value: true,
-        label: 'Enable gas alert',
-        detail: 'This updates the gas warning toggle for the selected device.',
-      };
-    }
-
-    if (/(gas alert off|disable gas alert|tat canh bao gas)/.test(normalized)) {
-      return {
-        type: 'setting',
-        key: 'gasAlertEnabled',
-        value: false,
-        label: 'Disable gas alert',
-        detail: 'This updates the gas warning toggle for the selected device.',
-      };
-    }
-
-    if (/(pir alert on|enable pir alert|bat canh bao pir)/.test(normalized)) {
-      return {
-        type: 'setting',
-        key: 'pirAlertEnabled',
-        value: true,
-        label: 'Enable PIR alert',
-        detail: 'This updates the motion warning toggle for the selected device.',
-      };
-    }
-
-    if (/(pir alert off|disable pir alert|tat canh bao pir)/.test(normalized)) {
-      return {
-        type: 'setting',
-        key: 'pirAlertEnabled',
-        value: false,
-        label: 'Disable PIR alert',
-        detail: 'This updates the motion warning toggle for the selected device.',
-      };
-    }
-
-    const deviceMatch = normalized.match(/(?:device|thiet bi)\s+(\d+)/);
-    if (deviceMatch) {
-      const index = Number(deviceMatch[1]) - 1;
-      if (devices[index]) {
-        return {
-          type: 'device',
-          deviceId: devices[index].id,
-          label: `Switch to ${devices[index].deviceName}`,
-          detail: 'The working device in the control screen will be updated.',
-        };
-      }
-    }
-
-    return null;
-  };
-
-  useEffect(() => {
-    if (!voiceTranscript.trim()) {
-      setVoiceCommand(null);
-      return;
-    }
-
-    const nextCommand = buildVoiceCommand(voiceTranscript);
-    setVoiceCommand(nextCommand);
-    if (nextCommand) {
-      setVoiceFeedback(`Command recognized: ${nextCommand.label}`);
-      setVoiceError('');
-    } else {
-      setVoiceFeedback('Voice captured, but no supported command was found.');
-    }
-  }, [voiceTranscript, devices]);
 
   const closeVerificationDialog = () => {
     if (isVerifying) {
@@ -403,12 +238,7 @@ const RemoteControl = () => {
     setStatusError('');
 
     try {
-      const verificationToken = await requestVerificationToken({
-        title: locked ? 'Unlock door' : 'Lock door',
-        description: `Enter your password to ${locked ? 'unlock' : 'lock'} ${currentDevice?.deviceName || 'this device'}. This action will be recorded.`,
-      });
-
-      const commandId = await smartLockApi.sendLockToggle(selectedDeviceId, verificationToken);
+      const commandId = await smartLockApi.sendLockToggle(selectedDeviceId);
       setLocked((current) => !current);
       setStatusMessage(`Command queued successfully. Reference: ${commandId}`);
     } catch (error) {
@@ -423,56 +253,6 @@ const RemoteControl = () => {
     setHasPendingSettingsChange(true);
     setStatusMessage('Saving device changes...');
     setStatusError('');
-  };
-
-  const startVoiceRecognition = () => {
-    if (!recognitionRef.current) {
-      setVoiceError('Voice recognition is not supported in this browser.');
-      return;
-    }
-
-    setVoiceTranscript('');
-    setVoiceCommand(null);
-    setVoiceError('');
-    recognitionRef.current.start();
-  };
-
-  const stopVoiceRecognition = () => {
-    recognitionRef.current?.stop();
-    setIsListening(false);
-  };
-
-  const runVoiceCommand = async () => {
-    if (!voiceCommand) return;
-
-    setVoiceError('');
-
-    if (voiceCommand.type === 'device') {
-      setSelectedDeviceId(voiceCommand.deviceId);
-      setVoiceFeedback(`Device switched: ${voiceCommand.label}`);
-      return;
-    }
-
-    if (voiceCommand.type === 'setting') {
-      updateSetting(voiceCommand.key, voiceCommand.value);
-      setVoiceFeedback(`Setting updated: ${voiceCommand.label}`);
-      return;
-    }
-
-    if (voiceCommand.type === 'lock') {
-      if (voiceCommand.targetState === 'locked' && locked) {
-        setVoiceFeedback('The selected device is already locked.');
-        return;
-      }
-
-      if (voiceCommand.targetState === 'unlocked' && !locked) {
-        setVoiceFeedback('The selected device is already unlocked.');
-        return;
-      }
-
-      await handleToggleLock();
-      return;
-    }
   };
 
   return (
@@ -550,7 +330,7 @@ const RemoteControl = () => {
           </button>
 
           <p className="relative z-10 mt-12 max-w-xs text-center font-medium text-outline">
-            {locked ? 'Unlock' : 'Lock'} the selected entry point. Every command requires password confirmation and is written to the audit log.
+            {locked ? 'Unlock' : 'Lock'} the selected entry point. Commands are written to the audit log.
           </p>
 
           {currentDevice && (
@@ -644,7 +424,7 @@ const RemoteControl = () => {
                 Control the device with your voice
               </h3>
               <p className="mt-3 max-w-xl text-sm leading-7 text-outline">
-                This frontend-only interface listens for simple lock, unlock, device switch, and quick-setting commands, then maps them to the existing control flow.
+                The global voice engine listens for lock, unlock, alert, navigation, device switch, and quick-setting commands from any protected page.
               </p>
 
               <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -664,12 +444,12 @@ const RemoteControl = () => {
 
                 <button
                   type="button"
-                  onClick={runVoiceCommand}
-                  disabled={!voiceCommand || isSendingCommand}
+                  onClick={() => runVoiceTranscript(voiceTranscript)}
+                  disabled={!voiceCommand || isVoiceExecuting || isSendingCommand}
                   className="inline-flex items-center gap-2 rounded-2xl border border-outline-variant/16 bg-surface px-5 py-3 text-sm font-semibold text-on-surface transition-colors hover:border-primary/30 hover:text-primary disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <span className="material-symbols-outlined text-[18px]">play_arrow</span>
-                  Run recognized command
+                  Run again
                 </button>
               </div>
 
@@ -716,11 +496,11 @@ const RemoteControl = () => {
             <div>
               <p className="text-sm font-bold uppercase tracking-[0.16em] text-outline">Sample phrases</p>
               <div className="mt-4 space-y-3">
-                {VOICE_COMMANDS.map((command) => (
+                {voiceHelpItems.slice(0, 5).map((command) => (
                   <button
                     key={command}
                     type="button"
-                    onClick={() => setVoiceTranscript(command)}
+                    onClick={() => runSampleCommand(command)}
                     className="w-full rounded-2xl border border-outline-variant/12 bg-background px-4 py-4 text-left text-sm font-semibold text-on-surface transition-colors hover:border-primary/30 hover:text-primary"
                   >
                     {command}
@@ -733,9 +513,9 @@ const RemoteControl = () => {
               <p className="text-sm font-bold text-on-surface">How it works</p>
               <ul className="mt-3 space-y-2 text-sm leading-6 text-outline">
                 <li>1. Start listening and speak a short command.</li>
-                <li>2. Review the transcript and parsed action.</li>
-                <li>3. Run the command to reuse the existing frontend control flow.</li>
-                <li>4. Lock and unlock still require password verification through the current modal.</li>
+                <li>2. The global engine parses and runs supported commands.</li>
+                <li>3. Lock and unlock run immediately; settings and alert resolution still verify identity.</li>
+                <li>4. Use the floating mic to control the app from other pages.</li>
               </ul>
             </div>
           </div>

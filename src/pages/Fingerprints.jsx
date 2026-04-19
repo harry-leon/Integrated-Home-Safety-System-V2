@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLang } from '../contexts/LangContext';
 import { useAuth } from '../contexts/AuthContext';
 import { smartLockApi } from '../services/api';
@@ -35,7 +35,7 @@ const Fingerprints = () => {
     isSubmitting: false,
   });
 
-  const fetchData = async ({ keepSelection = true } = {}) => {
+  const fetchData = useCallback(async ({ keepSelection = true } = {}) => {
     setIsLoading(true);
     setError('');
 
@@ -52,7 +52,7 @@ const Fingerprints = () => {
         setSelectedDevice(nextSelectedDevice);
       }
 
-      const data = await smartLockApi.getFingerprints(selectedDevice || undefined);
+      const data = await smartLockApi.getFingerprints(nextSelectedDevice || undefined);
       setUsers(Array.isArray(data) ? data : []);
 
       setDraftFingerprint((current) => ({
@@ -66,11 +66,11 @@ const Fingerprints = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [selectedDevice, t]);
 
   useEffect(() => {
     fetchData();
-  }, [selectedDevice]);
+  }, [fetchData]);
 
   const handleDraftChange = (field, value) => {
     setDraftFingerprint((current) => ({

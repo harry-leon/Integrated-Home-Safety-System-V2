@@ -33,7 +33,6 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
     { name: t('dashboard'), icon: 'dashboard', path: '/', roles: ['ADMIN', 'MEMBER', 'VIEWER'] },
     { name: t('remote_control'), icon: 'settings_remote', path: '/remote', roles: ['ADMIN', 'MEMBER', 'VIEWER'] },
     { name: t('fingerprints'), icon: 'fingerprint', path: '/fingerprints', roles: ['ADMIN', 'MEMBER'] },
-    { name: t('user_management'), icon: 'group', path: '/users', roles: ['ADMIN'] },
     { name: t('logs'), icon: 'history', path: '/logs', roles: ['ADMIN'] },
     { name: t('analytics'), icon: 'analytics', path: '/analytics', roles: ['ADMIN'] },
     { name: t('settings'), icon: 'settings', path: '/settings', roles: ['ADMIN', 'MEMBER', 'VIEWER'] },

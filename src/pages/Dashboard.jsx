@@ -1,8 +1,8 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useLang } from '../contexts/LangContext';
 import { useTimeWeather } from '../contexts/TimeWeatherContext';
-import ReAuthModal from '../components/ReAuthModal';
+import { useVoiceCommand } from '../contexts/VoiceCommandContext';
 import { smartLockApi } from '../services/api';
 
 const formatAlertType = (alertType) => {
@@ -91,85 +91,24 @@ const formatDateTime = (value) => {
   });
 };
 
-const normalizeSpeech = (value) =>
-  (value || '')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .trim();
-
 const Dashboard = () => {
   const { t } = useLang();
-  const navigate = useNavigate();
   const { weather } = useTimeWeather();
+  const {
+    isSupported: isVoiceSupported,
+    isListening,
+    isExecuting: isVoiceExecuting,
+    transcript: voiceTranscript,
+    feedback: voiceFeedback,
+    error: voiceError,
+    startListening: startVoiceRecognition,
+    stopListening: stopVoiceRecognition,
+  } = useVoiceCommand();
   const [alerts, setAlerts] = useState([]);
   const [weeklySnap, setWeeklySnap] = useState(null);
   const [devices, setDevices] = useState([]);
   const [accessLogs, setAccessLogs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [verificationState, setVerificationState] = useState({ token: '', expiresAt: 0 });
-  const [verificationDialog, setVerificationDialog] = useState({
-    isOpen: false,
-    title: '',
-    description: '',
-  });
-  const [verificationError, setVerificationError] = useState('');
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [isVoiceSupported, setIsVoiceSupported] = useState(false);
-  const [isListening, setIsListening] = useState(false);
-  const [isVoiceExecuting, setIsVoiceExecuting] = useState(false);
-  const [voiceTranscript, setVoiceTranscript] = useState('');
-  const [voiceCommand, setVoiceCommand] = useState(null);
-  const [voiceFeedback, setVoiceFeedback] = useState('Use voice to lock, unlock, or jump to another workspace.');
-  const [voiceError, setVoiceError] = useState('');
-  const verificationPromiseRef = useRef(null);
-  const recognitionRef = useRef(null);
-  const transcriptRef = useRef('');
-
-  useEffect(() => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      setIsVoiceSupported(false);
-      return undefined;
-    }
-
-    const recognition = new SpeechRecognition();
-    recognition.lang = 'en-US';
-    recognition.continuous = false;
-    recognition.interimResults = true;
-
-    recognition.onstart = () => {
-      setIsListening(true);
-      setVoiceError('');
-      setVoiceFeedback('Listening for a dashboard command...');
-    };
-
-    recognition.onresult = (event) => {
-      const transcript = Array.from(event.results)
-        .map((result) => result[0]?.transcript || '')
-        .join(' ')
-        .trim();
-      transcriptRef.current = transcript;
-      setVoiceTranscript(transcript);
-    };
-
-    recognition.onerror = (event) => {
-      setIsListening(false);
-      setVoiceError(event.error === 'not-allowed' ? 'Microphone permission was denied.' : 'Voice recognition failed. Try again.');
-    };
-
-    recognition.onend = () => {
-      setIsListening(false);
-    };
-
-    recognitionRef.current = recognition;
-    setIsVoiceSupported(true);
-
-    return () => {
-      recognition.stop();
-      recognitionRef.current = null;
-    };
-  }, []);
 
   useEffect(() => {
     let active = true;
@@ -197,19 +136,11 @@ const Dashboard = () => {
     };
 
     fetchData();
-    const intervalId = setInterval(fetchData, 6000);
+    const intervalId = setInterval(fetchData, 15000);
 
     return () => {
       active = false;
       clearInterval(intervalId);
-    };
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      if (verificationPromiseRef.current) {
-        verificationPromiseRef.current.reject(new Error('Confirmation was cancelled.'));
-      }
     };
   }, []);
 
@@ -222,198 +153,6 @@ const Dashboard = () => {
   const recentEvents = accessLogs.slice(0, 4);
   const latestLockAction = accessLogs.find((log) => log.action === 'LOCKED' || log.action === 'UNLOCKED');
   const isLocked = latestLockAction?.action !== 'UNLOCKED';
-
-  const requestVerificationToken = async ({ title, description }) => {
-    if (verificationState.token && verificationState.expiresAt > Date.now()) {
-      return verificationState.token;
-    }
-
-    setVerificationError('');
-    setVerificationDialog({
-      isOpen: true,
-      title,
-      description,
-    });
-
-    return new Promise((resolve, reject) => {
-      verificationPromiseRef.current = { resolve, reject };
-    });
-  };
-
-  const closeVerificationDialog = () => {
-    if (isVerifying) return;
-
-    setVerificationDialog((current) => ({ ...current, isOpen: false }));
-    setVerificationError('');
-
-    if (verificationPromiseRef.current) {
-      verificationPromiseRef.current.reject(new Error('Confirmation was cancelled.'));
-      verificationPromiseRef.current = null;
-    }
-  };
-
-  const handleVerificationConfirm = async (password) => {
-    setIsVerifying(true);
-    setVerificationError('');
-
-    try {
-      const verification = await smartLockApi.reAuthenticate(password);
-      const nextState = {
-        token: verification.verificationToken,
-        expiresAt: Date.now() + 4 * 60 * 1000,
-      };
-
-      setVerificationState(nextState);
-      setVerificationDialog((current) => ({ ...current, isOpen: false }));
-
-      if (verificationPromiseRef.current) {
-        verificationPromiseRef.current.resolve(nextState.token);
-        verificationPromiseRef.current = null;
-      }
-    } catch (error) {
-      setVerificationError(error.message || 'Unable to verify your password.');
-    } finally {
-      setIsVerifying(false);
-    }
-  };
-
-  const buildVoiceCommand = (transcript) => {
-    const normalized = normalizeSpeech(transcript);
-    if (!normalized) return null;
-
-    if (/(unlock|open|mo khoa|mo cua)/.test(normalized)) {
-      return {
-        type: 'lock',
-        targetState: 'unlocked',
-        label: 'Unlock the main device',
-        detail: 'This will send an unlock command for the primary dashboard device.',
-      };
-    }
-
-    if (/(lock|secure|khoa cua|dong cua)/.test(normalized)) {
-      return {
-        type: 'lock',
-        targetState: 'locked',
-        label: 'Lock the main device',
-        detail: 'This will send a lock command for the primary dashboard device.',
-      };
-    }
-
-    if (/(control|remote|dieu khien)/.test(normalized)) {
-      return {
-        type: 'navigate',
-        path: '/remote',
-        label: 'Open control page',
-        detail: 'Navigate to the full device control workspace.',
-      };
-    }
-
-    if (/(log|nhat ky|history)/.test(normalized)) {
-      return {
-        type: 'navigate',
-        path: '/logs',
-        label: 'Open logs',
-        detail: 'Navigate to the recent events and audit log page.',
-      };
-    }
-
-    if (/(analytics|analysis|bao cao|phan tich)/.test(normalized)) {
-      return {
-        type: 'navigate',
-        path: '/analytics',
-        label: 'Open analytics',
-        detail: 'Navigate to the weekly insights and system analytics page.',
-      };
-    }
-
-    return null;
-  };
-
-  useEffect(() => {
-    if (!voiceTranscript.trim()) {
-      setVoiceCommand(null);
-      return;
-    }
-
-    const nextCommand = buildVoiceCommand(voiceTranscript);
-    setVoiceCommand(nextCommand);
-
-    if (nextCommand) {
-      setVoiceFeedback(`Command recognized: ${nextCommand.label}`);
-      setVoiceError('');
-    } else {
-      setVoiceFeedback('Voice captured, but no supported dashboard command was found.');
-    }
-  }, [voiceTranscript]);
-
-  const startVoiceRecognition = () => {
-    if (!recognitionRef.current) {
-      setVoiceError('Voice recognition is not supported in this browser.');
-      return;
-    }
-
-    transcriptRef.current = '';
-    setVoiceTranscript('');
-    setVoiceCommand(null);
-    setVoiceError('');
-    recognitionRef.current.start();
-  };
-
-  const stopVoiceRecognition = () => {
-    recognitionRef.current?.stop();
-    setIsListening(false);
-  };
-
-  const runVoiceCommand = async () => {
-    if (!voiceCommand) return;
-
-    setIsVoiceExecuting(true);
-    setVoiceError('');
-
-    try {
-      if (voiceCommand.type === 'navigate') {
-        navigate(voiceCommand.path);
-        return;
-      }
-
-      if (!primaryDevice) {
-        throw new Error('No primary device is available on the dashboard.');
-      }
-
-      if (!primaryDevice.online) {
-        throw new Error('The primary device is offline. Reconnect it before sending a command.');
-      }
-
-      if (voiceCommand.type === 'lock') {
-        if (voiceCommand.targetState === 'locked' && isLocked) {
-          setVoiceFeedback('The primary device is already locked.');
-          return;
-        }
-
-        if (voiceCommand.targetState === 'unlocked' && !isLocked) {
-          setVoiceFeedback('The primary device is already unlocked.');
-          return;
-        }
-
-        const verificationToken = await requestVerificationToken({
-          title: voiceCommand.targetState === 'locked' ? 'Lock door from dashboard' : 'Unlock door from dashboard',
-          description: `Enter your password to ${voiceCommand.targetState === 'locked' ? 'lock' : 'unlock'} ${primaryDevice.deviceName || 'the primary device'} from dashboard voice control.`,
-        });
-
-        const commandId = await smartLockApi.sendLockToggle(primaryDevice.id, verificationToken);
-        setVoiceFeedback(`Command queued successfully. Reference: ${commandId}`);
-      }
-    } catch (error) {
-      setVoiceError(error.message || 'Unable to run the voice command.');
-    } finally {
-      setIsVoiceExecuting(false);
-    }
-  };
-
-  useEffect(() => {
-    if (!voiceCommand || isListening) return;
-    runVoiceCommand();
-  }, [voiceCommand, isListening]);
 
   const heroStatus = topAlert
     ? {
@@ -782,18 +521,6 @@ const Dashboard = () => {
           </div>
         </div>
       </section>
-
-      <ReAuthModal
-        isOpen={verificationDialog.isOpen}
-        title={verificationDialog.title}
-        description={verificationDialog.description}
-        confirmLabel="Verify"
-        cancelLabel="Cancel"
-        isSubmitting={isVerifying}
-        error={verificationError}
-        onConfirm={handleVerificationConfirm}
-        onClose={closeVerificationDialog}
-      />
     </div>
   );
 };

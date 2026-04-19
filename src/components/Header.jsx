@@ -106,7 +106,7 @@ const Header = () => {
     };
 
     loadAlerts();
-    const intervalId = setInterval(loadAlerts, 10000);
+    const intervalId = setInterval(loadAlerts, 30000);
 
     return () => {
       mounted = false;
