@@ -114,13 +114,15 @@ const Settings = () => {
         setSessions(Array.isArray(loginSessions) ? loginSessions : []);
         setSessionsError('');
       } catch (error) {
-        if (!isMounted) return;
-        setPreferencesError(error.message || 'Unable to load account preferences.');
-        setSessionsError(error.message || 'Unable to load login activity.');
+        if (isMounted) {
+          setPreferencesError(error.message || 'Unable to load account preferences.');
+          setSessionsError(error.message || 'Unable to load login activity.');
+        }
       } finally {
-        if (!isMounted) return;
-        setPreferencesLoading(false);
-        setSessionsLoading(false);
+        if (isMounted) {
+          setPreferencesLoading(false);
+          setSessionsLoading(false);
+        }
       }
     };
 

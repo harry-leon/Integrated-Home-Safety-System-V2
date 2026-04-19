@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import FloatingMicWidget from './FloatingMicWidget';
 
 const mobileNavItems = [
   { label: 'Tong quan', icon: 'dashboard', path: '/' },
@@ -60,6 +61,7 @@ const Layout = () => {
           );
         })}
       </nav>
+      <FloatingMicWidget />
     </div>
   );
 };

@@ -12,6 +12,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.HexFormat;
 import java.util.List;
 
@@ -19,10 +21,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserLoginSessionService {
 
+    private static final long TOUCH_THROTTLE_MILLIS = 60_000;
+
     private final UserLoginSessionRepository sessionRepository;
+    private final Map<String, Long> recentSessionTouches = new ConcurrentHashMap<>();
 
     public void recordLogin(User user, String rawToken, HttpServletRequest request) {
         String tokenHash = hashToken(rawToken);
+        long now = System.currentTimeMillis();
+
         UserLoginSession session = sessionRepository.findBySessionTokenHash(tokenHash)
                 .orElseGet(() -> UserLoginSession.builder()
                         .user(user)
@@ -36,6 +43,7 @@ public class UserLoginSessionService {
         session.setLastActiveAt(LocalDateTime.now());
         session.setLoggedOutAt(null);
         sessionRepository.save(session);
+        recentSessionTouches.put(tokenHash, now);
     }
 
     public void touchSession(User user, String rawToken, HttpServletRequest request) {
@@ -44,6 +52,12 @@ public class UserLoginSessionService {
         }
 
         String tokenHash = hashToken(rawToken);
+        long now = System.currentTimeMillis();
+        Long lastTouch = recentSessionTouches.get(tokenHash);
+        if (lastTouch != null && now - lastTouch < TOUCH_THROTTLE_MILLIS) {
+            return;
+        }
+
         UserLoginSession session = sessionRepository.findBySessionTokenHash(tokenHash)
                 .orElseGet(() -> UserLoginSession.builder()
                         .user(user)
@@ -56,6 +70,7 @@ public class UserLoginSessionService {
 
         session.setLastActiveAt(LocalDateTime.now());
         sessionRepository.save(session);
+        recentSessionTouches.put(tokenHash, now);
     }
 
     public void logout(User user, String rawToken) {

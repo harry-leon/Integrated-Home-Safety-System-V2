@@ -109,12 +109,9 @@ export const smartLockApi = {
     return fetchApi('/api/devices');
   },
 
-  sendLockToggle: async (deviceId, token) => {
+  sendLockToggle: async (deviceId) => {
     return fetchApi(`/api/devices/${deviceId}/lock/toggle`, {
       method: 'POST',
-      headers: {
-        'X-Verification-Token': token,
-      },
     });
   },
 
@@ -158,8 +155,11 @@ export const smartLockApi = {
     return data && data.content ? data.content : (Array.isArray(data) ? data : []);
   },
 
-  resolveAlert: async (alertId) => {
-    return fetchApi(`/api/alerts/${alertId}/resolve`, { method: 'POST' });
+  resolveAlert: async (alertId, verificationToken) => {
+    return fetchApi(`/api/alerts/${alertId}/resolve`, {
+      method: 'POST',
+      headers: verificationToken ? { 'X-Verification-Token': verificationToken } : {},
+    });
   },
 
   getAnalyticsSnapshot: async () => {

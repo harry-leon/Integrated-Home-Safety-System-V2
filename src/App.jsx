@@ -4,6 +4,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { LangProvider, useLang } from './contexts/LangContext';
 import { TimeWeatherProvider } from './contexts/TimeWeatherContext';
 import { AuthProvider } from './contexts/AuthContext';
+import { VoiceCommandProvider } from './contexts/VoiceCommandContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
@@ -26,24 +27,22 @@ const AppRoutes = () => {
   const { t } = useLang();
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route element={<ProtectedRoute />}>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Dashboard />} />
-            <Route path="remote" element={<RemoteControl />} />
-            <Route path="fingerprints" element={<Fingerprints />} />
-            <Route path="logs" element={<Logs />} />
-            <Route path="analytics" element={<Analytics />} />
-            <Route path="users" element={<UserManagement />} />
-            <Route path="settings" element={<Settings />} />
-            <Route path="support" element={<Placeholder title={t('support_page')} />} />
-          </Route>
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route element={<ProtectedRoute />}>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="remote" element={<RemoteControl />} />
+          <Route path="fingerprints" element={<Fingerprints />} />
+          <Route path="logs" element={<Logs />} />
+          <Route path="analytics" element={<Analytics />} />
+          <Route path="users" element={<UserManagement />} />
+          <Route path="settings" element={<Settings />} />
+          <Route path="support" element={<Placeholder title={t('support_page')} />} />
         </Route>
-      </Routes>
-    </BrowserRouter>
+      </Route>
+    </Routes>
   );
 };
 
@@ -53,7 +52,11 @@ const App = () => {
       <LangProvider>
         <TimeWeatherProvider>
           <AuthProvider>
-            <AppRoutes />
+            <BrowserRouter>
+              <VoiceCommandProvider>
+                <AppRoutes />
+              </VoiceCommandProvider>
+            </BrowserRouter>
           </AuthProvider>
         </TimeWeatherProvider>
       </LangProvider>
