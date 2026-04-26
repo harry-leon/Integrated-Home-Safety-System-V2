@@ -4,6 +4,7 @@ import { useLang } from '../contexts/LangContext';
 import { useTimeWeather } from '../contexts/TimeWeatherContext';
 import { useVoiceCommand } from '../contexts/VoiceCommandContext';
 import { smartLockApi } from '../services/api';
+import { createTelemetrySubscription } from '../services/realtime';
 
 const formatAlertType = (alertType) => {
   switch (alertType) {
@@ -91,6 +92,61 @@ const formatDateTime = (value) => {
   });
 };
 
+const DEFAULT_LDR_THRESHOLD = 700;
+
+const getLightLevel = (ldrValue, ldrThreshold) => {
+  if (ldrValue == null) {
+    return {
+      label: 'Chua co du lieu LDR',
+      threshold: ldrThreshold ?? DEFAULT_LDR_THRESHOLD,
+    };
+  }
+
+  const threshold = Math.max(1, ldrThreshold ?? DEFAULT_LDR_THRESHOLD);
+
+  if (ldrValue <= threshold * 0.2) {
+    return { label: 'Rat toi', threshold };
+  }
+
+  if (ldrValue <= threshold * 0.5) {
+    return { label: 'Toi', threshold };
+  }
+
+  if (ldrValue <= threshold) {
+    return { label: 'Binh thuong', threshold };
+  }
+
+  if (ldrValue <= threshold * 1.35) {
+    return { label: 'Sang', threshold };
+  }
+
+  return { label: 'Qua sang', threshold };
+};
+
+const applyTelemetryToDevices = (deviceList, payload) => {
+  if (!Array.isArray(deviceList) || !payload?.deviceCode) {
+    return deviceList;
+  }
+
+  return deviceList.map((device) => {
+    if (device.deviceCode !== payload.deviceCode) {
+      return device;
+    }
+
+    return {
+      ...device,
+      online: true,
+      lastSeen: payload.recordedAt || device.lastSeen,
+      gasValue: payload.gasValue ?? device.gasValue,
+      ldrValue: payload.ldrValue ?? device.ldrValue,
+      pirTriggered: payload.pirTriggered ?? device.pirTriggered,
+      temperature: payload.temperature ?? device.temperature,
+      weatherDesc: payload.weatherDesc ?? device.weatherDesc,
+      lastSensorAt: payload.recordedAt || device.lastSensorAt,
+    };
+  });
+};
+
 const Dashboard = () => {
   const { t } = useLang();
   const { weather } = useTimeWeather();
@@ -109,6 +165,12 @@ const Dashboard = () => {
   const [devices, setDevices] = useState([]);
   const [accessLogs, setAccessLogs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [telemetryStatus, setTelemetryStatus] = useState('idle');
+  const [isFallbackActive, setIsFallbackActive] = useState(false);
+  const [lastTelemetryAt, setLastTelemetryAt] = useState(null);
+  const [telemetrySource, setTelemetrySource] = useState('snapshot');
+  const [primaryDeviceSettings, setPrimaryDeviceSettings] = useState(null);
+  const primaryDevice = devices[0] || null;
 
   useEffect(() => {
     let active = true;
@@ -116,18 +178,33 @@ const Dashboard = () => {
     const fetchData = async () => {
       try {
         const [alertsData, snapData, deviceData, logData] = await Promise.all([
-          smartLockApi.getAlerts().catch(() => []),
+          smartLockApi.getAlerts().catch(() => null),
           smartLockApi.getWeeklySnapshot().catch(() => null),
-          smartLockApi.getDevices().catch(() => []),
-          smartLockApi.getAccessLogs({ page: 0, size: 6 }).catch(() => []),
+          smartLockApi.getDevices().catch(() => null),
+          smartLockApi.getAccessLogs({ page: 0, size: 6 }).catch(() => null),
         ]);
 
         if (!active) return;
 
-        setAlerts(Array.isArray(alertsData) ? alertsData : []);
-        setWeeklySnap(snapData);
-        setDevices(Array.isArray(deviceData) ? deviceData : []);
-        setAccessLogs(Array.isArray(logData) ? logData : []);
+        if (Array.isArray(alertsData)) {
+          setAlerts(alertsData);
+        }
+
+        if (snapData) {
+          setWeeklySnap(snapData);
+        }
+
+        if (Array.isArray(deviceData)) {
+          setDevices(deviceData);
+          if (deviceData[0]?.lastSensorAt) {
+            setLastTelemetryAt((current) => current || deviceData[0].lastSensorAt);
+            setTelemetrySource((current) => current || 'snapshot');
+          }
+        }
+
+        if (Array.isArray(logData)) {
+          setAccessLogs(logData);
+        }
       } finally {
         if (active) {
           setIsLoading(false);
@@ -144,7 +221,107 @@ const Dashboard = () => {
     };
   }, []);
 
-  const primaryDevice = devices[0] || null;
+  useEffect(() => {
+    if (!primaryDevice?.deviceCode) {
+      setTelemetryStatus('idle');
+      return undefined;
+    }
+
+    return createTelemetrySubscription({
+      deviceCode: primaryDevice.deviceCode,
+      onStatusChange: (status) => {
+        setTelemetryStatus(status);
+        if (status === 'live') {
+          setIsFallbackActive(false);
+        }
+      },
+      onMessage: (payload) => {
+        setDevices((current) => applyTelemetryToDevices(current, payload));
+        setLastTelemetryAt(payload.recordedAt || new Date().toISOString());
+        setTelemetrySource('websocket');
+      },
+    });
+  }, [primaryDevice?.deviceCode]);
+
+  useEffect(() => {
+    if (!primaryDevice?.lastSensorAt) {
+      return;
+    }
+
+    setLastTelemetryAt((current) => {
+      if (!current) return primaryDevice.lastSensorAt;
+      return new Date(primaryDevice.lastSensorAt).getTime() > new Date(current).getTime()
+        ? primaryDevice.lastSensorAt
+        : current;
+    });
+  }, [primaryDevice?.lastSensorAt]);
+
+  useEffect(() => {
+    if (!primaryDevice?.id) {
+      setPrimaryDeviceSettings(null);
+      return undefined;
+    }
+
+    let active = true;
+
+    const loadPrimaryDeviceSettings = async () => {
+      try {
+        const settings = await smartLockApi.getDeviceSettings(primaryDevice.id);
+        if (active) {
+          setPrimaryDeviceSettings(settings);
+        }
+      } catch {
+        if (active) {
+          setPrimaryDeviceSettings(null);
+        }
+      }
+    };
+
+    loadPrimaryDeviceSettings();
+
+    return () => {
+      active = false;
+    };
+  }, [primaryDevice?.id]);
+
+  useEffect(() => {
+    if (!primaryDevice?.deviceCode || telemetryStatus === 'live' || telemetryStatus === 'connecting') {
+      setIsFallbackActive(false);
+      return undefined;
+    }
+
+    let active = true;
+    setIsFallbackActive(true);
+
+    const pollDevices = async () => {
+      try {
+        const deviceData = await smartLockApi.getDevices();
+        if (!active || !Array.isArray(deviceData)) {
+          return;
+        }
+
+        setDevices(deviceData);
+
+        const refreshedDevice = deviceData.find((device) => device.deviceCode === primaryDevice.deviceCode) || deviceData[0] || null;
+        if (refreshedDevice?.lastSensorAt) {
+          setLastTelemetryAt(refreshedDevice.lastSensorAt);
+          setTelemetrySource('polling');
+        }
+      } catch {
+        // Keep the last known snapshot while the socket is recovering.
+      }
+    };
+
+    pollDevices();
+    const intervalId = setInterval(pollDevices, 5000);
+
+    return () => {
+      active = false;
+      clearInterval(intervalId);
+      setIsFallbackActive(false);
+    };
+  }, [primaryDevice?.deviceCode, telemetryStatus]);
+
   const activeAlerts = useMemo(
     () => alerts.filter((alert) => !alert.resolved).sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)),
     [alerts],
@@ -153,6 +330,37 @@ const Dashboard = () => {
   const recentEvents = accessLogs.slice(0, 4);
   const latestLockAction = accessLogs.find((log) => log.action === 'LOCKED' || log.action === 'UNLOCKED');
   const isLocked = latestLockAction?.action !== 'UNLOCKED';
+  const telemetryBadge = isFallbackActive
+    ? {
+        label: 'Fallback',
+        tone: 'bg-amber-500/10 text-amber-600',
+      }
+    : telemetryStatus === 'live'
+      ? {
+          label: 'Live',
+          tone: 'bg-emerald-500/10 text-emerald-600',
+        }
+      : telemetryStatus === 'connecting'
+        ? {
+            label: 'Connecting',
+            tone: 'bg-blue-500/10 text-blue-600',
+          }
+        : telemetryStatus === 'reconnecting'
+          ? {
+              label: 'Reconnecting',
+              tone: 'bg-amber-500/10 text-amber-600',
+            }
+          : {
+              label: 'Waiting',
+              tone: 'bg-outline/10 text-outline',
+            };
+  const telemetryMeta = lastTelemetryAt
+    ? `Cap nhat ${formatRelativeTime(lastTelemetryAt)} qua ${telemetrySource === 'polling' ? 'polling du phong' : telemetrySource === 'websocket' ? 'kenh live' : 'snapshot gan nhat'}.`
+    : 'Chua co moc cap nhat sensor.';
+  const lightLevel = getLightLevel(primaryDevice?.ldrValue, primaryDeviceSettings?.ldrThreshold);
+  const lightDetailText = primaryDevice?.ldrValue != null
+    ? `Muc sang: ${lightLevel.label} - Nguong canh bao: ${lightLevel.threshold} lx`
+    : 'Chua co du lieu LDR';
 
   const heroStatus = topAlert
     ? {
@@ -208,9 +416,9 @@ const Dashboard = () => {
     {
       label: 'Ánh sáng',
       value: primaryDevice?.ldrValue != null ? `${primaryDevice.ldrValue} lx` : 'N/A',
-      detail: primaryDevice?.ldrValue != null ? `Ngưỡng: ${primaryDevice.ldrValue > 700 ? 'Quá sáng' : 'Ổn định'}` : 'Chưa có dữ liệu LDR',
       icon: 'wb_sunny',
       color: 'bg-amber-500/10 text-amber-500',
+      detail: lightDetailText,
       summary: 'Cảm biến quang trở',
     },
     {
@@ -407,10 +615,16 @@ const Dashboard = () => {
               <div>
                 <p className="text-sm font-semibold text-on-surface">{t('environment')}</p>
                 <p className="mt-1 text-sm text-outline">Gia tri hien tai, don vi va muc canh bao co ban.</p>
+                <p className="mt-2 text-xs text-outline">{telemetryMeta}</p>
               </div>
-              <Link to="/remote" className="text-sm font-semibold text-primary hover:underline">
-                Xem thiet bi
-              </Link>
+              <div className="flex items-center gap-4">
+                <span className={`rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] ${telemetryBadge.tone}`}>
+                  {telemetryBadge.label}
+                </span>
+                <Link to="/remote" className="text-sm font-semibold text-primary hover:underline">
+                  Xem thiet bi
+                </Link>
+              </div>
             </div>
 
             <div className="mt-5 flex flex-1 flex-col gap-3">
