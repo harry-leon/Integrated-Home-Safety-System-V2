@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom';
 import { useLang } from '../contexts/LangContext';
 import { useTimeWeather } from '../contexts/TimeWeatherContext';
 import { useVoiceCommand } from '../contexts/VoiceCommandContext';
+import { useAlertModal } from '../contexts/AlertModalContext';
 import { smartLockApi } from '../services/api';
-import { createTelemetrySubscription } from '../services/realtime';
+import { createAlertSubscription, createTelemetrySubscription } from '../services/realtime';
 
 const formatAlertType = (alertType) => {
   switch (alertType) {
@@ -147,6 +148,27 @@ const applyTelemetryToDevices = (deviceList, payload) => {
   });
 };
 
+const mergeAlertIntoList = (currentAlerts, incomingAlert) => {
+  if (!incomingAlert?.id) {
+    return currentAlerts;
+  }
+
+  const nextAlerts = Array.isArray(currentAlerts) ? [...currentAlerts] : [];
+  const existingIndex = nextAlerts.findIndex((alert) => alert.id === incomingAlert.id);
+
+  if (existingIndex >= 0) {
+    nextAlerts[existingIndex] = {
+      ...nextAlerts[existingIndex],
+      ...incomingAlert,
+    };
+  } else {
+    nextAlerts.unshift(incomingAlert);
+  }
+
+  nextAlerts.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+  return nextAlerts;
+};
+
 const Dashboard = () => {
   const { t } = useLang();
   const { weather } = useTimeWeather();
@@ -160,6 +182,31 @@ const Dashboard = () => {
     startListening: startVoiceRecognition,
     stopListening: stopVoiceRecognition,
   } = useVoiceCommand();
+  const { showAlert } = useAlertModal();
+
+  const triggerAlertModal = React.useCallback((payload) => {
+    const alertType = (payload.alertType || '').toUpperCase();
+    const severity = (payload.severity || '').toUpperCase();
+    const isSafetyCritical = alertType === 'GAS_LEAK' || alertType === 'INTRUDER_ALERT' || alertType === 'FIRE_ALARM';
+
+    if (severity === 'CRITICAL' || severity === 'HIGH' || isSafetyCritical) {
+      showAlert({
+        type: (severity === 'CRITICAL' || isSafetyCritical) ? 'error' : 'warning',
+        title: (severity === 'CRITICAL' || isSafetyCritical) ? t('reminder_error') : t('reminder_warning'),
+        message: alertType === 'GAS_LEAK' ? (t('reminder_gas_detected') || payload.message) :
+                 alertType === 'INTRUDER_ALERT' ? (t('reminder_intruder_detected') || payload.message) :
+                 alertType === 'FIRE_ALARM' ? (t('reminder_fire_detected') || payload.message || 'Phát hiện cháy!') :
+                 (payload.message || formatAlertType(alertType)),
+        confirmText: t('reminder_check_now') || 'Kiểm tra ngay',
+        showCancelButton: !isSafetyCritical,
+        preventClose: isSafetyCritical,
+        onConfirm: () => {
+          window.location.href = '/logs';
+        }
+      });
+    }
+  }, [showAlert, t]);
+
   const [alerts, setAlerts] = useState([]);
   const [weeklySnap, setWeeklySnap] = useState(null);
   const [devices, setDevices] = useState([]);
@@ -243,6 +290,31 @@ const Dashboard = () => {
     });
   }, [primaryDevice?.deviceCode]);
 
+  // Subscribe to the device-specific alert topic (only when device is known)
+  useEffect(() => {
+    if (!primaryDevice?.deviceCode) return undefined;
+
+    return createAlertSubscription({
+      deviceCode: primaryDevice.deviceCode,
+      onMessage: (payload) => {
+        setAlerts((current) => mergeAlertIntoList(current, payload));
+        triggerAlertModal(payload);
+      },
+    });
+  }, [primaryDevice?.deviceCode, showAlert, t]);
+
+  // Always subscribe to global alert topic regardless of device status
+  useEffect(() => {
+    return createAlertSubscription({
+      deviceCode: null, // forces /topic/alerts global topic
+      onMessage: (payload) => {
+        setAlerts((current) => mergeAlertIntoList(current, payload));
+        triggerAlertModal(payload);
+      },
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showAlert, t]);
+
   useEffect(() => {
     if (!primaryDevice?.lastSensorAt) {
       return;
@@ -255,6 +327,24 @@ const Dashboard = () => {
         : current;
     });
   }, [primaryDevice?.lastSensorAt]);
+
+  const [prevOnlineState, setPrevOnlineState] = useState(true);
+  useEffect(() => {
+    if (primaryDevice) {
+      if (prevOnlineState && !primaryDevice.online) {
+        showAlert({
+          type: 'warning',
+          title: t('reminder_warning'),
+          message: t('reminder_device_offline'),
+          confirmText: t('reminder_check_now'),
+          onConfirm: () => {
+            window.location.href = '/remote';
+          }
+        });
+      }
+      setPrevOnlineState(primaryDevice.online);
+    }
+  }, [primaryDevice?.online, prevOnlineState, showAlert, t]);
 
   useEffect(() => {
     if (!primaryDevice?.id) {
@@ -308,7 +398,6 @@ const Dashboard = () => {
           setTelemetrySource('polling');
         }
       } catch {
-        // Keep the last known snapshot while the socket is recovering.
       }
     };
 
@@ -348,35 +437,28 @@ const Dashboard = () => {
         : telemetryStatus === 'reconnecting'
           ? {
               label: 'Reconnecting',
-              tone: 'bg-amber-500/10 text-amber-600',
+              tone: 'bg-blue-500/10 text-blue-600',
             }
           : {
-              label: 'Waiting',
+              label: 'Idle',
               tone: 'bg-outline/10 text-outline',
             };
-  const telemetryMeta = lastTelemetryAt
-    ? `Cap nhat ${formatRelativeTime(lastTelemetryAt)} qua ${telemetrySource === 'polling' ? 'polling du phong' : telemetrySource === 'websocket' ? 'kenh live' : 'snapshot gan nhat'}.`
-    : 'Chua co moc cap nhat sensor.';
-  const lightLevel = getLightLevel(primaryDevice?.ldrValue, primaryDeviceSettings?.ldrThreshold);
-  const lightDetailText = primaryDevice?.ldrValue != null
-    ? `Muc sang: ${lightLevel.label} - Nguong canh bao: ${lightLevel.threshold} lx`
-    : 'Chua co du lieu LDR';
 
   const heroStatus = topAlert
     ? {
-        eyebrow: 'Can xu ly ngay',
+        eyebrow: 'Cần xử lý ngay',
         title: formatAlertType(topAlert.alertType),
-        description: topAlert.message || 'He thong dang phat hien su kien can kiem tra.',
-        tone: 'border-error/30 bg-error/8',
+        description: 'Hệ thống đang phát hiện sự kiện cần kiểm tra ngay lập tức.',
+        tone: 'border-error/20 bg-error/5',
         accent: 'text-error',
       }
     : {
-        eyebrow: 'He thong on dinh',
-        title: isLocked ? 'Cua dang khoa' : 'Cua dang mo',
+        eyebrow: 'Hệ thống ổn định',
+        title: 'Bảo mật Sentinel đang hoạt động',
         description: primaryDevice?.online
-          ? `${primaryDevice.deviceName || 'Thiet bi chinh'} dang ket noi binh thuong.`
-          : 'Chua co thiet bi online. Kiem tra ket noi truoc khi dieu khien.',
-        tone: 'border-primary/20 bg-primary/6',
+          ? `${primaryDevice.deviceName || 'Thiết bị'} đang kết nối bình thường.`
+          : 'Chưa có thiết bị online. Kiểm tra kết nối trước khi điều khiển.',
+        tone: 'border-primary/20 bg-primary/5',
         accent: 'text-primary',
       };
 
@@ -403,6 +485,11 @@ const Dashboard = () => {
       bgColor: primaryDevice?.online ? 'bg-blue-500/5' : 'bg-error/5',
     },
   ];
+
+  const lightLevel = getLightLevel(primaryDevice?.ldrValue, primaryDeviceSettings?.ldrThreshold);
+  const lightDetailText = primaryDevice?.ldrValue != null
+    ? `Muc sang: ${lightLevel.label} - Nguong canh bao: ${lightLevel.threshold} lx`
+    : 'Chua co du lieu LDR';
 
   const environmentCards = [
     {
@@ -454,6 +541,11 @@ const Dashboard = () => {
       color: 'bg-red-600/10 text-red-600',
     },
   ];
+
+  const topAlertStyle = topAlert ? getSeverityStyle(topAlert.severity) : null;
+  const telemetryMeta = lastTelemetryAt
+    ? `Cap nhat ${formatRelativeTime(lastTelemetryAt)} qua ${telemetrySource === 'polling' ? 'polling du phong' : telemetrySource === 'websocket' ? 'kenh live' : 'snapshot gan nhat'}.`
+    : 'Chua co moc cap nhat sensor.';
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
@@ -509,6 +601,43 @@ const Dashboard = () => {
                     {topAlert ? 'Xem canh bao chi tiet' : 'Xem bao cao tuan'}
                   </Link>
                 </div>
+
+                {topAlert ? (
+                  <div className={`rounded-[1.5rem] border px-5 py-4 ${topAlertStyle.tone}`}>
+                    <div className="flex flex-wrap items-start justify-between gap-4">
+                      <div className="flex min-w-0 items-start gap-3">
+                        <div className={`rounded-2xl p-3 ${topAlertStyle.iconWrap}`}>
+                          <span className="material-symbols-outlined text-[22px]">
+                            {getAlertIcon(topAlert.alertType)}
+                          </span>
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <p className="text-sm font-black uppercase tracking-[0.16em]">
+                              {topAlertStyle.label}
+                            </p>
+                            <span className={`rounded-full px-2 py-1 text-[10px] font-bold uppercase tracking-[0.14em] ${topAlertStyle.badge}`}>
+                              {formatAlertType(topAlert.alertType)}
+                            </span>
+                          </div>
+                          <p className="mt-2 text-base font-semibold text-on-surface">
+                            {topAlert.message || 'He thong vua ghi nhan mot canh bao moi.'}
+                          </p>
+                          <p className="mt-1 text-sm text-outline">
+                            {formatDateTime(topAlert.createdAt)}
+                          </p>
+                        </div>
+                      </div>
+                      <Link
+                        to="/logs"
+                        className="inline-flex items-center gap-2 rounded-2xl border border-current/15 bg-white/60 px-4 py-2 text-sm font-semibold text-current transition-colors hover:bg-white/80"
+                      >
+                        <span className="material-symbols-outlined text-[18px]">notifications_active</span>
+                        Xem chi tiet
+                      </Link>
+                    </div>
+                  </div>
+                ) : null}
               </div>
               <div className="hidden lg:block" />
             </div>
@@ -719,17 +848,17 @@ const Dashboard = () => {
             <div className="mt-auto grid gap-3 p-5 sm:grid-cols-2">
               <Link
                 to="/remote"
-                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-primary px-4 py-3 text-sm font-bold text-white transition-transform hover:scale-[0.98]"
+                className="flex items-center justify-center gap-2 rounded-2xl bg-primary/10 px-4 py-3 text-sm font-bold text-primary transition-all hover:bg-primary hover:text-white"
               >
-                <span className="material-symbols-outlined text-[18px]">settings_remote</span>
-                Dieu khien thiet bi
+                <span className="material-symbols-outlined text-[18px]">videocam</span>
+                Camera live
               </Link>
               <Link
                 to="/logs"
-                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-outline-variant/20 bg-surface px-4 py-3 text-sm font-semibold text-on-surface transition-colors hover:border-primary/30 hover:text-primary"
+                className="flex items-center justify-center gap-2 rounded-2xl bg-surface-container-high border border-outline-variant/15 px-4 py-3 text-sm font-bold text-on-surface transition-all hover:border-primary/30"
               >
                 <span className="material-symbols-outlined text-[18px]">history</span>
-                Mo nhat ky
+                Nhat ky anh
               </Link>
             </div>
           </div>

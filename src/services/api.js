@@ -46,7 +46,13 @@ async function fetchApi(url, options = {}) {
         // Token might be invalid or expired, clear it
         localStorage.removeItem('sentinel_token');
         localStorage.removeItem('sentinel_user');
-        window.location.href = '/login';
+        window.dispatchEvent(new CustomEvent('session-expired'));
+        // We delay the redirect to let the UI show a modal if it wants
+        setTimeout(() => {
+          if (!window.sessionExpiredModalShown) {
+             window.location.href = '/login';
+          }
+        }, 100);
       }
       const errorText = await response.text();
       let errorMessage = response.statusText;

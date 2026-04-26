@@ -18,8 +18,8 @@ const parsePayload = (body) => {
   }
 };
 
-export const createTelemetrySubscription = ({ deviceCode, onMessage, onStatusChange }) => {
-  if (!deviceCode) {
+const createSubscription = ({ topic, onMessage, onStatusChange }) => {
+  if (!topic) {
     return () => {};
   }
 
@@ -40,7 +40,7 @@ export const createTelemetrySubscription = ({ deviceCode, onMessage, onStatusCha
     debug: () => {},
     onConnect: () => {
       setStatus('live');
-      subscription = client.subscribe(`/topic/devices/${deviceCode}/telemetry`, (frame) => {
+      subscription = client.subscribe(topic, (frame) => {
         const payload = parsePayload(frame.body);
         if (payload) {
           onMessage?.(payload);
@@ -67,3 +67,22 @@ export const createTelemetrySubscription = ({ deviceCode, onMessage, onStatusCha
     client.deactivate();
   };
 };
+
+export const createTelemetrySubscription = ({ deviceCode, onMessage, onStatusChange }) => {
+  if (!deviceCode) {
+    return () => {};
+  }
+
+  return createSubscription({
+    topic: `/topic/devices/${deviceCode}/telemetry`,
+    onMessage,
+    onStatusChange,
+  });
+};
+
+export const createAlertSubscription = ({ deviceCode, onMessage, onStatusChange }) =>
+  createSubscription({
+    topic: deviceCode ? `/topic/devices/${deviceCode}/alerts` : '/topic/alerts',
+    onMessage,
+    onStatusChange,
+  });

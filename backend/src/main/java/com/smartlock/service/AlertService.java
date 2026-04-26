@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -27,12 +28,13 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AlertService {
 
-    private static final int DEFAULT_GAS_THRESHOLD = 1400;
+    private static final int DEFAULT_GAS_THRESHOLD = 300;
 
     private final AlertRepository alertRepository;
     private final DeviceSettingsRepository deviceSettingsRepository;
     private final UserRepository userRepository;
     private final DeviceAccessService deviceAccessService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     public Page<AlertResponseDTO> getAlerts(
             UUID deviceId,
@@ -90,7 +92,8 @@ public class AlertService {
             alert.setResolved(true);
             alert.setResolvedAt(LocalDateTime.now());
             alert.setResolvedBy(user);
-            alertRepository.save(alert);
+            Alert savedAlert = alertRepository.save(alert);
+            publishAlertUpdate(savedAlert);
         }
     }
 
@@ -115,10 +118,18 @@ public class AlertService {
             resolveOpenAlert(device, AlertType.GAS_LEAK);
         }
 
-        // Raw PIR telemetry alone does not necessarily mean an intruder alert.
-        // We resolve any previously open PIR alert here and leave future alert
-        // creation to a dedicated explicit signal when the firmware provides one.
-        resolveOpenAlert(device, AlertType.INTRUDER_ALERT);
+        boolean pirAlertEnabled = settings == null || settings.isPirAlertEnabled();
+        if (pirAlertEnabled && pirTriggered) {
+            createAlertIfAbsent(
+                    device,
+                    AlertType.INTRUDER_ALERT,
+                    "CRITICAL",
+                    "Motion detected! Possible intruder.",
+                    1
+            );
+        } else {
+            resolveOpenAlert(device, AlertType.INTRUDER_ALERT);
+        }
     }
 
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
@@ -143,7 +154,6 @@ public class AlertService {
                 try {
                     csvBuilder.append(a.getId() != null ? a.getId().toString() : "").append(",");
                     
-                    // Thêm kiểm tra kỹ hơn cho device để tránh LazyInitializationException hoặc NullPointer
                     String devId = "";
                     try {
                         if (a.getDevice() != null) {
@@ -189,7 +199,7 @@ public class AlertService {
             return;
         }
 
-        alertRepository.save(Alert.builder()
+        Alert alert = alertRepository.save(Alert.builder()
                 .device(device)
                 .alertType(alertType)
                 .severity(severity)
@@ -197,6 +207,7 @@ public class AlertService {
                 .sensorValue(sensorValue)
                 .isResolved(false)
                 .build());
+        publishAlertUpdate(alert);
     }
 
     private void resolveOpenAlert(Device device, AlertType alertType) {
@@ -204,8 +215,20 @@ public class AlertService {
                 .ifPresent(alert -> {
                     alert.setResolved(true);
                     alert.setResolvedAt(LocalDateTime.now());
-                    alertRepository.save(alert);
+                    Alert savedAlert = alertRepository.save(alert);
+                    publishAlertUpdate(savedAlert);
                 });
+    }
+
+    private void publishAlertUpdate(Alert alert) {
+        AlertResponseDTO payload = mapToDTO(alert);
+        messagingTemplate.convertAndSend("/topic/alerts", payload);
+        if (alert.getDevice() != null && alert.getDevice().getDeviceCode() != null) {
+            messagingTemplate.convertAndSend(
+                    "/topic/devices/" + alert.getDevice().getDeviceCode() + "/alerts",
+                    payload
+            );
+        }
     }
 
     private AlertResponseDTO mapToDTO(Alert alert) {
