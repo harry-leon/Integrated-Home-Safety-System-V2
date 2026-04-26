@@ -5,6 +5,7 @@ import { LangProvider, useLang } from './contexts/LangContext';
 import { TimeWeatherProvider } from './contexts/TimeWeatherContext';
 import { AuthProvider } from './contexts/AuthContext';
 import { VoiceCommandProvider } from './contexts/VoiceCommandContext';
+import { AlertModalProvider, useAlertModal } from './contexts/AlertModalContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
@@ -25,6 +26,32 @@ const Placeholder = ({ title }) => (
 
 const AppRoutes = () => {
   const { t } = useLang();
+  const { showAlert } = useAlertModal();
+
+  React.useEffect(() => {
+    const handleSessionExpired = () => {
+      if (window.sessionExpiredModalShown) return;
+      window.sessionExpiredModalShown = true;
+      showAlert({
+        type: 'error',
+        title: t('reminder_error'),
+        message: t('reminder_session_expired'),
+        confirmText: t('reminder_relogin'),
+        onConfirm: () => {
+          window.location.href = '/login';
+        },
+        onClose: () => {
+          window.location.href = '/login';
+        }
+      });
+    };
+
+    window.addEventListener('session-expired', handleSessionExpired);
+    return () => {
+      window.removeEventListener('session-expired', handleSessionExpired);
+      window.sessionExpiredModalShown = false;
+    };
+  }, [showAlert, t]);
 
   return (
     <Routes>
@@ -52,11 +79,13 @@ const App = () => {
       <LangProvider>
         <TimeWeatherProvider>
           <AuthProvider>
-            <BrowserRouter>
-              <VoiceCommandProvider>
-                <AppRoutes />
-              </VoiceCommandProvider>
-            </BrowserRouter>
+            <AlertModalProvider>
+              <BrowserRouter>
+                <VoiceCommandProvider>
+                  <AppRoutes />
+                </VoiceCommandProvider>
+              </BrowserRouter>
+            </AlertModalProvider>
           </AuthProvider>
         </TimeWeatherProvider>
       </LangProvider>

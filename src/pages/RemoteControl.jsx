@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useLang } from '../contexts/LangContext';
 import { useVoiceCommand } from '../contexts/VoiceCommandContext';
+import { useAlertModal } from '../contexts/AlertModalContext';
 import GuestAccessModal from '../components/GuestAccessModal';
 import ReAuthModal from '../components/ReAuthModal';
 import { smartLockApi } from '../services/api';
@@ -33,6 +34,8 @@ const RemoteControl = () => {
     runTranscript: runVoiceTranscript,
     runSampleCommand,
   } = useVoiceCommand();
+  const { showAlert } = useAlertModal();
+
   const [locked, setLocked] = useState(true);
   const [isGuestModalOpen, setIsGuestModalOpen] = useState(false);
   const [devices, setDevices] = useState([]);
@@ -169,13 +172,20 @@ const RemoteControl = () => {
         setStatusMessage('Device settings saved.');
         setStatusError('');
         setHasPendingSettingsChange(false);
+
+        showAlert({
+          type: 'success',
+          title: t('reminder_success'),
+          message: t('settings_saved_successfully') || 'Device settings saved.',
+          confirmText: t('reminder_ok'),
+        });
       } catch (error) {
         setStatusError(error.message || 'Unable to save device settings.');
       }
     }, 700);
 
     return () => window.clearTimeout(timer);
-  }, [deviceSettings, hasPendingSettingsChange, requestVerificationToken, selectedDeviceId]);
+  }, [deviceSettings, hasPendingSettingsChange, requestVerificationToken, selectedDeviceId, showAlert, t]);
 
   useEffect(() => {
     return () => {
@@ -233,19 +243,28 @@ const RemoteControl = () => {
       return;
     }
 
-    setIsSendingCommand(true);
-    setStatusMessage('');
-    setStatusError('');
+    showAlert({
+      type: locked ? 'warning' : 'info',
+      title: locked ? t('reminder_warning') : t('reminder_info'),
+      message: locked ? t('reminder_confirm_unlock') : t('reminder_confirm_lock'),
+      confirmText: t('reminder_confirm'),
+      cancelText: t('reminder_cancel'),
+      onConfirm: async () => {
+        setIsSendingCommand(true);
+        setStatusMessage('');
+        setStatusError('');
 
-    try {
-      const commandId = await smartLockApi.sendLockToggle(selectedDeviceId);
-      setLocked((current) => !current);
-      setStatusMessage(`Command queued successfully. Reference: ${commandId}`);
-    } catch (error) {
-      setStatusError(error.message || 'Unable to send lock command.');
-    } finally {
-      setIsSendingCommand(false);
-    }
+        try {
+          const commandId = await smartLockApi.sendLockToggle(selectedDeviceId);
+          setLocked((current) => !current);
+          setStatusMessage(`Command queued successfully. Reference: ${commandId}`);
+        } catch (error) {
+          setStatusError(error.message || 'Unable to send lock command.');
+        } finally {
+          setIsSendingCommand(false);
+        }
+      }
+    });
   };
 
   const updateSetting = (key, value) => {

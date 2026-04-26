@@ -1,11 +1,14 @@
 package com.smartlock.controller;
 
+import com.smartlock.dto.DeviceReportDTO;
 import com.smartlock.model.Device;
 import com.smartlock.model.enums.AccessAction;
 import com.smartlock.model.enums.AccessMethod;
 import com.smartlock.repository.DeviceRepository;
 import com.smartlock.service.AuditLogService;
+import com.smartlock.service.BlynkService;
 import com.smartlock.service.CommandService;
+import com.smartlock.service.DeviceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -28,6 +32,7 @@ public class BlynkWebhookController {
     private final AuditLogService auditLogService;
     private final DeviceRepository deviceRepository;
     private final CommandService commandService;
+    private final DeviceService deviceService;
 
     @Value("${blynk.auth-token:}")
     private String globalWebhookToken;
@@ -70,6 +75,8 @@ public class BlynkWebhookController {
                 "Pin " + pin + " changed to " + value
         );
 
+        handleTelemetryPin(deviceCode, pin, value);
+
         if ("V10".equals(pin)) {
             try {
                 String[] parts = value.split(":");
@@ -99,5 +106,59 @@ public class BlynkWebhookController {
         }
 
         return ResponseEntity.ok().build();
+    }
+
+    private void handleTelemetryPin(String deviceCode, String pin, String value) {
+        try {
+            DeviceReportDTO report = new DeviceReportDTO();
+            report.setDeviceCode(deviceCode);
+            Boolean pirTriggered = null;
+
+            String normalizedPin = pin.toUpperCase();
+            if (normalizedPin.equals("V" + BlynkService.PIN_GAS_VALUE)) {
+                report.setGasValue(parseInteger(value));
+            } else if (normalizedPin.equals("V" + BlynkService.PIN_TEMPERATURE)) {
+                report.setTemperature(parseDouble(value));
+            } else if (normalizedPin.equals("V" + BlynkService.PIN_WEATHER_CONDITION)) {
+                report.setWeatherDesc(value);
+            } else if (normalizedPin.equals("V" + BlynkService.PIN_PIR_VALUE)) {
+                pirTriggered = parseBooleanSensor(value);
+                report.setPirTriggered(pirTriggered);
+            } else if (normalizedPin.equals("V" + BlynkService.PIN_LDR_VALUE)) {
+                report.setLdrValue(parseInteger(value));
+            } else {
+                return;
+            }
+
+            var sensorData = deviceService.recordPartialSensorData(report, pirTriggered);
+            HashMap<String, Object> payload = new HashMap<>();
+            payload.put("deviceCode", deviceCode);
+            payload.put("gasValue", sensorData.getGasValue());
+            payload.put("ldrValue", sensorData.getLdrValue());
+            payload.put("pirTriggered", sensorData.isPirTriggered());
+            payload.put("temperature", sensorData.getTemperature());
+            payload.put("weatherDesc", sensorData.getWeatherDesc());
+            payload.put("recordedAt", sensorData.getRecordedAt());
+            messagingTemplate.convertAndSend("/topic/devices/" + deviceCode + "/telemetry", payload);
+        } catch (Exception e) {
+            log.warn("Ignored telemetry pin {}={} for device {}: {}", pin, value, deviceCode, e.getMessage());
+        }
+    }
+
+    private Integer parseInteger(String value) {
+        return (int) Math.round(Double.parseDouble(value.trim()));
+    }
+
+    private Double parseDouble(String value) {
+        return Double.parseDouble(value.trim());
+    }
+
+    private Boolean parseBooleanSensor(String value) {
+        String normalized = value == null ? "" : value.trim().toLowerCase();
+        return "1".equals(normalized)
+                || "true".equals(normalized)
+                || "high".equals(normalized)
+                || "on".equals(normalized)
+                || "motion".equals(normalized);
     }
 }

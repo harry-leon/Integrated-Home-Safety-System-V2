@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
+import { useLang } from '../contexts/LangContext';
+import { useAlertModal } from '../contexts/AlertModalContext';
 import { smartLockApi } from '../services/api';
 import UserAvatar from '../components/UserAvatar';
 
@@ -31,6 +33,8 @@ const formatDateTime = (value) => {
 const Settings = () => {
   const { theme, toggleTheme } = useTheme();
   const { user, applyUserProfile } = useAuth();
+  const { t } = useLang();
+  const { showAlert } = useAlertModal();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const initialSection = PROFILE_SECTIONS.some((item) => item.id === searchParams.get('section'))
@@ -88,6 +92,17 @@ const Settings = () => {
       URL.revokeObjectURL(avatarPreview);
     }
   }, [avatarPreview]);
+
+  const hasUnsavedProfileChanges = useMemo(() => {
+    return (
+      profileForm.fullName !== (user?.fullName || '') ||
+      profileForm.phone !== (user?.phone || '') ||
+      profileForm.gender !== (user?.gender || '') ||
+      profileForm.dateOfBirth !== (user?.dateOfBirth || '') ||
+      profileForm.address !== (user?.address || '') ||
+      profileForm.bio !== (user?.bio || '')
+    );
+  }, [profileForm, user]);
 
   useEffect(() => {
     let isMounted = true;
@@ -168,11 +183,22 @@ const Settings = () => {
       };
       const updated = await smartLockApi.updateCurrentProfile(payload);
       applyUserProfile(updated);
-      setProfileMessage('Profile updated successfully.');
+      showAlert({
+        type: 'success',
+        title: t('reminder_success'),
+        message: t('profile_updated_successfully') || 'Profile updated successfully.',
+        confirmText: t('reminder_ok') || 'OK',
+      });
       setIsEditingProfile(false);
       updateSearch('profile');
     } catch (error) {
       setProfileError(error.message || 'Unable to update profile.');
+      showAlert({
+        type: 'error',
+        title: t('reminder_error'),
+        message: error.message || 'Unable to update profile.',
+        confirmText: t('reminder_ok') || 'OK',
+      });
     } finally {
       setProfileSaving(false);
     }
@@ -247,10 +273,21 @@ const Settings = () => {
       }
       const verification = await smartLockApi.reAuthenticate(notificationPassword.trim());
       await smartLockApi.updateNotificationSettings(notificationSettings, verification.verificationToken);
-      setPreferencesMessage('Settings saved successfully.');
+      showAlert({
+        type: 'success',
+        title: t('reminder_success'),
+        message: t('preferences_saved_successfully') || 'Settings saved successfully.',
+        confirmText: t('reminder_ok') || 'OK',
+      });
       setNotificationPassword('');
     } catch (error) {
       setPreferencesError(error.message || 'Unable to save settings.');
+      showAlert({
+        type: 'error',
+        title: t('reminder_error'),
+        message: error.message || 'Unable to save settings.',
+        confirmText: t('reminder_ok') || 'OK',
+      });
     } finally {
       setPreferencesSaving(false);
     }
@@ -478,16 +515,30 @@ const Settings = () => {
                     <button
                       type="button"
                       onClick={() => {
-                        setProfileForm({
-                          fullName: user?.fullName || '',
-                          phone: user?.phone || '',
-                          gender: user?.gender || '',
-                          dateOfBirth: user?.dateOfBirth || '',
-                          address: user?.address || '',
-                          bio: user?.bio || '',
-                        });
-                        setIsEditingProfile(false);
-                        updateSearch('profile');
+                        if (hasUnsavedProfileChanges) {
+                          showAlert({
+                            type: 'warning',
+                            title: t('reminder_warning'),
+                            message: t('reminder_unsaved_changes'),
+                            confirmText: t('reminder_discard') || 'Discard',
+                            cancelText: t('reminder_cancel'),
+                            onConfirm: () => {
+                              setProfileForm({
+                                fullName: user?.fullName || '',
+                                phone: user?.phone || '',
+                                gender: user?.gender || '',
+                                dateOfBirth: user?.dateOfBirth || '',
+                                address: user?.address || '',
+                                bio: user?.bio || '',
+                              });
+                              setIsEditingProfile(false);
+                              updateSearch('profile');
+                            }
+                          });
+                        } else {
+                          setIsEditingProfile(false);
+                          updateSearch('profile');
+                        }
                       }}
                       className="inline-flex items-center gap-2 rounded-2xl border border-outline-variant/15 px-5 py-3 text-sm font-bold text-outline hover:text-on-surface hover:border-primary/20 transition-all"
                     >
