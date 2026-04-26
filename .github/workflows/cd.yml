@@ -1,0 +1,28 @@
+name: Continuous Deployment (Vercel & Render)
+
+on:
+  push:
+    branches: [ "main", "dev" ]
+
+jobs:
+  deploy-backend:
+    name: Trigger Render Deployment (Backend)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render Deploy Hook
+        # Call the auto-deploy webhook provided by Render
+        run: |
+          if [ -z "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" ]; then
+            echo "RENDER_DEPLOY_HOOK_URL is not set. Deployment skipped."
+            exit 1
+          fi
+          curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+
+  deploy-frontend:
+    name: Frontend Deployment Info
+    runs-on: ubuntu-latest
+    steps:
+      - name: Vercel Native Deployment
+        run: |
+          echo "Frontend Next.js is typically deployed automatically by Vercel's GitHub Integration."
+          echo "If you have linked this repository to Vercel, a deployment will start automatically in Vercel."

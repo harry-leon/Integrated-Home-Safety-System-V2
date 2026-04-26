@@ -1,0 +1,59 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [ "main", "dev" ]
+  pull_request:
+    branches: [ "main", "dev" ]
+
+jobs:
+  build-backend:
+    name: Build & Test Backend (Spring Boot)
+    runs-on: ubuntu-latest
+    
+    # Thiết lập thư mục mặc định cho các lệnh run ở job này
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: 'maven'
+        
+    - name: Build with Maven
+      run: mvn clean package
+      # Bạn có thể bỏ -DskipTests nếu dự án đã có sẵn Unit Tests
+
+  build-frontend:
+    name: Build Frontend (Next.js)
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./frontend
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        # Nếu đang dùng yarn hay pnpm thì đổi 'npm' thành 'yarn' / 'pnpm'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Lint Next.js project
+      run: npm run lint
+
+    - name: Build Next.js project
+      run: npm run build
