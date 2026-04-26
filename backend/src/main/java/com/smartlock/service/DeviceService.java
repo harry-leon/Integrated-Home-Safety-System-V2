@@ -76,7 +76,36 @@ public class DeviceService {
     @Transactional
     public SensorData recordSensorData(DeviceReportDTO report) {
         Device device = touchDeviceHeartbeat(report.getDeviceCode());
-        SensorData sensorData = sensorDataRepository.save(SensorData.builder()
+        SensorData sensorData = saveSensorSnapshot(device, report);
+        alertService.processTelemetryAlerts(device, report.getGasValue(), report.isPirTriggered());
+        return sensorData;
+    }
+
+    @Transactional
+    public SensorData recordPartialSensorData(DeviceReportDTO report) {
+        return recordPartialSensorData(report, null);
+    }
+
+    @Transactional
+    public SensorData recordPartialSensorData(DeviceReportDTO report, Boolean pirTriggered) {
+        Device device = touchDeviceHeartbeat(report.getDeviceCode());
+        SensorData latest = sensorDataRepository.findFirstByDeviceIdOrderByRecordedAtDesc(device.getId()).orElse(null);
+
+        DeviceReportDTO merged = new DeviceReportDTO();
+        merged.setDeviceCode(report.getDeviceCode());
+        merged.setGasValue(report.getGasValue() != null ? report.getGasValue() : latest == null ? null : latest.getGasValue());
+        merged.setLdrValue(report.getLdrValue() != null ? report.getLdrValue() : latest == null ? null : latest.getLdrValue());
+        merged.setPirTriggered(pirTriggered != null ? pirTriggered : latest != null && latest.isPirTriggered());
+        merged.setTemperature(report.getTemperature() != null ? report.getTemperature() : latest == null ? null : latest.getTemperature());
+        merged.setWeatherDesc(report.getWeatherDesc() != null ? report.getWeatherDesc() : latest == null ? null : latest.getWeatherDesc());
+
+        SensorData sensorData = saveSensorSnapshot(device, merged);
+        alertService.processTelemetryAlerts(device, merged.getGasValue(), merged.isPirTriggered());
+        return sensorData;
+    }
+
+    private SensorData saveSensorSnapshot(Device device, DeviceReportDTO report) {
+        return sensorDataRepository.save(SensorData.builder()
                 .device(device)
                 .gasValue(report.getGasValue())
                 .ldrValue(report.getLdrValue())
@@ -84,8 +113,6 @@ public class DeviceService {
                 .temperature(report.getTemperature())
                 .weatherDesc(report.getWeatherDesc())
                 .build());
-        alertService.processTelemetryAlerts(device, report.getGasValue(), report.isPirTriggered());
-        return sensorData;
     }
 
     private void ensureDemoDeviceExists() {

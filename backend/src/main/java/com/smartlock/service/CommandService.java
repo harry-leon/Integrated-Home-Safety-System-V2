@@ -75,7 +75,7 @@ public class CommandService {
             log.info(
                     "Command {} sent to Blynk pin V{} with value {} for device {}",
                     command.getId(),
-                    BlynkService.DOOR_CONTROL_PIN,
+                    BlynkService.PIN_DOOR_CONTROL,
                     openDoor ? 1 : 0,
                     command.getDevice().getDeviceCode()
             );
