@@ -1,30 +1,76 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useLang } from '../contexts/LangContext';
 import { useAuth } from '../contexts/AuthContext';
-import Ribbon3D from '../components/Ribbon3D';
+import House3D from '../components/House3D';
 
-const BADGES = [
-  { icon: 'shield', label: 'AES-256' },
-  { icon: 'lock_clock', label: 'Auto-lock' },
+const BOTTOM_BADGES = [
+  { icon: 'shield_lock', label: 'Military-Grade AES-256' },
+  { icon: 'memory',      label: 'AI Threat Detection' },
+  { icon: 'verified',    label: 'ISO 27001 Certified' },
+];
+
+const TRUST_BADGES = [
+  { icon: 'shield',      label: 'AES-256' },
+  { icon: 'lock_clock',  label: 'Auto-lock' },
   { icon: 'fingerprint', label: 'Biometric' },
 ];
 
+const FEATURES = [
+  { dot: '#2dd4bf', title: 'Smart Hub Core',      sub: 'Quản lý tập trung mọi cảm biến IoT' },
+  { dot: '#38bdf8', title: 'Grid Architecture',   sub: 'Phân tách dữ liệu đa tầng bảo mật' },
+  { dot: '#a855f7', title: 'Smart Lock Control',  sub: 'Điều khiển từ xa' },
+];
+
+const STATS = [
+  { num: '3D',    label: 'Bản đồ số' },
+  { num: 'E2EE',  label: 'Mã hóa chuẩn' },
+  { num: '99.9%', label: 'Độ ổn định' },
+];
+
 const Login = () => {
-  const { t } = useLang();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const navigate  = useNavigate();
+  const location  = useLocation();
   const { login, isAuthenticated } = useAuth();
 
-  const [email, setEmail] = useState('');
+  const [email,    setEmail]    = useState('');
   const [password, setPassword] = useState('');
   const [showPass, setShowPass] = useState(false);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [error,    setError]    = useState('');
+  const [loading,  setLoading]  = useState(false);
+  const [showHouseGuide, setShowHouseGuide] = useState(true);
+
+  const cardRef = useRef(null);
+
+  const hideHouseGuide = React.useCallback(() => {
+    document.documentElement.dataset.houseGuideHidden = 'true';
+    setShowHouseGuide(false);
+  }, []);
 
   React.useEffect(() => {
     if (isAuthenticated) navigate('/', { replace: true });
   }, [isAuthenticated, navigate]);
+
+  React.useEffect(() => {
+    delete document.documentElement.dataset.houseGuideHidden;
+  }, []);
+
+  React.useEffect(() => {
+    if (!showHouseGuide) return undefined;
+    const hide = (e) => {
+      if (e.target?.closest?.('[data-auth-card="true"]')) return;
+      hideHouseGuide();
+    };
+    document.addEventListener('pointerdown', hide, true);
+    document.addEventListener('mousedown',   hide, true);
+    document.addEventListener('touchstart',  hide, true);
+    document.addEventListener('wheel',       hide, true);
+    return () => {
+      document.removeEventListener('pointerdown', hide, true);
+      document.removeEventListener('mousedown',   hide, true);
+      document.removeEventListener('touchstart',  hide, true);
+      document.removeEventListener('wheel',       hide, true);
+    };
+  }, [hideHouseGuide, showHouseGuide]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,277 +86,355 @@ const Login = () => {
     }
   };
 
-  return (
-    <div className="min-h-screen overflow-hidden relative bg-[#060a12] text-white font-body">
+  const hideGuideFromScene = (e) => {
+    if (e.target?.closest?.('[data-auth-card="true"]')) return;
+    hideHouseGuide();
+  };
 
-      {/* 3-D ribbon canvas */}
-      <div className="absolute inset-0 z-0">
-        <Ribbon3D />
+  /* ── Card mouse glow ─────────────────────────────────────────── */
+  const handleCardMouseMove = (e) => {
+    const card = cardRef.current;
+    if (!card) return;
+    const r = card.getBoundingClientRect();
+    const x = ((e.clientX - r.left) / r.width  * 100).toFixed(1);
+    const y = ((e.clientY - r.top)  / r.height * 100).toFixed(1);
+    card.style.background = `radial-gradient(circle at ${x}% ${y}%, rgba(56,189,248,0.08) 0%, transparent 50%), rgba(10,15,28,0.65)`;
+  };
+  const handleCardMouseLeave = () => {
+    if (cardRef.current) cardRef.current.style.background = 'rgba(10,15,28,0.65)';
+  };
+
+  return (
+    <div
+      className="min-h-screen overflow-hidden relative text-white font-body"
+      style={{ background: '#020617' }}
+      onClickCapture={hideGuideFromScene}
+      onPointerDownCapture={hideGuideFromScene}
+      onWheelCapture={hideGuideFromScene}
+    >
+      {/* 3-D house canvas */}
+      <div className="absolute inset-0 z-[4]">
+        <House3D onInteract={hideHouseGuide} />
       </div>
 
-      {/* vignette */}
+      {/* Interaction layer — passes clicks to House3D */}
       <div
-        className="absolute inset-0 z-[1] pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse at 50% 50%, transparent 30%, rgba(6,10,18,0.82) 100%)' }}
+        aria-hidden="true"
+        data-testid="house-interaction-layer"
+        className="absolute inset-y-0 left-0 z-[8] w-full cursor-grab active:cursor-grabbing md:w-[58vw]"
+        onClick={hideHouseGuide}
+        onMouseDown={hideHouseGuide}
+        onPointerDown={hideHouseGuide}
+        onTouchStart={hideHouseGuide}
+        onWheel={hideHouseGuide}
+        style={{ background: 'rgba(255,255,255,0.001)' }}
       />
 
-      {/* cyber grid */}
+      {/* House guide callout */}
+      {showHouseGuide && (
+        <div className="house-guide-callout pointer-events-none absolute left-4 right-4 top-12 z-[9] md:left-[18vw] md:right-auto md:top-[48%] md:w-[min(360px,46vw)] md:-translate-y-1/2">
+          <div className="absolute -left-8 top-1/2 hidden h-px w-8 bg-gradient-to-l from-blue-300/55 to-transparent md:block" />
+          <div className="absolute -left-14 top-1/2 hidden h-6 w-6 -translate-y-1/2 rounded-full border border-blue-300/45 shadow-[0_0_22px_rgba(96,165,250,0.42)] md:block">
+            <span className="absolute inset-1 rounded-full bg-blue-300/18 house-guide-ping" />
+          </div>
+          <div className="ui-demo-reveal rounded-2xl border border-white/[0.10] bg-white/[0.055] px-4 py-3 shadow-[0_18px_46px_rgba(2,6,23,0.38)] backdrop-blur-2xl">
+            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.22em] text-blue-300/85">
+              <span className="material-symbols-outlined text-[16px]">touch_app</span>
+              Tương tác căn nhà
+            </div>
+            <div className="mt-3 grid gap-2 text-[11px] leading-relaxed text-slate-300">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-[16px] text-blue-300">360</span>
+                <span>Kéo trên vùng nhà để xoay 360°</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-[16px] text-cyan-300">layers</span>
+                <span>Bấm vào nhà để tách hoặc thu tầng</span>
+              </div>
+              <div className="hidden items-center gap-2 md:flex">
+                <span className="material-symbols-outlined text-[16px] text-amber-300">zoom_in</span>
+                <span>Cuộn trên vùng nhà để zoom</span>
+              </div>
+            </div>
+            <p className="mt-3 border-t border-white/[0.08] pt-2 text-[9px] font-bold uppercase tracking-[0.2em] text-slate-500">
+              Tự ẩn sau thao tác đầu tiên
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Vignette */}
+      <div className="absolute inset-0 z-[1] pointer-events-none"
+        style={{ background: 'radial-gradient(ellipse at 50% 50%, transparent 20%, rgba(2,6,23,0.92) 100%)' }} />
+
+      {/* Cyber grid */}
       <div className="absolute inset-0 z-[2] pointer-events-none"
         style={{
           backgroundImage: 'linear-gradient(rgba(15,98,254,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(15,98,254,0.06) 1px, transparent 1px)',
           backgroundSize: '40px 40px',
-        }}
-      />
+        }} />
 
-      {/* dot matrix */}
-      <div
-        className="absolute inset-0 z-[2] opacity-[0.12] pointer-events-none"
-        style={{ backgroundImage: 'radial-gradient(rgba(100,160,255,0.5) 1px, transparent 1px)', backgroundSize: '30px 30px' }}
-      />
+      {/* Dot matrix */}
+      <div className="absolute inset-0 z-[2] opacity-[0.12] pointer-events-none"
+        style={{ backgroundImage: 'radial-gradient(rgba(100,160,255,0.5) 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
 
-      {/* scanlines */}
-      <div
-        className="absolute inset-0 z-[3] pointer-events-none"
-        style={{
-          backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.04) 2px, rgba(0,0,0,0.04) 4px)',
-        }}
-      />
+      {/* Scanlines */}
+      <div className="absolute inset-0 z-[3] pointer-events-none"
+        style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.04) 2px, rgba(0,0,0,0.04) 4px)' }} />
 
-      {/* top HUD bar */}
+      {/* Top HUD bar */}
       <div className="absolute top-0 left-0 right-0 z-[5] h-8 border-b border-blue-500/10 flex items-center px-6 gap-4 pointer-events-none">
         <div className="flex items-center gap-1.5">
           <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
           <span className="text-[8px] text-green-400/70 font-bold tracking-[0.3em] uppercase">SENTINEL SYS ONLINE</span>
         </div>
         <div className="flex-1 border-t border-blue-500/10" />
-        <span className="text-[8px] text-blue-400/40 font-['Inter'] tracking-widest">AUTH v2.4.1</span>
+        <span className="text-[8px] text-blue-400/40 font-['Inter'] tracking-widest">AUTH v5.0.GRID</span>
       </div>
 
-      <main className="relative z-10 w-full max-w-6xl mx-auto px-6 min-h-screen grid grid-cols-1 md:grid-cols-12 gap-0 md:gap-12 items-center py-12">
+      {/* Main layout */}
+      <main className="relative z-10 pointer-events-none w-full max-w-[1440px] mx-auto px-6 md:px-14 min-h-screen grid grid-cols-1 md:grid-cols-12 gap-0 md:gap-12 items-center py-12">
 
-        {/* ── Left branding ───────────────────────────────────────── */}
-        <div className="hidden md:flex md:col-span-6 flex-col justify-center space-y-8 pr-8 animate-in slide-in-from-left-8 duration-700">
-          <div className="space-y-5">
-            <span className="text-blue-400/80 font-bold tracking-[0.3em] text-[9px] uppercase flex items-center gap-2">
-              <span className="w-4 h-px bg-blue-400/50" />
-              Hệ Thống Bảo Mật Cấp Cao
-              <span className="w-4 h-px bg-blue-400/50" />
-            </span>
+        {/* ── Left branding ─────────────────────────────────────── */}
+        <div className="hidden md:flex md:col-span-6 flex-col justify-center gap-9 pr-8 animate-in slide-in-from-left-8 duration-700 select-none">
+
+          {/* Tagline */}
+          <div className="text-[11px] font-semibold tracking-[0.25em] uppercase text-[#38bdf8] flex items-center gap-3">
+            <span className="w-8 h-px bg-[#38bdf8]" />
+            Hệ sinh thái Smart Home bảo mật cao
+          </div>
+
+          {/* Headline */}
+          <div className="space-y-4">
             <h1
-              className="text-7xl font-extrabold tracking-tight font-headline leading-none glitch-text"
+              className="text-[clamp(52px,5.5vw,72px)] font-black leading-[1.05] tracking-tight font-headline glitch-text"
               data-text="SENTINEL."
-              style={{ textShadow: '0 0 40px rgba(59,130,246,0.35)' }}
+              style={{ textShadow: '0 0 40px rgba(15,98,254,0.35)' }}
             >
-              SENTINEL<span className="text-blue-400">.</span>
+              SENTINEL<span className="text-[#38bdf8]">.</span>
             </h1>
-            <p className="text-slate-400/80 text-base max-w-md font-light leading-relaxed">
-              Kiểm soát truy cập toàn diện với độ trễ cực thấp. Bảo vệ tài sản số bằng công nghệ Precision Secure tiên tiến.
+            <p className="text-[rgba(200,210,230,0.5)] text-base leading-[1.8] max-w-[460px] font-light">
+              Hệ thống Nhà thông minh thế hệ mới tích hợp bảo mật đa lớp, hiển thị trực quan cấu trúc mạng nội bộ và giám sát thiết bị IoT theo thời gian thực.
             </p>
           </div>
 
-          <div className="flex flex-col gap-3">
-            {[
-              { icon: 'verified_user', color: 'text-blue-400', title: 'Xác thực 2 lớp', sub: 'Bảo mật đa tầng' },
-              { icon: 'history',       color: 'text-cyan-400',  title: 'Truy vết tức thì', sub: 'Giám sát 24/7' },
-            ].map(c => (
-              <div
-                key={c.icon}
-                className="
-                  relative p-4 rounded-2xl bg-white/[0.04] border border-white/[0.08]
-                  backdrop-blur-sm hover:bg-white/[0.07] hover:border-blue-500/20
-                  transition-all group overflow-hidden
-                "
-              >
-                {/* left accent */}
-                <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-blue-500/40 group-hover:bg-blue-400 transition-colors" />
-                <div className="flex items-center gap-4">
-                  <span className={`material-symbols-outlined ${c.color} text-xl`}>{c.icon}</span>
-                  <div>
-                    <div className="text-sm font-semibold">{c.title}</div>
-                    <div className="text-[10px] text-slate-500 mt-0.5 uppercase tracking-wider">{c.sub}</div>
-                  </div>
+          {/* Stats row */}
+          <div className="flex items-center gap-9">
+            {STATS.map((s, i) => (
+              <React.Fragment key={s.num}>
+                {i > 0 && <div className="w-px self-stretch bg-white/[0.08]" />}
+                <div className="flex flex-col gap-1.5">
+                  <span
+                    className="font-black text-3xl text-white tabular-nums"
+                    style={{ textShadow: '0 0 20px rgba(56,189,248,0.4)' }}
+                  >{s.num}</span>
+                  <span className="text-[10px] font-semibold tracking-[0.15em] uppercase text-slate-500">{s.label}</span>
                 </div>
-              </div>
+              </React.Fragment>
             ))}
           </div>
 
-          {/* system metrics */}
-          <div className="grid grid-cols-3 gap-3">
-            {[
-              { label: 'LATENCY',  val: '< 12ms',  icon: 'speed' },
-              { label: 'UPTIME',   val: '99.98%',  icon: 'cloud_done' },
-              { label: 'NODES',    val: '4 Active', icon: 'hub' },
-            ].map(m => (
-              <div key={m.label} className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-3 text-center">
-                <span className="material-symbols-outlined text-blue-400/60 text-[14px] block mb-1">{m.icon}</span>
-                <div className="text-sm font-black text-white/80 tabular-nums">{m.val}</div>
-                <div className="text-[8px] text-slate-600 uppercase tracking-widest mt-0.5">{m.label}</div>
+          {/* Feature cards */}
+          <div className="flex flex-col gap-2.5">
+            {FEATURES.map((f) => (
+              <div
+                key={f.title}
+                className="feat-item-hover flex items-center gap-4 px-5 py-3.5 rounded-2xl bg-[rgba(15,23,42,0.3)] border border-white/[0.03] cursor-default"
+              >
+                <span
+                  className="w-2 h-2 rounded-full flex-shrink-0"
+                  style={{ background: f.dot, boxShadow: `0 0 12px ${f.dot}` }}
+                />
+                <div className="text-sm text-[rgba(200,210,230,0.6)]">
+                  <strong className="text-[rgba(248,250,252,0.9)] font-semibold">{f.title}</strong>
+                  {' '}— {f.sub}
+                </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* ── Right form card ──────────────────────────────────────── */}
-        <div className="md:col-span-6 lg:col-span-5 lg:col-start-8 animate-in slide-in-from-right-8 duration-700">
-          <div className="relative bg-white/[0.05] backdrop-blur-2xl border border-white/[0.10] p-8 md:p-10 rounded-[2rem] shadow-2xl overflow-hidden">
+        {/* ── Right form card ────────────────────────────────────── */}
+        <div
+          data-auth-card="true"
+          className="pointer-events-auto md:col-span-6 lg:col-span-5 lg:col-start-8 animate-in slide-in-from-right-8 duration-700"
+        >
+          {/* Outer wrapper — double border effect */}
+          <div className="p-[1px] rounded-[26px]"
+            style={{ background: 'linear-gradient(135deg, rgba(56,189,248,0.2), rgba(45,212,191,0.1), rgba(56,189,248,0.05))' }}>
+            <div
+              ref={cardRef}
+              className="form-card-glow relative rounded-[24px] p-10 overflow-hidden"
+              style={{
+                background: 'rgba(10,15,28,0.65)',
+                backdropFilter: 'blur(40px) saturate(1.2)',
+                WebkitBackdropFilter: 'blur(40px) saturate(1.2)',
+                boxShadow: '0 24px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.02) inset',
+              }}
+              onMouseMove={handleCardMouseMove}
+              onMouseLeave={handleCardMouseLeave}
+            >
+              {/* Top neon line */}
+              <div className="absolute top-0 left-[10%] right-[10%] h-[2px] opacity-80"
+                style={{ background: 'linear-gradient(90deg, transparent, #38bdf8, #2dd4bf, transparent)' }} />
 
-            {/* top neon line */}
-            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-400 to-transparent opacity-80" />
-
-            {/* inner scanline sweep */}
-            <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-[2rem]">
-              <div
-                className="absolute left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-400/30 to-transparent"
-                style={{ animation: 'scanline-sweep 5s linear infinite' }}
-              />
-            </div>
-
-            {/* HUD corners */}
-            <div className="absolute top-3 left-3 w-5 h-5 border-t-2 border-l-2 border-blue-400/40" />
-            <div className="absolute top-3 right-3 w-5 h-5 border-t-2 border-r-2 border-blue-400/40" />
-            <div className="absolute bottom-3 left-3 w-5 h-5 border-b-2 border-l-2 border-blue-400/20" />
-            <div className="absolute bottom-3 right-3 w-5 h-5 border-b-2 border-r-2 border-blue-400/20" />
-
-            {/* mobile logo */}
-            <div className="md:hidden flex justify-center mb-6">
-              <h2 className="text-3xl font-extrabold tracking-tight font-headline" style={{ textShadow: '0 0 20px rgba(59,130,246,0.5)' }}>
-                SENTINEL
-              </h2>
-            </div>
-
-            <div className="mb-8">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-400 data-pulse" />
-                <span className="text-[9px] text-blue-400/70 font-bold tracking-[0.3em] uppercase">AUTH PORTAL</span>
-              </div>
-              <h3 className="text-2xl font-bold tracking-tight">Đăng nhập</h3>
-              <p className="text-slate-500 text-sm mt-1">Vui lòng nhập thông tin để truy cập hệ thống.</p>
-            </div>
-
-            <form className="space-y-5" onSubmit={handleSubmit}>
-              {error && (
-                <div className="bg-red-500/10 text-red-400 px-4 py-3 rounded-xl text-sm font-medium border border-red-500/20 flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[16px]">error</span>
-                  {error}
-                </div>
-              )}
-
-              {/* Email */}
-              <div className="space-y-1.5">
-                <label className="text-[9px] font-bold text-slate-500 tracking-[0.25em] uppercase ml-1" htmlFor="email">
-                  Email Hệ Thống
-                </label>
-                <div className="relative group/f">
-                  <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 text-lg transition-colors duration-200 group-focus-within/f:text-blue-400">
-                    alternate_email
-                  </span>
-                  <input
-                    id="email" type="email" required disabled={loading}
-                    value={email} onChange={e => setEmail(e.target.value)}
-                    placeholder="name@sentinel.security"
-                    className="
-                      w-full bg-white/[0.05] border border-white/[0.10] rounded-xl
-                      py-3.5 pl-12 pr-4 text-white placeholder:text-slate-700
-                      focus:ring-1 focus:ring-blue-500/50 focus:border-blue-500/40
-                      transition-all outline-none text-sm
-                    "
-                  />
-                </div>
+              {/* Inner scanline sweep */}
+              <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-[24px]">
+                <div className="absolute left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-400/30 to-transparent"
+                  style={{ animation: 'scanline-sweep 5s linear infinite' }} />
               </div>
 
-              {/* Password */}
-              <div className="space-y-1.5">
-                <div className="flex justify-between items-center px-1">
-                  <label className="text-[9px] font-bold text-slate-500 tracking-[0.25em] uppercase" htmlFor="password">
-                    Mật Khẩu
+              {/* HUD corners */}
+              <div className="absolute top-3 left-3 w-5 h-5 border-t-2 border-l-2 border-blue-400/40" />
+              <div className="absolute top-3 right-3 w-5 h-5 border-t-2 border-r-2 border-blue-400/40" />
+              <div className="absolute bottom-3 left-3 w-5 h-5 border-b-2 border-l-2 border-blue-400/20" />
+              <div className="absolute bottom-3 right-3 w-5 h-5 border-b-2 border-r-2 border-blue-400/20" />
+
+              {/* Mobile logo */}
+              <div className="md:hidden flex justify-center mb-6">
+                <h2 className="text-3xl font-extrabold tracking-tight font-headline"
+                  style={{ textShadow: '0 0 20px rgba(15,98,254,0.5)' }}>SENTINEL</h2>
+              </div>
+
+              {/* Form badge */}
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 mb-7">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+                <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-blue-400">AUTH PORTAL</span>
+              </div>
+
+              {/* Heading */}
+              <h3 className="text-[32px] font-extrabold tracking-tight leading-tight mb-2">Đăng nhập</h3>
+              <p className="text-sm text-slate-400/70 mb-9">Nhập thông tin định danh để điều khiển thiết bị.</p>
+
+              <form className="space-y-6" onSubmit={handleSubmit}>
+                {error && (
+                  <div className="bg-red-500/10 text-red-400 px-4 py-3 rounded-xl text-sm font-medium border border-red-500/20 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-[16px]">error</span>
+                    {error}
+                  </div>
+                )}
+
+                {/* Email */}
+                <div className="space-y-2">
+                  <label className="block text-[11px] font-semibold tracking-[0.08em] uppercase text-slate-400/80" htmlFor="email">
+                    Tài khoản
                   </label>
-                  <a href="#" className="text-[10px] text-blue-400/70 hover:text-blue-300 transition-colors">
-                    Quên mật khẩu?
-                  </a>
-                </div>
-                <div className="relative group/f">
-                  <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 text-lg transition-colors duration-200 group-focus-within/f:text-blue-400">
-                    lock
-                  </span>
-                  <input
-                    id="password" type={showPass ? 'text' : 'password'} required disabled={loading}
-                    value={password} onChange={e => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="
-                      w-full bg-white/[0.05] border border-white/[0.10] rounded-xl
-                      py-3.5 pl-12 pr-12 text-white placeholder:text-slate-700
-                      focus:ring-1 focus:ring-blue-500/50 focus:border-blue-500/40
-                      transition-all outline-none text-sm
-                    "
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPass(v => !v)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-600 hover:text-white transition-colors"
-                  >
-                    <span className="material-symbols-outlined text-lg">
-                      {showPass ? 'visibility_off' : 'visibility'}
+                  <div className="relative group/f">
+                    <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-xl transition-all duration-300 group-focus-within/f:text-[#38bdf8]">
+                      account_circle
                     </span>
-                  </button>
+                    <input
+                      id="email" type="email" required disabled={loading}
+                      value={email} onChange={e => setEmail(e.target.value)}
+                      placeholder="admin@sentinel.io"
+                      className="w-full bg-[rgba(15,23,42,0.5)] border border-[rgba(56,189,248,0.15)] rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-slate-600 focus:ring-2 focus:ring-[#38bdf8]/20 focus:border-[#38bdf8]/50 transition-all outline-none text-sm"
+                    />
+                  </div>
                 </div>
+
+                {/* Password */}
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <label className="text-[11px] font-semibold tracking-[0.08em] uppercase text-slate-400/80" htmlFor="password">
+                      Mã khóa
+                    </label>
+                    <Link to="/forgot-password" className="text-[11px] text-[#38bdf8]/70 hover:text-[#38bdf8] transition-colors">
+                      Quên mã khóa?
+                    </Link>
+                  </div>
+                  <div className="relative group/f">
+                    <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-xl transition-all duration-300 group-focus-within/f:text-[#38bdf8]">
+                      lock
+                    </span>
+                    <input
+                      id="password" type={showPass ? 'text' : 'password'} required disabled={loading}
+                      value={password} onChange={e => setPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="w-full bg-[rgba(15,23,42,0.5)] border border-[rgba(56,189,248,0.15)] rounded-2xl py-4 pl-12 pr-12 text-white placeholder:text-slate-600 focus:ring-2 focus:ring-[#38bdf8]/20 focus:border-[#38bdf8]/50 transition-all outline-none text-sm"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPass(v => !v)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
+                      aria-label={showPass ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                    >
+                      <span className="material-symbols-outlined text-xl">{showPass ? 'visibility_off' : 'visibility'}</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Remember */}
+                <div className="flex items-center gap-3 px-1">
+                  <input id="remember" type="checkbox" disabled={loading}
+                    className="w-4 h-4 rounded bg-white/5 border-white/20 accent-[#0f62fe] outline-none" />
+                  <label htmlFor="remember" className="text-xs text-slate-500 cursor-pointer select-none">
+                    Duy trì phiên đăng nhập
+                  </label>
+                </div>
+
+                {/* Submit */}
+                <button
+                  type="submit" disabled={loading}
+                  className="relative w-full py-[18px] rounded-2xl font-bold text-base text-white overflow-hidden transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(15,98,254,0.4)] active:translate-y-0 disabled:opacity-50 disabled:pointer-events-none group"
+                  style={{ background: 'linear-gradient(135deg, #0f62fe, #0284c7)', boxShadow: '0 10px 30px rgba(15,98,254,0.3)' }}
+                >
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 holo-shimmer transition-opacity" />
+                  <span className="relative flex items-center justify-center gap-2.5">
+                    {loading ? (
+                      <>
+                        <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        Đang giải mã...
+                      </>
+                    ) : (
+                      <>
+                        Thiết lập kết nối an toàn
+                        <span className="material-symbols-outlined text-lg">arrow_forward</span>
+                      </>
+                    )}
+                  </span>
+                </button>
+              </form>
+
+              {/* OR divider */}
+              <div className="flex items-center gap-4 my-6">
+                <div className="flex-1 h-px bg-white/[0.06]" />
+                <span className="text-[11px] font-semibold tracking-[0.15em] uppercase text-slate-600">hoặc xác thực bằng</span>
+                <div className="flex-1 h-px bg-white/[0.06]" />
               </div>
 
-              {/* Remember */}
-              <div className="flex items-center gap-3 px-1">
-                <input
-                  id="remember" type="checkbox" disabled={loading}
-                  className="w-3.5 h-3.5 rounded bg-white/5 border-white/20 accent-blue-500 outline-none"
-                />
-                <label htmlFor="remember" className="text-xs text-slate-500 cursor-pointer select-none">
-                  Ghi nhớ đăng nhập
-                </label>
+              {/* Social buttons */}
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  className="flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-white/[0.04] border border-white/[0.08] text-sm font-semibold text-slate-300 hover:bg-white/[0.07] hover:border-[#38bdf8]/30 transition-all"
+                >
+                  <span className="material-symbols-outlined text-[18px] text-[#38bdf8]">fingerprint</span>
+                  Sinh trắc học
+                </button>
+                <button
+                  type="button"
+                  className="flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-white/[0.04] border border-white/[0.08] text-sm font-semibold text-slate-300 hover:bg-white/[0.07] hover:border-[#38bdf8]/30 transition-all"
+                >
+                  <span className="material-symbols-outlined text-[18px] text-[#38bdf8]">nfc</span>
+                  Thẻ bảo mật NFC
+                </button>
               </div>
 
-              {/* Submit */}
-              <button
-                type="submit" disabled={loading}
-                className="
-                  relative w-full mt-2 py-3.5 rounded-xl font-bold text-base text-white overflow-hidden
-                  bg-gradient-to-r from-blue-700 to-blue-500
-                  hover:from-blue-600 hover:to-blue-400
-                  hover:shadow-[0_0_32px_rgba(59,130,246,0.55)]
-                  hover:scale-[1.02] active:scale-[0.98]
-                  transition-all flex items-center justify-center gap-2.5
-                  disabled:opacity-50 disabled:pointer-events-none
-                  group
-                "
-              >
-                {/* holo shimmer on hover */}
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 holo-shimmer transition-opacity" />
-                <span className="relative flex items-center gap-2.5">
-                  {loading ? (
-                    <>
-                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Đang xác thực...
-                    </>
-                  ) : (
-                    <>
-                      Đăng nhập
-                      <span className="material-symbols-outlined text-lg">arrow_forward</span>
-                    </>
-                  )}
-                </span>
-              </button>
-            </form>
-
-            <div className="mt-6 pt-5 border-t border-white/[0.08] text-center">
-              <p className="text-slate-500 text-xs">
-                Chưa có tài khoản?{' '}
-                <Link to="/register" className="text-blue-400 hover:text-blue-300 underline-offset-4 hover:underline transition-all">
-                  Đăng ký ngay →
-                </Link>
-              </p>
+              {/* Footer */}
+              <div className="mt-8 pt-6 border-t border-white/[0.06] text-center">
+                <p className="text-sm text-slate-500">
+                  Yêu cầu cấp quyền?{' '}
+                  <Link to="/register" className="text-[#38bdf8] hover:text-[#7dd3fc] font-semibold transition-colors">
+                    Đăng ký ngay →
+                  </Link>
+                </p>
+              </div>
             </div>
           </div>
 
-          {/* trust badges */}
+          {/* Trust badges */}
           <div className="mt-5 flex justify-center gap-5">
-            {BADGES.map(b => (
+            {TRUST_BADGES.map(b => (
               <div key={b.label} className="flex items-center gap-1.5 text-slate-700 hover:text-slate-500 transition-colors">
                 <span className="material-symbols-outlined text-[12px]">{b.icon}</span>
                 <span className="text-[9px] font-bold tracking-[0.2em] uppercase">{b.label}</span>
@@ -320,22 +444,15 @@ const Login = () => {
         </div>
       </main>
 
-      {/* data stream ticker */}
-      <div className="absolute bottom-8 left-0 right-0 z-10 overflow-hidden pointer-events-none">
-        <div className="flex whitespace-nowrap ticker-inner gap-8 text-[8px] text-blue-400/20 font-['Inter'] tracking-widest uppercase">
-          {Array(4).fill(null).map((_, i) => (
-            <span key={i}>
-              ◆ SENTINEL PRECISION SECURE ◆ AES-256 ENCRYPTION ◆ BIOMETRIC AUTH ◆ ZERO-TRUST ARCHITECTURE ◆ REAL-TIME MONITORING ◆ &nbsp;
-            </span>
-          ))}
-        </div>
+      {/* Bottom bar */}
+      <div className="absolute bottom-0 left-0 right-0 z-10 flex items-center justify-center gap-8 py-5 pointer-events-none">
+        {BOTTOM_BADGES.map(b => (
+          <div key={b.label} className="flex items-center gap-1.5 text-[10px] font-semibold tracking-[0.15em] uppercase text-slate-700">
+            <span className="material-symbols-outlined text-[12px] text-slate-600">{b.icon}</span>
+            {b.label}
+          </div>
+        ))}
       </div>
-
-      <footer className="absolute bottom-3 left-0 w-full flex justify-center z-10 pointer-events-none">
-        <p className="text-[8px] text-slate-800 tracking-[0.35em] uppercase hidden sm:block">
-          © 2024 SENTINEL PRECISION SECURE · ALL RIGHTS RESERVED
-        </p>
-      </footer>
     </div>
   );
 };
