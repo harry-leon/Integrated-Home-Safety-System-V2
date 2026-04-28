@@ -10,6 +10,7 @@ const sectionMeta = {
   '/fingerprints': 'nav_scope_fingerprints',
   '/logs': 'nav_scope_logs',
   '/analytics': 'nav_scope_analytics',
+  '/users': 'nav_scope_users',
   '/settings': 'nav_scope_settings',
 };
 
@@ -34,7 +35,8 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
     { name: t('remote_control'), icon: 'settings_remote', path: '/remote', roles: ['ADMIN', 'MEMBER', 'VIEWER'] },
     { name: t('fingerprints'), icon: 'fingerprint', path: '/fingerprints', roles: ['ADMIN', 'MEMBER'] },
     { name: t('logs'), icon: 'history', path: '/logs', roles: ['ADMIN'] },
-    { name: t('analytics'), icon: 'analytics', path: '/analytics', roles: ['ADMIN'] },
+    { name: t('analytics'), icon: 'analytics', path: '/analytics', roles: ['ADMIN', 'MEMBER'] },
+    { name: t('user_management'), icon: 'manage_accounts', path: '/users', roles: ['ADMIN'] },
     { name: t('settings'), icon: 'settings', path: '/settings', roles: ['ADMIN', 'MEMBER', 'VIEWER'] },
   ];
 
