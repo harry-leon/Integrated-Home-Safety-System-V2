@@ -8,24 +8,24 @@ import UserAvatar from './UserAvatar';
 import ProfileMenu from './ProfileMenu';
 import { smartLockApi } from '../services/api';
 
-const formatAlertTitle = (alertType) => {
+const formatAlertTitle = (alertType, t) => {
   switch (alertType) {
     case 'GAS_LEAK':
-      return 'Canh bao khi gas';
+      return t('alert_gas_leak');
     case 'INTRUDER_ALERT':
-      return 'Canh bao dot nhap';
+      return t('alert_intruder');
     case 'FIRE_ALARM':
-      return 'Canh bao chay';
+      return t('alert_fire');
     case 'WRONG_PASSWORD':
-      return 'Sai mat khau';
+      return t('alert_wrong_password');
     case 'TAMPER_ALERT':
-      return 'Canh bao pha hoai';
+      return t('alert_tamper');
     case 'BATTERY_LOW':
-      return 'Pin yeu';
+      return t('alert_battery_low');
     case 'OFFLINE_ALERT':
-      return 'Thiet bi offline';
+      return t('alert_offline');
     default:
-      return alertType || 'Thong bao he thong';
+      return alertType || t('reminder_info');
   }
 };
 
@@ -211,7 +211,7 @@ const Header = () => {
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0">
-                            <p className="truncate text-sm font-semibold text-on-surface">{formatAlertTitle(alert.alertType)}</p>
+                            <p className="truncate text-sm font-semibold text-on-surface">{formatAlertTitle(alert.alertType, t)}</p>
                             <p className="mt-1 text-xs leading-5 text-outline">
                               {alert.message || 'Can kiem tra ngay de tranh su co tiep theo.'}
                             </p>

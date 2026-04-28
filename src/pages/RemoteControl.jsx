@@ -242,29 +242,19 @@ const RemoteControl = () => {
       setStatusError('This device is offline. Reconnect it before sending a command.');
       return;
     }
+    setIsSendingCommand(true);
+    setStatusMessage('');
+    setStatusError('');
 
-    showAlert({
-      type: locked ? 'warning' : 'info',
-      title: locked ? t('reminder_warning') : t('reminder_info'),
-      message: locked ? t('reminder_confirm_unlock') : t('reminder_confirm_lock'),
-      confirmText: t('reminder_confirm'),
-      cancelText: t('reminder_cancel'),
-      onConfirm: async () => {
-        setIsSendingCommand(true);
-        setStatusMessage('');
-        setStatusError('');
-
-        try {
-          const commandId = await smartLockApi.sendLockToggle(selectedDeviceId);
-          setLocked((current) => !current);
-          setStatusMessage(`Command queued successfully. Reference: ${commandId}`);
-        } catch (error) {
-          setStatusError(error.message || 'Unable to send lock command.');
-        } finally {
-          setIsSendingCommand(false);
-        }
-      }
-    });
+    try {
+      const commandId = await smartLockApi.sendLockToggle(selectedDeviceId);
+      setLocked((current) => !current);
+      setStatusMessage(`Command queued successfully. Reference: ${commandId}`);
+    } catch (error) {
+      setStatusError(error.message || 'Unable to send lock command.');
+    } finally {
+      setIsSendingCommand(false);
+    }
   };
 
   const updateSetting = (key, value) => {

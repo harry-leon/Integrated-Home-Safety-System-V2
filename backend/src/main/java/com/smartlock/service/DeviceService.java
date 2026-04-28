@@ -42,7 +42,7 @@ public class DeviceService {
     public List<DeviceResponseDTO> getAllDevices(Authentication authentication) {
         ensureDemoDeviceExists();
         List<Device> devices;
-        if (deviceAccessService.isAdmin(authentication)) {
+        if (deviceAccessService.canViewAllDevices(authentication)) {
             devices = deviceRepository.findAll();
         } else {
             List<UUID> accessibleDeviceIds = deviceAccessService.getAccessibleDeviceIds(authentication);
