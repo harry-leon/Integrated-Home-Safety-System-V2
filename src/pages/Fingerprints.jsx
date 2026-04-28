@@ -247,9 +247,22 @@ const Fingerprints = () => {
       closeReAuth();
       await fetchData();
     } catch (err) {
+      const rawMessage = err?.message || '';
+      const slotInPayload =
+        reauthState.intent?.type === 'enroll' ? reauthState.intent?.payload?.fingerSlotId : null;
+      const isSlotConflict =
+        reauthState.intent?.type === 'enroll' &&
+        (rawMessage.includes('Finger slot is already in use') ||
+          rawMessage.includes('HTTP 409') ||
+          rawMessage.includes('409'));
+
+      const friendlyError = isSlotConflict
+        ? `ID/Slot #${String(slotInPayload ?? '').padStart(3, '0')} đã có vân tay, vui lòng chọn ID khác.`
+        : (rawMessage || 'Xác thực lại không thành công.');
+
       setReauthState((current) => ({
         ...current,
-        error: err.message || 'Xác thực lại không thành công.',
+        error: friendlyError,
         isSubmitting: false,
       }));
     } finally {

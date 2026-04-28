@@ -5,9 +5,7 @@
  */
 export const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
-  (typeof window !== 'undefined' && /^(localhost|127\.0\.0\.1)$/i.test(window.location.hostname)
-    ? 'http://localhost:8080'
-    : '');
+  (import.meta.env.DEV ? 'http://localhost:8080' : '');
 
 const isAbsoluteUrl = (value) => /^https?:\/\//i.test(value);
 
