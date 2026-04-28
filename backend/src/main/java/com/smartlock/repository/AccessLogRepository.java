@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 @Repository
 public interface AccessLogRepository extends JpaRepository<AccessLog, UUID>, JpaSpecificationExecutor<AccessLog> {
@@ -71,4 +74,8 @@ public interface AccessLogRepository extends JpaRepository<AccessLog, UUID>, Jpa
 
     @EntityGraph(attributePaths = {"device", "user", "fingerprint"})
     java.util.Optional<AccessLog> findTopByDeviceIdOrderByCreatedAtDesc(UUID deviceId);
+
+    @Modifying
+    @Query("UPDATE AccessLog a SET a.fingerprint = null WHERE a.fingerprint.id = :fingerprintId")
+    int clearFingerprintReference(@Param("fingerprintId") UUID fingerprintId);
 }

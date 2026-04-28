@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -29,6 +30,7 @@ public class FingerprintController {
     private final VerificationService verificationService;
     private final DeviceAccessService deviceAccessService;
     private final com.smartlock.repository.FingerprintRepository fingerprintRepository;
+    private final com.smartlock.repository.AccessLogRepository accessLogRepository;
     private final com.smartlock.repository.DeviceRepository deviceRepository;
     private final com.smartlock.repository.UserRepository userRepository;
     private final com.smartlock.service.AuditLogService auditLogService;
@@ -36,6 +38,7 @@ public class FingerprintController {
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
+    @Transactional(readOnly = true)
     public ResponseEntity<List<Map<String, Object>>> getFingerprints(
             @RequestParam(required = false) UUID deviceId,
             Authentication authentication
@@ -136,6 +139,7 @@ public class FingerprintController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
     public ResponseEntity<?> deleteFingerprint(
             @PathVariable UUID id,
             @RequestHeader(value = "X-Verification-Token", required = false) String verificationToken,
@@ -154,6 +158,7 @@ public class FingerprintController {
         auditLogService.logAction(fingerprint.getDevice(), AccessAction.DELETED, AccessMethod.FINGERPRINT,
                 "Da xoa van tay cua: " + fingerprint.getPersonName() + " | Slot: " + fingerprint.getFingerSlotId());
         publishFingerprintDelete(fingerprint.getDevice(), fingerprint.getFingerSlotId(), fingerprint.getPersonName());
+        accessLogRepository.clearFingerprintReference(fingerprint.getId());
         fingerprintRepository.deleteById(id);
 
         return ResponseEntity.noContent().build();
@@ -161,6 +166,7 @@ public class FingerprintController {
 
     @PatchMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
     public ResponseEntity<?> renameFingerprint(
             @PathVariable UUID id,
             @RequestBody FingerprintRenameRequestDTO request,
