@@ -31,6 +31,7 @@ public class CommandService {
     private final AccessLogRepository accessLogRepository;
     private final SimpMessagingTemplate messagingTemplate;
     private final BlynkService blynkService;
+    private final DirectEsp32CommandService directEsp32CommandService;
     private final AuditLogService auditLogService;
 
     private static final int MAX_RETRIES = 3;
@@ -64,7 +65,12 @@ public class CommandService {
     @Transactional
     public void executeCommand(DeviceCommand command) {
         boolean openDoor = resolveTargetDoorState(command);
-        boolean dispatched = blynkService.sendDoorCommand(command.getDevice(), openDoor);
+        boolean dispatched = directEsp32CommandService.sendDoorCommand(command.getDevice(), openDoor);
+        String channel = "ESP32_DIRECT";
+        if (!dispatched) {
+            dispatched = blynkService.sendDoorCommand(command.getDevice(), openDoor);
+            channel = "BLYNK";
+        }
 
         command.setSentAt(LocalDateTime.now());
         if (dispatched) {
@@ -73,9 +79,9 @@ public class CommandService {
             command.setStatus(CommandStatus.SUCCESS);
             command.setFailureReason(null);
             log.info(
-                    "Command {} sent to Blynk pin V{} with value {} for device {}",
+                    "Command {} sent via {} with value {} for device {}",
                     command.getId(),
-                    BlynkService.PIN_DOOR_CONTROL,
+                    channel,
                     openDoor ? 1 : 0,
                     command.getDevice().getDeviceCode()
             );
@@ -84,13 +90,13 @@ public class CommandService {
                         command.getDevice(),
                         openDoor ? AccessAction.UNLOCKED : AccessAction.LOCKED,
                         AccessMethod.REMOTE,
-                        "Dieu khien tu xa thanh cong qua Blynk V20"
+                        "Dieu khien tu xa thanh cong qua " + channel
                 );
             }
         } else {
             command.setStatus(CommandStatus.RETRYING);
-            command.setFailureReason("Failed to send command to Blynk pin V20");
-            log.warn("Failed to send command {} to Blynk. Marked for retry.", command.getId());
+            command.setFailureReason("Failed to send command via ESP32 direct and Blynk");
+            log.warn("Failed to send command {} via ESP32 direct and Blynk. Marked for retry.", command.getId());
         }
 
         commandRepository.save(command);

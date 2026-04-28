@@ -50,7 +50,7 @@ public class DeviceAccessService {
 
     public List<UUID> getAccessibleDeviceIds(Authentication authentication) {
         User user = getAuthenticatedUser(authentication);
-        if (user.getRole() == UserRole.ADMIN) {
+        if (canBypassDevicePermission(user, UserDevicePermission.VIEW_ONLY)) {
             return List.of();
         }
 
@@ -65,6 +65,11 @@ public class DeviceAccessService {
         return getAuthenticatedUser(authentication).getRole() == UserRole.ADMIN;
     }
 
+    public boolean canViewAllDevices(Authentication authentication) {
+        User user = getAuthenticatedUser(authentication);
+        return user.getRole() == UserRole.ADMIN || user.getRole() == UserRole.MEMBER;
+    }
+
     public User getAuthenticatedUser(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new AccessDeniedException("Authentication is required");
@@ -76,7 +81,7 @@ public class DeviceAccessService {
 
     private boolean hasPermission(UUID deviceId, Authentication authentication, UserDevicePermission requiredPermission) {
         User user = getAuthenticatedUser(authentication);
-        if (user.getRole() == UserRole.ADMIN) {
+        if (canBypassDevicePermission(user, requiredPermission)) {
             return true;
         }
 
@@ -103,6 +108,19 @@ public class DeviceAccessService {
         if (requiredPermission == UserDevicePermission.CONTROL) {
             return actualPermission == UserDevicePermission.CONTROL;
         }
+        return false;
+    }
+
+    private boolean canBypassDevicePermission(User user, UserDevicePermission requiredPermission) {
+        if (user.getRole() == UserRole.ADMIN) {
+            return true;
+        }
+
+        if (user.getRole() == UserRole.MEMBER) {
+            return requiredPermission == UserDevicePermission.VIEW_ONLY
+                    || requiredPermission == UserDevicePermission.CONTROL;
+        }
+
         return false;
     }
 }
