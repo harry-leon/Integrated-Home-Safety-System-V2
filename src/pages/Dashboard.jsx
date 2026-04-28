@@ -148,6 +148,31 @@ const applyTelemetryToDevices = (deviceList, payload) => {
   });
 };
 
+const getDeviceTelemetryTime = (device) => {
+  const timestamp = device?.lastSensorAt || device?.lastSeen;
+  const parsed = timestamp ? new Date(timestamp).getTime() : 0;
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const getPreferredDashboardDevice = (deviceList) => {
+  if (!Array.isArray(deviceList) || deviceList.length === 0) {
+    return null;
+  }
+
+  return [...deviceList].sort((left, right) => {
+    const telemetryDelta = getDeviceTelemetryTime(right) - getDeviceTelemetryTime(left);
+    if (telemetryDelta !== 0) {
+      return telemetryDelta;
+    }
+
+    if (left.online !== right.online) {
+      return Number(right.online) - Number(left.online);
+    }
+
+    return (left.deviceName || '').localeCompare(right.deviceName || '');
+  })[0];
+};
+
 const mergeAlertIntoList = (currentAlerts, incomingAlert) => {
   if (!incomingAlert?.id) {
     return currentAlerts;
@@ -217,7 +242,11 @@ const Dashboard = () => {
   const [lastTelemetryAt, setLastTelemetryAt] = useState(null);
   const [telemetrySource, setTelemetrySource] = useState('snapshot');
   const [primaryDeviceSettings, setPrimaryDeviceSettings] = useState(null);
-  const primaryDevice = devices[0] || null;
+  const telemetryDeviceCodes = useMemo(
+    () => Array.from(new Set(devices.map((device) => device?.deviceCode).filter(Boolean))),
+    [devices],
+  );
+  const primaryDevice = useMemo(() => getPreferredDashboardDevice(devices), [devices]);
 
   useEffect(() => {
     let active = true;
@@ -243,8 +272,9 @@ const Dashboard = () => {
 
         if (Array.isArray(deviceData)) {
           setDevices(deviceData);
-          if (deviceData[0]?.lastSensorAt) {
-            setLastTelemetryAt((current) => current || deviceData[0].lastSensorAt);
+          const preferredDevice = getPreferredDashboardDevice(deviceData);
+          if (preferredDevice?.lastSensorAt) {
+            setLastTelemetryAt((current) => current || preferredDevice.lastSensorAt);
             setTelemetrySource((current) => current || 'snapshot');
           }
         }
@@ -269,26 +299,54 @@ const Dashboard = () => {
   }, []);
 
   useEffect(() => {
-    if (!primaryDevice?.deviceCode) {
+    if (telemetryDeviceCodes.length === 0) {
       setTelemetryStatus('idle');
       return undefined;
     }
 
-    return createTelemetrySubscription({
-      deviceCode: primaryDevice.deviceCode,
-      onStatusChange: (status) => {
-        setTelemetryStatus(status);
-        if (status === 'live') {
-          setIsFallbackActive(false);
-        }
-      },
-      onMessage: (payload) => {
-        setDevices((current) => applyTelemetryToDevices(current, payload));
-        setLastTelemetryAt(payload.recordedAt || new Date().toISOString());
-        setTelemetrySource('websocket');
-      },
-    });
-  }, [primaryDevice?.deviceCode]);
+    const statusByDevice = new Map();
+
+    const updateAggregateStatus = () => {
+      const statuses = Array.from(statusByDevice.values());
+
+      if (statuses.some((status) => status === 'live')) {
+        setTelemetryStatus('live');
+        setIsFallbackActive(false);
+        return;
+      }
+
+      if (statuses.some((status) => status === 'connecting')) {
+        setTelemetryStatus('connecting');
+        return;
+      }
+
+      if (statuses.some((status) => status === 'reconnecting')) {
+        setTelemetryStatus('reconnecting');
+        return;
+      }
+
+      setTelemetryStatus('idle');
+    };
+
+    const cleanups = telemetryDeviceCodes.map((deviceCode) =>
+      createTelemetrySubscription({
+        deviceCode,
+        onStatusChange: (status) => {
+          statusByDevice.set(deviceCode, status);
+          updateAggregateStatus();
+        },
+        onMessage: (payload) => {
+          setDevices((current) => applyTelemetryToDevices(current, payload));
+          setLastTelemetryAt(payload.recordedAt || new Date().toISOString());
+          setTelemetrySource('websocket');
+        },
+      }),
+    );
+
+    return () => {
+      cleanups.forEach((cleanup) => cleanup?.());
+    };
+  }, [telemetryDeviceCodes]);
 
   // Subscribe to the device-specific alert topic (only when device is known)
   useEffect(() => {
@@ -392,7 +450,9 @@ const Dashboard = () => {
 
         setDevices(deviceData);
 
-        const refreshedDevice = deviceData.find((device) => device.deviceCode === primaryDevice.deviceCode) || deviceData[0] || null;
+        const refreshedDevice =
+          deviceData.find((device) => device.deviceCode === primaryDevice.deviceCode) ||
+          getPreferredDashboardDevice(deviceData);
         if (refreshedDevice?.lastSensorAt) {
           setLastTelemetryAt(refreshedDevice.lastSensorAt);
           setTelemetrySource('polling');

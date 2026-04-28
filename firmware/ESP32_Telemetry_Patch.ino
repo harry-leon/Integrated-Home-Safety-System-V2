@@ -14,6 +14,24 @@ const char* DEVICE_CODE = "SL-FRONT-001";
 const char* BACKEND_TELEMETRY_URL = "http://192.168.1.10:8080/api/telemetry/report";
 
 // =========================================================
+// BLYNK DATASTREAM MAPPING (100% theo danh sach trong Blynk template)
+// =========================================================
+const int VPIN_RADIAL_GAUGE = V1;              // Radial Gauge (gas sensor)
+const int VPIN_TEST_LED = 2;                   // TESTLED (pin 2)
+const int VPIN_LDR_VALUE = V3;                 // LDR sensor
+const int VPIN_PIR_VALUE = V4;                 // PIR sensor
+const int VPIN_DOOR_CONTROL = V20;             // DOOR
+const int VPIN_DOOR_STATUS = V30;              // DoorStatus
+const int VPIN_ALERT_ENABLE = V40;             // ALERT_ENABLE
+const int VPIN_TEMPERATURE = V50;              // Tempurature
+const int VPIN_WEATHER_CONDITION = V51;        // Weather_Condition
+const int VPIN_FINGER_ID = V100;               // Finger_ID
+const int VPIN_REGISTER_FINGERPRINT = V101;    // Register FingerPrint
+const int VPIN_DELETE_FINGERPRINT = V102;      // Delete FingerPrint
+const int VPIN_DISPLAY = V103;                 // Display
+const int VPIN_NAME = V104;                    // Name
+
+// =========================================================
 // BACKEND TELEMETRY
 // Add these helper functions near your other helpers
 // =========================================================
@@ -59,10 +77,34 @@ void sendTelemetryToBackend() {
 // =========================================================
 void sendSensorData() {
   const int g = analogRead(MQ2_PIN);
-  Blynk.virtualWrite(V1, g);
-  Blynk.virtualWrite(V2, g > GAS_THRESHOLD ? 255 : 0);
+  const int ldr = analogRead(LDR_PIN);
+  const int pir = digitalRead(PIR_PIN);
+
+  Blynk.virtualWrite(VPIN_RADIAL_GAUGE, g);
+  Blynk.virtualWrite(VPIN_TEST_LED, g > GAS_THRESHOLD ? 255 : 0);
+  Blynk.virtualWrite(VPIN_LDR_VALUE, ldr);
+  Blynk.virtualWrite(VPIN_PIR_VALUE, pir);
+  Blynk.virtualWrite(VPIN_TEMPERATURE, weatherTemp);
+  Blynk.virtualWrite(VPIN_WEATHER_CONDITION, weatherDesc);
+
   sendTelemetryToBackend();
 }
+
+// =========================================================
+// OPTIONAL: callbacks for control pins from Blynk app
+// (merge into your existing callbacks/state variables)
+// =========================================================
+/*
+bool gasAlertEnabled = true;
+
+BLYNK_WRITE(V40) {
+  gasAlertEnabled = param.asInt() == 1;
+}
+
+void publishDoorStatusToBlynk(bool isDoorOpened) {
+  Blynk.virtualWrite(VPIN_DOOR_STATUS, isDoorOpened ? "Opened" : "Closed");
+}
+*/
 
 // =========================================================
 // SETUP HOOK

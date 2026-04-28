@@ -6,6 +6,7 @@ import com.smartlock.model.UserLoginSession;
 import com.smartlock.repository.UserLoginSessionRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
@@ -42,7 +43,7 @@ public class UserLoginSessionService {
         session.setLocation(null);
         session.setLastActiveAt(LocalDateTime.now());
         session.setLoggedOutAt(null);
-        sessionRepository.save(session);
+        saveSession(session, tokenHash);
         recentSessionTouches.put(tokenHash, now);
     }
 
@@ -58,18 +59,13 @@ public class UserLoginSessionService {
             return;
         }
 
-        UserLoginSession session = sessionRepository.findBySessionTokenHash(tokenHash)
-                .orElseGet(() -> UserLoginSession.builder()
-                        .user(user)
-                        .sessionTokenHash(tokenHash)
-                        .ipAddress(resolveIp(request))
-                        .userAgent(truncate(request.getHeader("User-Agent"), 1024))
-                        .deviceName(resolveDeviceName(request.getHeader("User-Agent")))
-                        .location(null)
-                        .build());
+        UserLoginSession session = sessionRepository.findBySessionTokenHash(tokenHash).orElse(null);
+        if (session == null) {
+            return;
+        }
 
         session.setLastActiveAt(LocalDateTime.now());
-        sessionRepository.save(session);
+        saveSession(session, tokenHash);
         recentSessionTouches.put(tokenHash, now);
     }
 
@@ -111,6 +107,22 @@ public class UserLoginSessionService {
             return truncate(forwarded.split(",")[0].trim(), 120);
         }
         return truncate(request.getRemoteAddr(), 120);
+    }
+
+    private UserLoginSession saveSession(UserLoginSession session, String tokenHash) {
+        try {
+            return sessionRepository.saveAndFlush(session);
+        } catch (DataIntegrityViolationException ex) {
+            UserLoginSession existing = sessionRepository.findBySessionTokenHash(tokenHash)
+                    .orElseThrow(() -> ex);
+            existing.setIpAddress(session.getIpAddress());
+            existing.setUserAgent(session.getUserAgent());
+            existing.setDeviceName(session.getDeviceName());
+            existing.setLocation(session.getLocation());
+            existing.setLastActiveAt(session.getLastActiveAt());
+            existing.setLoggedOutAt(session.getLoggedOutAt());
+            return sessionRepository.saveAndFlush(existing);
+        }
     }
 
     private String resolveDeviceName(String userAgent) {

@@ -32,3 +32,8 @@ logging:
   level:
     org.springframework.security: INFO
     org.springframework.web: INFO
+
+blynk:
+  telemetry:
+    ldr-pin: ${BLYNK_LDR_PIN:3}
+    pir-pin: ${BLYNK_PIR_PIN:4}
