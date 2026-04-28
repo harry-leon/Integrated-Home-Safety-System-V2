@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useLang } from '../contexts/LangContext';
 import House3D from '../components/House3D';
 
 const BOTTOM_BADGES = [
@@ -31,46 +32,19 @@ const Login = () => {
   const navigate  = useNavigate();
   const location  = useLocation();
   const { login, isAuthenticated } = useAuth();
+  const { lang, toggleLang, t } = useLang();
 
   const [email,    setEmail]    = useState('');
   const [password, setPassword] = useState('');
   const [showPass, setShowPass] = useState(false);
   const [error,    setError]    = useState('');
   const [loading,  setLoading]  = useState(false);
-  const [showHouseGuide, setShowHouseGuide] = useState(true);
 
   const cardRef = useRef(null);
-
-  const hideHouseGuide = React.useCallback(() => {
-    document.documentElement.dataset.houseGuideHidden = 'true';
-    setShowHouseGuide(false);
-  }, []);
 
   React.useEffect(() => {
     if (isAuthenticated) navigate('/', { replace: true });
   }, [isAuthenticated, navigate]);
-
-  React.useEffect(() => {
-    delete document.documentElement.dataset.houseGuideHidden;
-  }, []);
-
-  React.useEffect(() => {
-    if (!showHouseGuide) return undefined;
-    const hide = (e) => {
-      if (e.target?.closest?.('[data-auth-card="true"]')) return;
-      hideHouseGuide();
-    };
-    document.addEventListener('pointerdown', hide, true);
-    document.addEventListener('mousedown',   hide, true);
-    document.addEventListener('touchstart',  hide, true);
-    document.addEventListener('wheel',       hide, true);
-    return () => {
-      document.removeEventListener('pointerdown', hide, true);
-      document.removeEventListener('mousedown',   hide, true);
-      document.removeEventListener('touchstart',  hide, true);
-      document.removeEventListener('wheel',       hide, true);
-    };
-  }, [hideHouseGuide, showHouseGuide]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -86,10 +60,7 @@ const Login = () => {
     }
   };
 
-  const hideGuideFromScene = (e) => {
-    if (e.target?.closest?.('[data-auth-card="true"]')) return;
-    hideHouseGuide();
-  };
+  const hideGuideFromScene = (_e) => {};
 
   /* ── Card mouse glow ─────────────────────────────────────────── */
   const handleCardMouseMove = (e) => {
@@ -114,7 +85,7 @@ const Login = () => {
     >
       {/* 3-D house canvas */}
       <div className="absolute inset-0 z-[4]">
-        <House3D onInteract={hideHouseGuide} />
+        <House3D onInteract={() => {}} />
       </div>
 
       {/* Interaction layer — passes clicks to House3D */}
@@ -122,46 +93,8 @@ const Login = () => {
         aria-hidden="true"
         data-testid="house-interaction-layer"
         className="absolute inset-y-0 left-0 z-[8] w-full cursor-grab active:cursor-grabbing md:w-[58vw]"
-        onClick={hideHouseGuide}
-        onMouseDown={hideHouseGuide}
-        onPointerDown={hideHouseGuide}
-        onTouchStart={hideHouseGuide}
-        onWheel={hideHouseGuide}
         style={{ background: 'rgba(255,255,255,0.001)' }}
       />
-
-      {/* House guide callout */}
-      {showHouseGuide && (
-        <div className="house-guide-callout pointer-events-none absolute left-4 right-4 top-12 z-[9] md:left-[18vw] md:right-auto md:top-[48%] md:w-[min(360px,46vw)] md:-translate-y-1/2">
-          <div className="absolute -left-8 top-1/2 hidden h-px w-8 bg-gradient-to-l from-blue-300/55 to-transparent md:block" />
-          <div className="absolute -left-14 top-1/2 hidden h-6 w-6 -translate-y-1/2 rounded-full border border-blue-300/45 shadow-[0_0_22px_rgba(96,165,250,0.42)] md:block">
-            <span className="absolute inset-1 rounded-full bg-blue-300/18 house-guide-ping" />
-          </div>
-          <div className="ui-demo-reveal rounded-2xl border border-white/[0.10] bg-white/[0.055] px-4 py-3 shadow-[0_18px_46px_rgba(2,6,23,0.38)] backdrop-blur-2xl">
-            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.22em] text-blue-300/85">
-              <span className="material-symbols-outlined text-[16px]">touch_app</span>
-              Tương tác căn nhà
-            </div>
-            <div className="mt-3 grid gap-2 text-[11px] leading-relaxed text-slate-300">
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-[16px] text-blue-300">360</span>
-                <span>Kéo trên vùng nhà để xoay 360°</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-[16px] text-cyan-300">layers</span>
-                <span>Bấm vào nhà để tách hoặc thu tầng</span>
-              </div>
-              <div className="hidden items-center gap-2 md:flex">
-                <span className="material-symbols-outlined text-[16px] text-amber-300">zoom_in</span>
-                <span>Cuộn trên vùng nhà để zoom</span>
-              </div>
-            </div>
-            <p className="mt-3 border-t border-white/[0.08] pt-2 text-[9px] font-bold uppercase tracking-[0.2em] text-slate-500">
-              Tự ẩn sau thao tác đầu tiên
-            </p>
-          </div>
-        </div>
-      )}
 
       {/* Vignette */}
       <div className="absolute inset-0 z-[1] pointer-events-none"
@@ -191,6 +124,15 @@ const Login = () => {
         <div className="flex-1 border-t border-blue-500/10" />
         <span className="text-[8px] text-blue-400/40 font-['Inter'] tracking-widest">AUTH v5.0.GRID</span>
       </div>
+
+      <button
+        type="button"
+        onClick={toggleLang}
+        className="pointer-events-auto absolute right-6 top-12 z-[20] rounded-xl border border-white/10 bg-white/10 px-3 py-2 text-xs font-black text-white backdrop-blur hover:border-blue-300/40"
+        title={t('switch_language')}
+      >
+        {lang === 'vn' ? 'VI' : 'EN'}
+      </button>
 
       {/* Main layout */}
       <main className="relative z-10 pointer-events-none w-full max-w-[1440px] mx-auto px-6 md:px-14 min-h-screen grid grid-cols-1 md:grid-cols-12 gap-0 md:gap-12 items-center py-12">
@@ -303,8 +245,8 @@ const Login = () => {
               </div>
 
               {/* Heading */}
-              <h3 className="text-[32px] font-extrabold tracking-tight leading-tight mb-2">Đăng nhập</h3>
-              <p className="text-sm text-slate-400/70 mb-9">Nhập thông tin định danh để điều khiển thiết bị.</p>
+              <h3 className="text-[32px] font-extrabold tracking-tight leading-tight mb-2">{t('login_title')}</h3>
+              <p className="text-sm text-slate-400/70 mb-9">{t('login_desc')}</p>
 
               <form className="space-y-6" onSubmit={handleSubmit}>
                 {error && (
@@ -339,7 +281,7 @@ const Login = () => {
                       Mã khóa
                     </label>
                     <Link to="/forgot-password" className="text-[11px] text-[#38bdf8]/70 hover:text-[#38bdf8] transition-colors">
-                      Quên mã khóa?
+                      {t('forgot_password')}
                     </Link>
                   </div>
                   <div className="relative group/f">
@@ -368,7 +310,7 @@ const Login = () => {
                   <input id="remember" type="checkbox" disabled={loading}
                     className="w-4 h-4 rounded bg-white/5 border-white/20 accent-[#0f62fe] outline-none" />
                   <label htmlFor="remember" className="text-xs text-slate-500 cursor-pointer select-none">
-                    Duy trì phiên đăng nhập
+                    {t('remember_session')}
                   </label>
                 </div>
 
@@ -387,7 +329,7 @@ const Login = () => {
                       </>
                     ) : (
                       <>
-                        Thiết lập kết nối an toàn
+                        {t('login_submit')}
                         <span className="material-symbols-outlined text-lg">arrow_forward</span>
                       </>
                     )}
@@ -423,9 +365,9 @@ const Login = () => {
               {/* Footer */}
               <div className="mt-8 pt-6 border-t border-white/[0.06] text-center">
                 <p className="text-sm text-slate-500">
-                  Yêu cầu cấp quyền?{' '}
+                  {t('no_account')}{' '}
                   <Link to="/register" className="text-[#38bdf8] hover:text-[#7dd3fc] font-semibold transition-colors">
-                    Đăng ký ngay →
+                    {t('register_title')} →
                   </Link>
                 </p>
               </div>

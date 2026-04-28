@@ -8,9 +8,9 @@ import { smartLockApi } from '../services/api';
 import UserAvatar from '../components/UserAvatar';
 
 const PROFILE_SECTIONS = [
-  { id: 'profile', label: 'Profile', icon: 'person', roles: ['ADMIN', 'MEMBER', 'VIEWER'] },
-  { id: 'preferences', label: 'Settings', icon: 'tune', roles: ['ADMIN', 'MEMBER', 'VIEWER'] },
-  { id: 'logins', label: 'Login activity', icon: 'devices', roles: ['ADMIN'] },
+  { id: 'profile', labelKey: 'profile_view', icon: 'person', roles: ['ADMIN', 'MEMBER', 'VIEWER'] },
+  { id: 'preferences', labelKey: 'preferences', icon: 'tune', roles: ['ADMIN', 'MEMBER', 'VIEWER'] },
+  { id: 'logins', labelKey: 'login_activity', icon: 'devices', roles: ['ADMIN'] },
 ];
 
 const emptyProfileForm = {
@@ -22,18 +22,10 @@ const emptyProfileForm = {
   bio: '',
 };
 
-const formatDateTime = (value) => {
-  if (!value) return 'Unavailable';
-  return new Date(value).toLocaleString('vi-VN', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  });
-};
-
 const Settings = () => {
   const { theme, toggleTheme } = useTheme();
   const { user, applyUserProfile } = useAuth();
-  const { t } = useLang();
+  const { t, formatDateTime } = useLang();
   const { showAlert } = useAlertModal();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -130,8 +122,8 @@ const Settings = () => {
         setSessionsError('');
       } catch (error) {
         if (isMounted) {
-          setPreferencesError(error.message || 'Unable to load account preferences.');
-          setSessionsError(error.message || 'Unable to load login activity.');
+          setPreferencesError(error.message || t('preferences_desc'));
+          setSessionsError(error.message || t('login_activity_desc'));
         }
       } finally {
         if (isMounted) {
@@ -297,11 +289,9 @@ const Settings = () => {
     <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500 relative pb-20">
       <section className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
         <div>
-          <h1 className="text-4xl sm:text-5xl font-headline font-extrabold tracking-tighter text-on-surface mb-2">
-            Account Settings
-          </h1>
+          <h1 className="text-4xl sm:text-5xl font-headline font-extrabold tracking-tighter text-on-surface mb-2">{t('account_settings_title')}</h1>
           <p className="text-outline font-body opacity-80">
-            Manage avatar, profile details, preferences, and active login sessions.
+            {t('account_settings_desc')}
           </p>
         </div>
 
@@ -320,7 +310,7 @@ const Settings = () => {
                 }`}
               >
                 <span className="material-symbols-outlined text-[18px]">{section.icon}</span>
-                {section.label}
+                {t(section.labelKey)}
               </button>
             );
           })}
@@ -352,11 +342,11 @@ const Settings = () => {
 
             <div className="mt-6 space-y-3">
               <label className="block">
-                <span className="sr-only">Choose avatar</span>
+                <span className="sr-only">{t('profile_edit')}</span>
                 <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" className="hidden" onChange={handleAvatarSelection} />
                 <span className="flex items-center justify-center gap-2 rounded-2xl border border-outline-variant/15 bg-surface-container-high px-4 py-3 text-sm font-semibold text-on-surface cursor-pointer hover:border-primary/25 transition-all">
                   <span className="material-symbols-outlined text-[18px] text-primary">upload</span>
-                  Choose avatar
+                  {t('profile_edit')}
                 </span>
               </label>
 
@@ -366,7 +356,7 @@ const Settings = () => {
                 disabled={!avatarFile || avatarUploading}
                 className="w-full rounded-2xl bg-gradient-to-br from-primary-container to-primary px-4 py-3 text-sm font-bold text-on-primary-container transition-all hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {avatarUploading ? 'Uploading avatar...' : avatarFile ? 'Upload selected avatar' : 'Select a file first'}
+                {avatarUploading ? t('loading') : avatarFile ? t('profile_edit') : t('fingerprints_not_selected')}
               </button>
 
               {avatarError && <p className="text-sm text-error">{avatarError}</p>}
@@ -376,10 +366,10 @@ const Settings = () => {
           </div>
 
           <div className="bg-surface-container rounded-[2rem] p-7 border border-outline-variant/10 shadow-sm">
-            <h3 className="text-lg font-headline font-bold text-on-surface mb-4">Account snapshot</h3>
+            <h3 className="text-lg font-headline font-bold text-on-surface mb-4">{t('current_device')}</h3>
             <div className="space-y-4">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-outline">Theme</span>
+                <span className="text-outline">{t('switch_theme')}</span>
                 <button
                   type="button"
                   onClick={toggleTheme}
@@ -390,12 +380,12 @@ const Settings = () => {
                 </button>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-outline">Last login</span>
+                <span className="text-outline">{t('last_login')}</span>
                 <span className="text-on-surface font-semibold text-right">{formatDateTime(user?.lastLogin)}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-outline">Current session</span>
-                <span className="text-on-surface font-semibold text-right">{currentSession?.deviceName || 'Current browser session'}</span>
+                <span className="text-outline">{t('current_device')}</span>
+                <span className="text-on-surface font-semibold text-right">{currentSession?.deviceName || t('current_browser_session')}</span>
               </div>
             </div>
           </div>
@@ -406,8 +396,8 @@ const Settings = () => {
             <div className="bg-surface-container rounded-[2rem] p-8 border border-outline-variant/10 shadow-sm">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                 <div>
-                  <h3 className="text-2xl font-headline font-bold text-on-surface">Profile details</h3>
-                  <p className="text-outline text-sm mt-1">Your account data is stored securely and only editable by the current signed-in user.</p>
+                  <h3 className="text-2xl font-headline font-bold text-on-surface">{t('profile_view')}</h3>
+                  <p className="text-outline text-sm mt-1">{t('profile_view_desc')}</p>
                 </div>
 
                 <button
@@ -420,13 +410,13 @@ const Settings = () => {
                   className="inline-flex items-center justify-center gap-2 rounded-2xl border border-outline-variant/15 bg-surface-container-high px-4 py-3 text-sm font-bold text-on-surface hover:border-primary/20 transition-all"
                 >
                   <span className="material-symbols-outlined text-[18px]">{isEditingProfile ? 'visibility' : 'edit_square'}</span>
-                  {isEditingProfile ? 'View mode' : 'Edit profile'}
+                  {isEditingProfile ? t('profile_view') : t('profile_edit')}
                 </button>
               </div>
 
               <form className="grid grid-cols-1 md:grid-cols-2 gap-5" onSubmit={handleProfileSave}>
                 <label className="space-y-2">
-                  <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-outline">Full name</span>
+                  <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-outline">{t('full_name')}</span>
                   <input
                     name="fullName"
                     value={profileForm.fullName}
@@ -503,12 +493,12 @@ const Settings = () => {
                       {profileSaving ? (
                         <>
                           <span className="w-4 h-4 border-2 border-on-primary-container/30 border-t-on-primary-container rounded-full animate-spin" />
-                          Saving...
+                          {t('loading')}
                         </>
                       ) : (
                         <>
                           <span className="material-symbols-outlined text-[18px]">save</span>
-                          Save profile
+                          {t('profile_edit')}
                         </>
                       )}
                     </button>
@@ -543,7 +533,7 @@ const Settings = () => {
                       className="inline-flex items-center gap-2 rounded-2xl border border-outline-variant/15 px-5 py-3 text-sm font-bold text-outline hover:text-on-surface hover:border-primary/20 transition-all"
                     >
                       <span className="material-symbols-outlined text-[18px]">close</span>
-                      Cancel
+                      {t('voice_cancel')}
                     </button>
                   </div>
                 )}
@@ -554,8 +544,8 @@ const Settings = () => {
           {activeSection === 'preferences' && (
             <div className="bg-surface-container rounded-[2rem] p-8 border border-outline-variant/10 shadow-sm">
               <div className="mb-8">
-                <h3 className="text-2xl font-headline font-bold text-on-surface">Notification & account preferences</h3>
-                <p className="text-outline text-sm mt-1">Existing settings are protected with step-up verification before saving changes.</p>
+                <h3 className="text-2xl font-headline font-bold text-on-surface">{t('preferences')}</h3>
+                <p className="text-outline text-sm mt-1">{t('preferences_desc')}</p>
               </div>
 
               {preferencesLoading ? (
@@ -567,12 +557,12 @@ const Settings = () => {
               ) : (
                 <form className="space-y-5" onSubmit={handlePreferenceSave}>
                   {[
-                    ['webPushEnabled', 'Web push alerts', 'Live browser security alerts'],
-                    ['emailEnabled', 'Email digest', 'Daily and critical account summaries'],
-                    ['gasAlertEnabled', 'Gas alerts', 'Immediate gas leak notifications'],
-                    ['intruderAlertEnabled', 'Intruder alerts', 'Unauthorized access activity'],
-                    ['wrongPassAlertEnabled', 'Wrong password alerts', 'Failed keypad attempts'],
-                    ['fingerprintAlertEnabled', 'Fingerprint alerts', 'Biometric enrollment and usage events'],
+                    ['webPushEnabled', t('notifications'), t('system_safe_desc')],
+                    ['emailEnabled', 'Email', t('weekly_report_fallback')],
+                    ['gasAlertEnabled', t('gas_alert'), t('reminder_gas_detected')],
+                    ['intruderAlertEnabled', t('alert_intruder'), t('reminder_intruder_detected')],
+                    ['wrongPassAlertEnabled', t('alert_wrong_password'), t('review_logs')],
+                    ['fingerprintAlertEnabled', t('fingerprints'), t('fingerprints_registry_desc')],
                   ].map(([key, title, description]) => (
                     <button
                       key={key}
@@ -591,12 +581,12 @@ const Settings = () => {
                   ))}
 
                   <label className="space-y-2 block">
-                    <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-outline">Current password</span>
+                    <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-outline">Password</span>
                     <input
                       type="password"
                       value={notificationPassword}
                       onChange={(event) => setNotificationPassword(event.target.value)}
-                      placeholder="Required to save preference changes"
+                      placeholder={t('voice_verify')}
                       className="w-full rounded-2xl bg-surface-container-high border border-outline-variant/10 px-4 py-3 outline-none focus:ring-1 focus:ring-primary text-on-surface"
                     />
                   </label>
@@ -612,12 +602,12 @@ const Settings = () => {
                     {preferencesSaving ? (
                       <>
                         <span className="w-4 h-4 border-2 border-on-primary-container/30 border-t-on-primary-container rounded-full animate-spin" />
-                        Saving settings...
+                        {t('loading')}
                       </>
                     ) : (
                       <>
                         <span className="material-symbols-outlined text-[18px]">shield_lock</span>
-                        Save preferences
+                        {t('preferences')}
                       </>
                     )}
                   </button>
@@ -629,8 +619,8 @@ const Settings = () => {
           {activeSection === 'logins' && (
             <div className="bg-surface-container rounded-[2rem] p-8 border border-outline-variant/10 shadow-sm">
               <div className="mb-8">
-                <h3 className="text-2xl font-headline font-bold text-on-surface">Login activity</h3>
-                <p className="text-outline text-sm mt-1">Review your current device and the most recent authenticated sessions.</p>
+                <h3 className="text-2xl font-headline font-bold text-on-surface">{t('login_activity')}</h3>
+                <p className="text-outline text-sm mt-1">{t('login_activity_desc')}</p>
               </div>
 
               {sessionsLoading ? (
@@ -660,27 +650,27 @@ const Settings = () => {
                             </span>
                             <div>
                               <p className="text-sm font-bold text-on-surface">
-                                {session.deviceName || 'Unknown device'}
+                                {session.deviceName || t('unknown_device')}
                                 {session.current && (
                                   <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] uppercase tracking-[0.18em] text-primary">
                                     <span className="w-1.5 h-1.5 rounded-full bg-primary data-pulse" />
-                                    Current
+                                    {t('current_device')}
                                   </span>
                                 )}
                               </p>
-                              <p className="text-xs text-outline">{session.ipAddress || 'IP unavailable'}</p>
+                              <p className="text-xs text-outline">{session.ipAddress || 'IP'}</p>
                             </div>
                           </div>
-                          <p className="text-sm text-outline break-all">{session.userAgent || 'User agent unavailable'}</p>
+                          <p className="text-sm text-outline break-all">{session.userAgent || t('unavailable')}</p>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 min-w-[18rem]">
                           <div className="rounded-2xl bg-surface-container px-4 py-3 border border-outline-variant/10">
-                            <div className="text-[10px] uppercase tracking-[0.2em] text-outline font-bold">Signed in</div>
+                            <div className="text-[10px] uppercase tracking-[0.2em] text-outline font-bold">{t('signed_in')}</div>
                             <div className="text-sm font-semibold text-on-surface mt-1">{formatDateTime(session.createdAt)}</div>
                           </div>
                           <div className="rounded-2xl bg-surface-container px-4 py-3 border border-outline-variant/10">
-                            <div className="text-[10px] uppercase tracking-[0.2em] text-outline font-bold">Last active</div>
+                            <div className="text-[10px] uppercase tracking-[0.2em] text-outline font-bold">{t('last_active')}</div>
                             <div className="text-sm font-semibold text-on-surface mt-1">{formatDateTime(session.lastActiveAt)}</div>
                           </div>
                         </div>
@@ -688,7 +678,7 @@ const Settings = () => {
 
                       {session.loggedOutAt && (
                         <p className="mt-3 text-xs text-outline">
-                          Logged out at {formatDateTime(session.loggedOutAt)}
+                          {t('logged_out')} {formatDateTime(session.loggedOutAt)}
                         </p>
                       )}
                     </div>
@@ -696,7 +686,7 @@ const Settings = () => {
 
                   {sessions.length === 0 && (
                     <div className="rounded-2xl border border-outline-variant/10 bg-surface-container-high px-5 py-8 text-center text-outline">
-                      No login activity is available yet.
+                      {t('no_data')}
                     </div>
                   )}
                 </div>

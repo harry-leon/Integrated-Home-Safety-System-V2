@@ -1,83 +1,73 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { smartLockApi } from '../services/api';
+import {
+  PERIOD_OPTIONS,
+  SENSOR_SERIES,
+  generateAnalyticsSimulation,
+} from '../utils/analyticsSimulation';
+import { useLang } from '../contexts/LangContext';
 
 const COLORS = {
   access: '#38bdf8',
   alert: '#f59e0b',
   success: '#22c55e',
   danger: '#ef4444',
-  purple: '#a855f7',
-  cyan: '#2dd4bf',
-  blue: '#0f62fe',
-  muted: '#64748b',
+  surface: 'var(--color-surface-container)',
 };
 
-const ACTION_META = {
-  UNLOCKED: { label: 'Mo khoa', color: COLORS.success, icon: 'lock_open' },
-  LOCKED: { label: 'Khoa cua', color: COLORS.blue, icon: 'lock' },
-  DENIED: { label: 'Tu choi', color: COLORS.danger, icon: 'block' },
-  TAMPERED: { label: 'Can thiep', color: COLORS.alert, icon: 'warning' },
-  SETTINGS_UPDATED: { label: 'Cai dat', color: COLORS.cyan, icon: 'settings' },
+const sensorLabelKeys = {
+  temperature: 'sensor_temperature',
+  humidity: 'sensor_humidity',
+  gas: 'sensor_gas',
+  light: 'sensor_light',
+  motion: 'sensor_motion',
+  doorOpen: 'sensor_door_open',
+  doorClose: 'sensor_door_close',
 };
 
-const METHOD_META = {
-  REMOTE: { label: 'Remote', color: COLORS.blue },
-  FINGERPRINT: { label: 'Van tay', color: COLORS.purple },
-  APP: { label: 'Ung dung', color: COLORS.access },
-  KEYPAD: { label: 'Keypad', color: COLORS.cyan },
+const SENSOR_THRESHOLDS = {
+  temperature: { note: '> 38°C: quá nóng, cần chú ý', dangerAt: 38, compare: 'above' },
+  humidity: { note: '> 85%: không khí quá ẩm', dangerAt: 85, compare: 'above' },
+  gas: { note: 'Rò rỉ khí gas (dựa vào ngưỡng người dùng)', dangerAt: 450, compare: 'above', dynamic: true },
+  light: { note: '< 80 lux: trời tối', dangerAt: 80, compare: 'below' },
+  motion: { note: '> 5 lần/lần đo: có nhiều chuyển động', dangerAt: 5, compare: 'above' },
+  doorOpen: { note: '> 5 lần/lần đo: cửa mở bất thường', dangerAt: 5, compare: 'above' },
+  doorClose: { note: '> 5 lần/lần đo: cửa đóng liên tục', dangerAt: 5, compare: 'above' },
 };
-
-const SEVERITY_META = {
-  CRITICAL: { label: 'Nguy cap', color: COLORS.danger },
-  HIGH: { label: 'Cao', color: COLORS.alert },
-  MEDIUM: { label: 'Trung binh', color: COLORS.access },
-  LOW: { label: 'Thap', color: COLORS.success },
-};
-
-const EMPTY_WEEK = ['D-6', 'D-5', 'D-4', 'D-3', 'D-2', 'D-1', 'Today'];
 
 const formatNumber = (value) => new Intl.NumberFormat('vi-VN').format(Number(value || 0));
 
-const formatPercent = (value) => `${Number(value || 0).toFixed(0)}%`;
-
-const formatChange = (value) => {
-  if (value == null) return '0.0%';
-  const sign = Number(value) > 0 ? '+' : '';
-  return `${sign}${Number(value).toFixed(1)}%`;
-};
-
 const formatDateTime = (value) => {
-  if (!value) return 'Chua co moc thoi gian';
+  if (!value) return 'Đang tải';
+  return new Date(value).toLocaleString('vi-VN', { dateStyle: 'short', timeStyle: 'short' });
+};
+
+const formatDetailedTime = (value) => {
+  if (!value) return 'Chưa có thời gian';
   return new Date(value).toLocaleString('vi-VN', {
-    dateStyle: 'short',
-    timeStyle: 'short',
+    dateStyle: 'medium',
+    timeStyle: 'medium',
   });
-};
-
-const relativeTime = (value) => {
-  if (!value) return 'Chua cap nhat';
-  const diff = Date.now() - new Date(value).getTime();
-  const minutes = Math.max(1, Math.floor(diff / 60000));
-  if (minutes < 60) return `${minutes} phut truoc`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours} gio truoc`;
-  return `${Math.floor(hours / 24)} ngay truoc`;
-};
-
-const mapTrend = (trend = {}) => {
-  const entries = Object.entries(trend || {});
-  if (entries.length) {
-    return entries.map(([label, value]) => ({ label, value: Number(value || 0) }));
-  }
-  return EMPTY_WEEK.map((label) => ({ label, value: 0 }));
 };
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
+const getSensorStatus = (sensorKey, value, thresholds = SENSOR_THRESHOLDS) => {
+  const threshold = thresholds[sensorKey];
+  if (!threshold) return { label: 'Bình thường', color: COLORS.success };
+
+  const numeric = Number(value || 0);
+  const isDanger = threshold.compare === 'below'
+    ? numeric < threshold.dangerAt
+    : numeric > threshold.dangerAt;
+
+  return isDanger
+    ? { label: 'Cảnh báo', color: COLORS.danger }
+    : { label: 'Bình thường', color: COLORS.success };
+};
+
 const Panel = ({ children, className = '' }) => (
-  <section
-    className={`relative overflow-hidden rounded-[1.75rem] border border-outline-variant/12 bg-surface-container p-5 shadow-sm ${className}`}
-  >
+  <section className={`rounded-[1.75rem] border border-outline-variant/12 bg-surface-container p-5 shadow-sm ${className}`}>
     {children}
   </section>
 );
@@ -96,117 +86,55 @@ const LoadingBlock = ({ className = 'h-24' }) => (
   <div className={`${className} animate-pulse rounded-2xl bg-surface-container-high`} />
 );
 
-const EmptyState = ({ title = 'Chua co du lieu', detail = 'He thong se hien thi khi backend ghi nhan du lieu moi.' }) => (
-  <div className="flex min-h-32 flex-col items-center justify-center rounded-2xl border border-dashed border-outline-variant/30 bg-surface-container-high/50 px-4 py-6 text-center">
-    <span className="material-symbols-outlined text-3xl text-outline">query_stats</span>
-    <p className="mt-2 text-sm font-bold text-on-surface">{title}</p>
-    <p className="mt-1 max-w-sm text-xs leading-5 text-outline">{detail}</p>
+const StatCard = ({ label, value, detail, icon, color }) => (
+  <div className="relative overflow-hidden rounded-[1.5rem] border border-outline-variant/12 bg-surface-container p-5 shadow-sm">
+    <div className="absolute right-0 top-0 h-24 w-24 rounded-bl-[4rem] opacity-10" style={{ background: color }} />
+    <div className="relative flex items-start gap-3">
+      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl" style={{ background: `${color}18`, color }}>
+        <span className="material-symbols-outlined text-[22px]">{icon}</span>
+      </div>
+      <div className="min-w-0">
+        <p className="text-xs font-bold uppercase tracking-[0.16em] text-outline">{label}</p>
+        <p className="mt-3 text-3xl font-black tracking-tight text-on-surface">{value}</p>
+        <p className="mt-2 text-sm text-outline">{detail}</p>
+      </div>
+    </div>
   </div>
 );
 
-const Sparkline = ({ data = [], color = COLORS.access }) => {
-  const values = data.map((item) => Number(item.value ?? item ?? 0));
+const LineChart = ({ data, series, title }) => {
+  const width = 760;
+  const height = 300;
+  const pad = { top: 18, right: 24, bottom: 42, left: 46 };
+  const labels = data.map((item) => item.label);
+  const values = data.flatMap((item) => series.map((entry) => Number(item[entry.key] || 0)));
   const max = Math.max(...values, 1);
   const min = Math.min(...values, 0);
   const range = Math.max(max - min, 1);
-  const points = values.map((value, index) => {
-    const x = (index / Math.max(values.length - 1, 1)) * 116 + 2;
-    const y = 38 - ((value - min) / range) * 34;
-    return `${x.toFixed(1)},${y.toFixed(1)}`;
-  });
-
-  return (
-    <svg viewBox="0 0 120 42" className="h-11 w-28" aria-hidden="true">
-      <polyline
-        points={points.join(' ')}
-        fill="none"
-        stroke={color}
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      {points.length ? <circle cx={points.at(-1).split(',')[0]} cy={points.at(-1).split(',')[1]} r="3" fill={color} /> : null}
-    </svg>
-  );
-};
-
-const KpiCard = ({ label, value, detail, icon, color, trend, spark }) => (
-  <div className="group relative overflow-hidden rounded-[1.5rem] border border-outline-variant/12 bg-surface-container p-5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-primary/25">
-    <div
-      className="absolute right-0 top-0 h-24 w-24 rounded-bl-[4rem] opacity-10"
-      style={{ background: color }}
-      aria-hidden="true"
-    />
-    <div className="relative flex items-start justify-between gap-4">
-      <div className="flex min-w-0 items-start gap-3">
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl" style={{ background: `${color}18`, color }}>
-          <span className="material-symbols-outlined text-[22px]">{icon}</span>
-        </div>
-        <div className="min-w-0">
-          <p className="text-xs font-bold uppercase tracking-[0.16em] text-outline">{label}</p>
-          <p className="mt-3 text-3xl font-black tracking-tight text-on-surface">{value}</p>
-        </div>
-      </div>
-      {spark ? <Sparkline data={spark} color={color} /> : null}
-    </div>
-    <div className="relative mt-4 flex flex-wrap items-center justify-between gap-3">
-      <p className="text-sm text-outline">{detail}</p>
-      {trend != null ? (
-        <span
-          className="rounded-full px-2.5 py-1 text-xs font-black"
-          style={{
-            background: Number(trend) >= 0 ? `${COLORS.success}16` : `${COLORS.danger}16`,
-            color: Number(trend) >= 0 ? COLORS.success : COLORS.danger,
-          }}
-        >
-          {formatChange(trend)}
-        </span>
-      ) : null}
-    </div>
-  </div>
-);
-
-const AreaChart = ({ accessData, alertData }) => {
-  const width = 720;
-  const height = 280;
-  const pad = { top: 18, right: 20, bottom: 38, left: 42 };
-  const labels = accessData.map((item) => item.label);
-  const allValues = [...accessData, ...alertData].map((item) => item.value);
-  const max = Math.max(...allValues, 1);
   const innerW = width - pad.left - pad.right;
   const innerH = height - pad.top - pad.bottom;
   const x = (index) => pad.left + (index / Math.max(labels.length - 1, 1)) * innerW;
-  const y = (value) => pad.top + innerH - (Number(value || 0) / max) * innerH;
+  const y = (value) => pad.top + innerH - ((Number(value || 0) - min) / range) * innerH;
 
-  const makePath = (data) =>
+  const makePath = (key) =>
     data
       .map((item, index) => {
         const currentX = x(index);
-        const currentY = y(item.value);
+        const currentY = y(item[key]);
         if (index === 0) return `M${currentX},${currentY}`;
         const prevX = x(index - 1);
-        const prevY = y(data[index - 1].value);
+        const prevY = y(data[index - 1][key]);
         const midX = (prevX + currentX) / 2;
         return `C${midX},${prevY} ${midX},${currentY} ${currentX},${currentY}`;
       })
       .join(' ');
 
-  const accessPath = makePath(accessData);
-  const alertPath = makePath(alertData);
-  const areaPath = `${accessPath} L${x(accessData.length - 1)},${pad.top + innerH} L${x(0)},${pad.top + innerH} Z`;
-  const ticks = [0, 0.25, 0.5, 0.75, 1].map((tick) => Math.round(tick * max));
+  const tickValues = [0, 0.25, 0.5, 0.75, 1].map((tick) => Math.round(min + tick * range));
 
   return (
-    <div className="w-full overflow-hidden rounded-2xl bg-surface-container-high/50 px-2 py-3">
-      <svg viewBox={`0 0 ${width} ${height}`} className="h-auto w-full" role="img" aria-label="Bieu do xu huong truy cap va canh bao trong 7 ngay">
-        <defs>
-          <linearGradient id="access-area" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={COLORS.access} stopOpacity="0.28" />
-            <stop offset="100%" stopColor={COLORS.access} stopOpacity="0" />
-          </linearGradient>
-        </defs>
-
-        {ticks.map((tick, index) => (
+    <div className="overflow-hidden rounded-2xl bg-surface-container-high/50 px-2 py-3">
+      <svg viewBox={`0 0 ${width} ${height}`} className="h-auto w-full" role="img" aria-label={title}>
+        {tickValues.map((tick, index) => (
           <g key={`${tick}-${index}`}>
             <line x1={pad.left} x2={width - pad.right} y1={y(tick)} y2={y(tick)} stroke="currentColor" strokeOpacity="0.08" />
             <text x={pad.left - 10} y={y(tick) + 4} textAnchor="end" fontSize="11" fill="currentColor" opacity="0.45">
@@ -214,237 +142,224 @@ const AreaChart = ({ accessData, alertData }) => {
             </text>
           </g>
         ))}
-
         {labels.map((label, index) => (
-          <text key={`${label}-${index}`} x={x(index)} y={height - 12} textAnchor="middle" fontSize="11" fill="currentColor" opacity="0.55">
+          <text
+            key={`${label}-${index}`}
+            x={x(index)}
+            y={height - 14}
+            textAnchor="middle"
+            fontSize="11"
+            fill="currentColor"
+            opacity={index % Math.ceil(labels.length / 8 || 1) === 0 || index === labels.length - 1 ? 0.6 : 0}
+          >
             {label}
           </text>
         ))}
-
-        <path d={areaPath} fill="url(#access-area)" />
-        <path d={accessPath} fill="none" stroke={COLORS.access} strokeWidth="3" strokeLinecap="round" />
-        <path d={alertPath} fill="none" stroke={COLORS.alert} strokeWidth="3" strokeLinecap="round" strokeDasharray="8 8" />
-
-        {accessData.map((item, index) => (
-          <circle key={`a-${item.label}-${index}`} cx={x(index)} cy={y(item.value)} r="4" fill={COLORS.access} stroke="var(--color-surface-container)" strokeWidth="2" />
-        ))}
-        {alertData.map((item, index) => (
-          <g key={`b-${item.label}-${index}`}>
-            <rect x={x(index) - 4} y={y(item.value) - 4} width="8" height="8" rx="2" fill={COLORS.alert} />
-          </g>
+        {series.map((entry) => (
+          <path key={entry.key} d={makePath(entry.key)} fill="none" stroke={entry.color} strokeWidth="3" strokeLinecap="round" />
         ))}
       </svg>
     </div>
   );
 };
 
-const DonutChart = ({ segments, centerValue, centerLabel }) => {
-  const size = 170;
-  const radius = 58;
-  const stroke = 18;
-  const circumference = 2 * Math.PI * radius;
-  const total = segments.reduce((sum, item) => sum + item.value, 0) || 1;
-  const arcs = segments.reduce((items, segment) => {
-    const dash = (segment.value / total) * circumference;
-    const previousOffset = items.length ? items[items.length - 1].nextOffset : 0;
-    items.push({
-      ...segment,
-      dash,
-      offset: previousOffset,
-      nextOffset: previousOffset + dash,
-    });
-    return items;
-  }, []);
+const BarCompare = ({ data, series }) => {
+  const max = Math.max(...data.flatMap((item) => series.map((entry) => item[entry.key] || 0)), 1);
+  const visibleLabels = Math.ceil(data.length / 10);
 
   return (
-    <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-      <svg viewBox={`0 0 ${size} ${size}`} className="mx-auto h-44 w-44 shrink-0" role="img" aria-label="Bieu do vong ti le su kien">
-        <circle cx="85" cy="85" r={radius} fill="none" stroke="currentColor" strokeOpacity="0.08" strokeWidth={stroke} />
-        {arcs.map((segment) => (
-          <circle
-            key={segment.label}
-            cx="85"
-            cy="85"
-            r={radius}
-            fill="none"
-            stroke={segment.color}
-            strokeWidth={stroke}
-            strokeLinecap="round"
-            strokeDasharray={`${Math.max(segment.dash - 3, 0)} ${circumference}`}
-            strokeDashoffset={-(segment.offset - circumference * 0.25)}
-          />
-        ))}
-        <text x="85" y="80" textAnchor="middle" fontSize="25" fontWeight="900" fill="currentColor">
-          {centerValue}
-        </text>
-        <text x="85" y="101" textAnchor="middle" fontSize="11" fontWeight="700" fill="currentColor" opacity="0.5">
-          {centerLabel}
-        </text>
-      </svg>
-      <div className="min-w-0 flex-1 space-y-3">
-        {segments.map((segment) => (
-          <div key={segment.label} className="flex items-center gap-3">
-            <span className="h-2.5 w-2.5 rounded-full" style={{ background: segment.color }} />
-            <span className="flex-1 text-sm font-semibold text-on-surface">{segment.label}</span>
-            <span className="text-sm font-black" style={{ color: segment.color }}>
-              {formatNumber(segment.value)}
+    <div className="flex h-72 items-end gap-2 overflow-hidden rounded-2xl bg-surface-container-high/50 px-3 pb-4 pt-6">
+      {data.map((item, index) => (
+        <div key={`${item.label}-${index}`} className="flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-2">
+          <div className="flex h-full w-full items-end justify-center gap-1">
+            {series.map((entry) => (
+              <div
+                key={entry.key}
+                className="w-full rounded-t-xl"
+                style={{
+                  height: `${clamp(((item[entry.key] || 0) / max) * 100, item[entry.key] > 0 ? 4 : 1, 100)}%`,
+                  background: `linear-gradient(180deg, ${entry.color}, ${entry.color}88)`,
+                }}
+                title={`${entry.label}: ${formatNumber(item[entry.key])}`}
+              />
+            ))}
+          </div>
+          <span className="w-full truncate text-center text-[11px] font-semibold text-outline">
+            {index % visibleLabels === 0 || index === data.length - 1 ? item.label : ''}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const SensorBarChart = ({ data, sensor }) => {
+  const max = Math.max(...data.map((item) => Number(item[sensor.key] || 0)), 1);
+  const visibleLabels = Math.ceil(data.length / 10);
+
+  return (
+    <div className="flex h-72 items-end gap-2 overflow-hidden rounded-2xl bg-surface-container-high/50 px-3 pb-4 pt-6">
+      {data.map((item, index) => {
+        const value = Number(item[sensor.key] || 0);
+        return (
+          <div key={`${sensor.key}-${item.label}-${index}`} className="flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-2">
+            <span className="text-xs font-black text-on-surface">{formatNumber(value)}</span>
+            <div
+              className="w-full rounded-t-2xl"
+              style={{
+                height: `${clamp((value / max) * 100, value > 0 ? 5 : 1, 100)}%`,
+                background: `linear-gradient(180deg, ${sensor.color}, ${sensor.color}88)`,
+              }}
+              title={`${sensor.label}: ${formatNumber(value)} ${sensor.unit}`}
+            />
+            <span className="w-full truncate text-center text-[11px] font-semibold text-outline">
+              {index % visibleLabels === 0 || index === data.length - 1 ? item.label : ''}
             </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+const HeatMap = ({ data }) => {
+  const max = Math.max(...data.map((item) => item.motion + item.doorOpen + item.alerts), 1);
+
+  return (
+    <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 xl:grid-cols-6">
+      {data.map((item, index) => {
+        const intensity = (item.motion + item.doorOpen + item.alerts) / max;
+        return (
+          <div
+            key={`${item.label}-${index}`}
+            className="rounded-2xl border border-outline-variant/10 px-3 py-3"
+            style={{ background: `rgba(56, 189, 248, ${0.07 + intensity * 0.28})` }}
+          >
+            <p className="truncate text-xs font-black text-on-surface">{item.label}</p>
+            <p className="mt-2 text-2xl font-black text-on-surface">{formatNumber(item.motion + item.doorOpen)}</p>
+            <p className="text-[11px] font-semibold text-outline">Chuyển động và cửa mở</p>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+const HISTORY_PERIOD_OPTIONS = [
+  { value: 'day',   label: 'Ngày' },
+  { value: 'week',  label: 'Tuần' },
+  { value: 'month', label: 'Tháng' },
+  { value: 'year',  label: 'Năm' },
+];
+
+const DetailTimeline = ({ title, label, icon, color, rows, emptyText, period: activePeriod, onPeriodChange }) => (
+  <Panel>
+    <SectionTitle
+      label={label}
+      title={title}
+      action={
+        <span className="inline-flex items-center gap-2 rounded-full bg-surface-container-high px-3 py-1 text-xs font-black text-outline">
+          <span className="material-symbols-outlined text-[16px]" style={{ color }}>{icon}</span>
+          {formatNumber(rows.length)} mốc
+        </span>
+      }
+    />
+    {onPeriodChange && (
+      <div className="mb-4 flex flex-wrap gap-2">
+        {HISTORY_PERIOD_OPTIONS.map((opt) => (
+          <button
+            key={opt.value}
+            type="button"
+            onClick={() => onPeriodChange(opt.value)}
+            className={`min-h-9 rounded-xl px-3 text-xs font-black transition ${
+              activePeriod === opt.value
+                ? 'bg-primary text-white shadow-sm'
+                : 'bg-surface-container-high text-outline hover:text-on-surface'
+            }`}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
+    )}
+    {rows.length ? (
+      <div className="space-y-3">
+        {rows.slice(0, 10).map((row) => (
+          <div key={row.id} className="grid gap-3 rounded-2xl bg-surface-container-high/70 p-4 sm:grid-cols-[44px_minmax(0,1fr)_140px] sm:items-center">
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl" style={{ background: `${color}18`, color }}>
+              <span className="material-symbols-outlined text-[20px]">{icon}</span>
+            </div>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-black text-on-surface">{row.title}</p>
+              <p className="mt-1 truncate text-xs font-semibold text-outline">{row.detail}</p>
+            </div>
+            <p className="text-xs font-bold text-outline sm:text-right">{formatDetailedTime(row.time)}</p>
           </div>
         ))}
       </div>
+    ) : (
+      <div className="rounded-2xl border border-dashed border-outline-variant/20 bg-surface-container-high/40 px-4 py-8 text-center text-sm font-semibold text-outline">
+        {emptyText}
+      </div>
+    )}
+  </Panel>
+);
+
+const DeviceTable = ({ rows, formatDeviceName }) => (
+  <div className="overflow-hidden rounded-2xl border border-outline-variant/10">
+    <div className="grid grid-cols-[1.6fr_0.8fr_0.8fr_0.8fr_0.8fr] gap-3 bg-surface-container-high px-4 py-3 text-xs font-black uppercase tracking-[0.14em] text-outline">
+      <span>Thiết bị</span>
+      <span>Tình trạng</span>
+      <span>Nhiệt độ</span>
+      <span>Khí gas</span>
+      <span>Độ sáng</span>
     </div>
-  );
-};
-
-const BarChart = ({ data, color = COLORS.access }) => {
-  const max = Math.max(...data.map((item) => item.value), 1);
-
-  return (
-    <div className="flex h-56 items-end gap-2 rounded-2xl bg-surface-container-high/50 px-3 pb-3 pt-6">
-      {data.map((item) => {
-        const height = clamp((item.value / max) * 100, item.value > 0 ? 8 : 2, 100);
-        return (
-          <div key={item.label} className="flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-2">
-            <span className="text-xs font-black text-on-surface">{formatNumber(item.value)}</span>
-            <div className="w-full rounded-t-2xl" style={{ height: `${height}%`, background: `linear-gradient(180deg, ${color}, ${color}88)` }} />
-            <span className="w-full truncate text-center text-[11px] font-semibold text-outline">{item.label}</span>
-          </div>
-        );
-      })}
-    </div>
-  );
-};
-
-const Gauge = ({ value }) => {
-  const safeValue = clamp(Number(value || 0), 0, 100);
-  const color = safeValue >= 80 ? COLORS.success : safeValue >= 50 ? COLORS.alert : COLORS.danger;
-  const radius = 70;
-  const circumference = Math.PI * radius;
-
-  return (
-    <div className="flex flex-col items-center">
-      <svg viewBox="0 0 190 120" className="h-36 w-full max-w-56" role="img" aria-label={`Suc khoe thiet bi ${safeValue.toFixed(0)} phan tram`}>
-        <path d="M25 95 A70 70 0 0 1 165 95" fill="none" stroke="currentColor" strokeOpacity="0.1" strokeWidth="18" strokeLinecap="round" />
-        <path
-          d="M25 95 A70 70 0 0 1 165 95"
-          fill="none"
-          stroke={color}
-          strokeWidth="18"
-          strokeLinecap="round"
-          strokeDasharray={`${(safeValue / 100) * circumference} ${circumference}`}
-        />
-        <text x="95" y="80" textAnchor="middle" fontSize="32" fontWeight="900" fill={color}>
-          {safeValue.toFixed(0)}
-        </text>
-        <text x="95" y="102" textAnchor="middle" fontSize="12" fontWeight="800" fill="currentColor" opacity="0.5">
-          HEALTH SCORE
-        </text>
-      </svg>
-    </div>
-  );
-};
-
-const HorizontalBars = ({ data }) => {
-  const max = Math.max(...data.map((item) => item.value), 1);
-
-  return (
-    <div className="space-y-4">
-      {data.map((item) => (
-        <div key={item.label}>
-          <div className="mb-1.5 flex items-center justify-between gap-3">
-            <span className="text-sm font-bold text-on-surface">{item.label}</span>
-            <span className="text-sm font-black" style={{ color: item.color }}>
-              {formatNumber(item.value)}
-            </span>
-          </div>
-          <div className="h-2.5 overflow-hidden rounded-full bg-surface-container-high">
-            <div
-              className="h-full rounded-full"
-              style={{
-                width: `${(item.value / max) * 100}%`,
-                background: `linear-gradient(90deg, ${item.color}, ${item.color}99)`,
-              }}
-            />
-          </div>
+    {rows.map((row) => (
+      <div key={row.id} className="grid grid-cols-[1.6fr_0.8fr_0.8fr_0.8fr_0.8fr] gap-3 border-t border-outline-variant/10 px-4 py-4 text-sm">
+        <div className="min-w-0">
+          <p className="truncate font-black text-on-surface">{formatDeviceName(row.name)}</p>
+          <p className="mt-1 truncate text-xs font-semibold text-outline">{row.code} · {row.online ? 'Đang hoạt động' : 'Mất kết nối'}</p>
         </div>
-      ))}
-    </div>
-  );
-};
+        <span className="font-black text-on-surface">{row.health >= 70 ? 'Tốt' : 'Cần kiểm tra'}</span>
+        <span className="font-semibold text-outline">{row.temperature}°C</span>
+        <span className="font-semibold text-outline">{row.gas} ppm</span>
+        <span className="font-semibold text-outline">{row.light} lux</span>
+      </div>
+    ))}
+  </div>
+);
 
-const EventTimeline = ({ events }) => {
-  if (!events.length) return <EmptyState title="Chua co su kien gan day" detail="Nhat ky truy cap se xuat hien tai day sau khi co thao tac khoa/mo cua." />;
+const ToggleChip = ({ active, children, onClick, ...buttonProps }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    {...buttonProps}
+    className={`min-h-11 rounded-2xl px-4 text-sm font-black transition ${active ? 'bg-primary text-white shadow-sm' : 'bg-surface-container-high text-outline hover:text-on-surface'}`}
+  >
+    {children}
+  </button>
+);
 
-  return (
-    <div className="space-y-3">
-      {events.map((event) => {
-        const meta = ACTION_META[event.action] || { label: event.action || 'Su kien', color: COLORS.muted, icon: 'fiber_manual_record' };
-        return (
-          <div key={event.id || `${event.createdAt}-${event.action}`} className="grid gap-3 rounded-2xl bg-surface-container-high/70 p-4 sm:grid-cols-[44px_minmax(0,1fr)_120px] sm:items-center">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl" style={{ background: `${meta.color}16`, color: meta.color }}>
-              <span className="material-symbols-outlined text-[20px]">{meta.icon}</span>
-            </div>
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
-                <p className="font-black text-on-surface">{meta.label}</p>
-                <span className="rounded-full bg-surface px-2 py-0.5 text-[11px] font-bold text-outline">{event.method || 'SYSTEM'}</span>
-              </div>
-              <p className="mt-1 truncate text-sm text-outline">
-                {event.detail || event.personName || event.userName || event.deviceName || 'He thong ghi nhan su kien'}
-              </p>
-            </div>
-            <p className="text-xs font-semibold text-outline sm:text-right">{relativeTime(event.createdAt)}</p>
-          </div>
-        );
-      })}
-    </div>
-  );
-};
-
-const DeviceGrid = ({ devices }) => {
-  if (!devices.length) return <EmptyState title="Chua co thiet bi" detail="Khi backend tra ve danh sach thiet bi, trang thai online va cam bien se duoc cap nhat tai day." />;
+const ThresholdHint = ({ sensor, value, thresholds = SENSOR_THRESHOLDS }) => {
+  const threshold = thresholds[sensor.key];
+  const status = getSensorStatus(sensor.key, value, thresholds);
+  if (!threshold) return null;
 
   return (
-    <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-      {devices.map((device) => (
-        <div key={device.id || device.deviceCode} className="rounded-2xl border border-outline-variant/10 bg-surface-container-high/70 p-4">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <p className="truncate text-sm font-black text-on-surface">{device.deviceName || device.deviceCode || 'Smart lock'}</p>
-              <p className="mt-1 text-xs font-semibold text-outline">{device.deviceCode || 'No code'}</p>
-            </div>
-            <span
-              className="rounded-full px-2.5 py-1 text-[11px] font-black"
-              style={{
-                background: device.online ? `${COLORS.success}16` : `${COLORS.danger}16`,
-                color: device.online ? COLORS.success : COLORS.danger,
-              }}
-            >
-              {device.online ? 'ONLINE' : 'OFFLINE'}
-            </span>
-          </div>
-          <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-            <div className="rounded-xl bg-surface px-2 py-2">
-              <p className="text-sm font-black text-on-surface">{device.temperature ?? '--'}</p>
-              <p className="text-[10px] font-bold text-outline">C</p>
-            </div>
-            <div className="rounded-xl bg-surface px-2 py-2">
-              <p className="text-sm font-black text-on-surface">{device.gasValue ?? '--'}</p>
-              <p className="text-[10px] font-bold text-outline">Gas</p>
-            </div>
-            <div className="rounded-xl bg-surface px-2 py-2">
-              <p className="text-sm font-black text-on-surface">{device.ldrValue ?? '--'}</p>
-              <p className="text-[10px] font-bold text-outline">Lux</p>
-            </div>
-          </div>
-          <p className="mt-3 text-xs font-semibold text-outline">Cap nhat {relativeTime(device.lastSensorAt || device.lastSeen)}</p>
-        </div>
-      ))}
+    <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-outline-variant/10 bg-surface-container-high/60 px-4 py-3">
+      <span className="text-xs font-bold text-outline">{threshold.note}</span>
+      <span
+        className="rounded-full px-2.5 py-1 text-[11px] font-black"
+        style={{ background: `${status.color}18`, color: status.color }}
+      >
+        {status.label}
+      </span>
     </div>
   );
 };
 
 const Analytics = () => {
+  const { t, formatDeviceName, formatAccessMethod } = useLang();
   const [snapshot, setSnapshot] = useState(null);
   const [weeklySnapshot, setWeeklySnapshot] = useState(null);
   const [recentLogs, setRecentLogs] = useState([]);
@@ -453,7 +368,13 @@ const Analytics = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [lastUpdated, setLastUpdated] = useState(null);
-  const [countdown, setCountdown] = useState(30);
+  const [period, setPeriod] = useState('week');
+  const [customStart, setCustomStart] = useState('');
+  const [customEnd, setCustomEnd] = useState('');
+  const [activeSensorKeys, setActiveSensorKeys] = useState(['temperature', 'gas', 'light', 'motion', 'doorOpen', 'doorClose']);
+  const [selectedVolumeSensorKey, setSelectedVolumeSensorKey] = useState('motion');
+  const [sensorHistoryPeriod, setSensorHistoryPeriod] = useState('week');
+  const [deviceSettings, setDeviceSettings] = useState(null);
 
   const loadAll = useCallback(async () => {
     setLoading(true);
@@ -462,8 +383,8 @@ const Analytics = () => {
       const [snap, weekly, logs, alertData, deviceData] = await Promise.all([
         smartLockApi.getAnalyticsSnapshot(),
         smartLockApi.getWeeklySnapshot(),
-        smartLockApi.getAccessLogs({ page: 0, size: 60 }),
-        smartLockApi.getAlerts({ page: 0, size: 40 }),
+        smartLockApi.getAccessLogs({ page: 0, size: 80 }),
+        smartLockApi.getAlerts({ page: 0, size: 60 }),
         smartLockApi.getDevices(),
       ]);
       setSnapshot(snap || null);
@@ -472,9 +393,16 @@ const Analytics = () => {
       setAlerts(Array.isArray(alertData) ? alertData : []);
       setDevices(Array.isArray(deviceData) ? deviceData : []);
       setLastUpdated(new Date());
-      setCountdown(30);
+
+      // Load device settings for the first device to get user-configured thresholds
+      const firstDevice = Array.isArray(deviceData) && deviceData[0];
+      if (firstDevice?.id) {
+        smartLockApi.getDeviceSettings(firstDevice.id)
+          .then((settings) => setDeviceSettings(settings))
+          .catch(() => {});
+      }
     } catch (err) {
-      setError(err.message || 'Khong the tai du lieu phan tich.');
+      setError(err.message || 'Không thể tải dữ liệu cảm biến.');
     } finally {
       setLoading(false);
     }
@@ -484,115 +412,204 @@ const Analytics = () => {
     loadAll();
   }, [loadAll]);
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCountdown((current) => {
-        if (current <= 1) {
-          loadAll();
-          return 30;
-        }
-        return current - 1;
-      });
-    }, 1000);
+  const analytics = useMemo(() => generateAnalyticsSimulation({
+    period,
+    customStart,
+    customEnd,
+    snapshot,
+    weeklySnapshot,
+    logs: recentLogs,
+    alerts,
+    devices,
+  }), [alerts, customEnd, customStart, devices, period, recentLogs, snapshot, weeklySnapshot]);
 
-    return () => clearInterval(timer);
-  }, [loadAll]);
+  // Separate analytics for sensor history section — driven by sensorHistoryPeriod
+  const sensorHistoryAnalytics = useMemo(() => generateAnalyticsSimulation({
+    period: sensorHistoryPeriod,
+    customStart: '',
+    customEnd: '',
+    snapshot,
+    weeklySnapshot,
+    logs: recentLogs,
+    alerts,
+    devices,
+  }), [alerts, devices, recentLogs, sensorHistoryPeriod, snapshot, weeklySnapshot]);
 
-  const accessTrendData = useMemo(() => mapTrend(weeklySnapshot?.dailyAccessTrend), [weeklySnapshot]);
-  const alertTrendData = useMemo(() => mapTrend(weeklySnapshot?.dailyAlertTrend), [weeklySnapshot]);
+  const localizedSensorSeries = useMemo(() => SENSOR_SERIES.map((sensor) => ({
+    ...sensor,
+    label: t(sensorLabelKeys[sensor.key] || sensor.label),
+  })), [t]);
 
-  const actionBreakdown = useMemo(() => {
-    const totals = Object.keys(ACTION_META).map((action) => ({
-      ...ACTION_META[action],
-      key: action,
-      value: 0,
-    }));
-    recentLogs.forEach((log) => {
-      const item = totals.find((entry) => entry.key === log.action);
-      if (item) item.value += 1;
-    });
-    return totals;
-  }, [recentLogs]);
+  // Dynamic thresholds — gas and light use user-configured values from device settings
+  const dynamicThresholds = useMemo(() => {
+    const gasAt = Number(deviceSettings?.gasThreshold) || 450;
+    const lightAt = Number(deviceSettings?.ldrThreshold) || 80;
+    return {
+      ...SENSOR_THRESHOLDS,
+      gas: {
+        note: `> ${gasAt} ppm: rò rỉ khí gas (ngưỡng bạn đã cài)`,
+        dangerAt: gasAt,
+        compare: 'above',
+      },
+      light: {
+        note: `< ${lightAt} lux: trời tối (ngưỡng bạn đã cài)`,
+        dangerAt: lightAt,
+        compare: 'below',
+      },
+    };
+  }, [deviceSettings]);
+  const selectedSensorSeries = localizedSensorSeries.filter((item) => activeSensorKeys.includes(item.key));
+  const latest = analytics.timeline.at(-1) || {};
+  const criticalPoints = analytics.timeline.filter((item) => item.gas > dynamicThresholds.gas.dangerAt || item.alerts > 0).length;
+  const doorEventTotal = Number(analytics.totals.doorOpen || 0) + Number(analytics.totals.doorClose || 0);
+  const motionTotal = Number(analytics.totals.motion || 0);
+  const volumeSensors = localizedSensorSeries.filter((item) => ['doorOpen', 'doorClose', 'motion', 'gas', 'light', 'temperature', 'humidity'].includes(item.key));
+  const selectedVolumeSensor = volumeSensors.find((item) => item.key === selectedVolumeSensorKey) || volumeSensors[0];
+  const selectedVolumeAverage = analytics.averages[selectedVolumeSensor.key] ?? 0;
+  const selectedVolumeTotal = analytics.totals[selectedVolumeSensor.key] ?? 0;
+  const selectedVolumePeak = analytics.peaks[selectedVolumeSensor.key]?.[selectedVolumeSensor.key] ?? 0;
+  const selectedVolumeLatest = latest[selectedVolumeSensor.key] ?? 0;
+  const cumulativeSensorKeys = ['motion', 'doorOpen', 'doorClose'];
+  const primarySummaryLabel = cumulativeSensorKeys.includes(selectedVolumeSensor.key) ? t('total_times') : t('current');
+  const primarySummaryValue = cumulativeSensorKeys.includes(selectedVolumeSensor.key) ? selectedVolumeTotal : selectedVolumeLatest;
+  const fingerprintTotal = useMemo(() => {
+    const uniqueNames = new Set(
+      recentLogs
+        .filter((log) => log.method === 'FINGERPRINT')
+        .map((log) => log.personName || log.detail || log.id)
+        .filter(Boolean),
+    );
 
-  const methodBreakdown = useMemo(() => {
-    const totals = Object.keys(METHOD_META).map((method) => ({
-      ...METHOD_META[method],
-      key: method,
-      value: 0,
-    }));
-    recentLogs.forEach((log) => {
-      const item = totals.find((entry) => entry.key === log.method);
-      if (item) item.value += 1;
-    });
-    return totals;
-  }, [recentLogs]);
+    return Math.max(uniqueNames.size, Number(analytics.totals.fingerprint || 0) > 0 ? 1 : 0);
+  }, [analytics.totals.fingerprint, recentLogs]);
 
-  const severityBreakdown = useMemo(() => {
-    const totals = Object.keys(SEVERITY_META).map((severity) => ({
-      ...SEVERITY_META[severity],
-      key: severity,
-      value: 0,
-    }));
-    alerts.forEach((alert) => {
-      const item = totals.find((entry) => entry.key === alert.severity);
-      if (item) item.value += 1;
-    });
-    return totals.filter((item) => item.value > 0);
-  }, [alerts]);
+  const toggleSensor = (key) => {
+    setActiveSensorKeys((current) => (
+      current.includes(key)
+        ? current.filter((item) => item !== key)
+        : [...current, key]
+    ));
+  };
 
-  const eventSegments = useMemo(() => {
-    const success = recentLogs.filter((log) => ['UNLOCKED', 'LOCKED', 'SETTINGS_UPDATED'].includes(log.action)).length;
-    const denied = recentLogs.filter((log) => log.action === 'DENIED').length;
-    const tampered = recentLogs.filter((log) => log.action === 'TAMPERED').length;
-    const segments = [
-      { label: 'Thanh cong', value: success, color: COLORS.success },
-      { label: 'Tu choi', value: denied, color: COLORS.danger },
-      { label: 'Can thiep', value: tampered, color: COLORS.alert },
-    ].filter((item) => item.value > 0);
-    return segments.length ? segments : [{ label: 'Chua co su kien', value: 1, color: COLORS.muted }];
-  }, [recentLogs]);
+  const doorTimelineRows = useMemo(() => {
+    const logRows = recentLogs
+      .filter((log) => log.action === 'LOCKED' || log.action === 'UNLOCKED')
+      .map((log) => ({
+        id: log.id || `${log.action}-${log.createdAt}`,
+        time: log.createdAt,
+        title: log.action === 'LOCKED' ? 'Cửa đã đóng' : 'Cửa đã mở',
+        detail: `${formatDeviceName(log.deviceName)} · ${formatAccessMethod(log.method)} · ${log.personName || log.userName || 'Người dùng'}`,
+      }));
 
-  const totalClassifiedEvents = eventSegments.reduce((sum, item) => sum + item.value, 0);
-  const successRate = totalClassifiedEvents && eventSegments[0]?.label === 'Thanh cong'
-    ? (eventSegments[0].value / totalClassifiedEvents) * 100
-    : recentLogs.length === 0
-      ? 100
-      : 0;
+    if (logRows.length) return logRows;
 
-  const healthScore = Number(snapshot?.deviceHealthScore || 0);
-  const activeAlerts = alerts.filter((alert) => !alert.resolved);
-  const onlineDevices = devices.filter((device) => device.online).length;
-  const highRiskCount = alerts.filter((alert) => ['CRITICAL', 'HIGH'].includes(alert.severity)).length;
+    return analytics.timeline
+      .filter((item) => item.doorOpen > 0 || item.doorClose > 0)
+      .map((item, index) => ({
+        id: `door-${index}-${item.label}`,
+        time: item.date,
+        title: `${formatNumber(item.doorOpen)} lần mở · ${formatNumber(item.doorClose)} lần đóng`,
+        detail: `Dữ liệu trong mốc ${item.label}`,
+      }))
+      .reverse();
+  }, [analytics.timeline, recentLogs]);
+
+  const motionTimelineRows = useMemo(() => analytics.timeline
+    .filter((item) => item.motion > 0)
+    .map((item, index) => ({
+      id: `motion-${index}-${item.label}`,
+      time: item.date,
+      title: `Phát hiện ${formatNumber(item.motion)} lần chuyển động`,
+      detail: `Ghi nhận tại ${item.label}; cửa mở ${formatNumber(item.doorOpen)} lần trong cùng mốc.`,
+    }))
+    .reverse(), [analytics.timeline]);
+
+  const gasTimelineRows = useMemo(() => analytics.timeline
+    .map((item, index, all) => {
+      const previous = all[index - 1];
+      const delta = previous ? Number(item.gas || 0) - Number(previous.gas || 0) : 0;
+      const isDanger = Number(item.gas || 0) > dynamicThresholds.gas.dangerAt;
+      return {
+        id: `gas-${index}-${item.label}`,
+        time: item.date,
+        title: `${formatNumber(item.gas)} ppm, ${delta >= 0 ? 'tăng' : 'giảm'} ${formatNumber(Math.abs(delta))}`,
+        detail: isDanger ? `Vượt ngưỡng ${dynamicThresholds.gas.dangerAt} ppm — rò rỉ khí gas` : 'Đang trong mức an toàn',
+        delta,
+        isDanger,
+      };
+    })
+    .filter((item) => item.isDanger)
+    .reverse(), [analytics.timeline, dynamicThresholds.gas.dangerAt]);
+
+  const selectedSensorRows = useMemo(() => {
+    if (selectedVolumeSensor.key === 'doorOpen' || selectedVolumeSensor.key === 'doorClose') return doorTimelineRows;
+    if (selectedVolumeSensor.key === 'motion') return motionTimelineRows;
+    if (selectedVolumeSensor.key === 'gas') return gasTimelineRows;
+
+    return sensorHistoryAnalytics.timeline
+      .map((item, index, all) => {
+        const previous = all[index - 1];
+        const value = Number(item[selectedVolumeSensor.key] || 0);
+        const previousValue = previous ? Number(previous[selectedVolumeSensor.key] || 0) : value;
+        const delta = value - previousValue;
+        return {
+          id: `${selectedVolumeSensor.key}-${index}-${item.label}`,
+          time: item.date,
+          title: `${formatNumber(value)} ${selectedVolumeSensor.unit}, ${delta >= 0 ? 'tăng' : 'giảm'} ${formatNumber(Math.abs(delta))}`,
+          detail: `${selectedVolumeSensor.label} thay đổi tại mốc ${item.label}`,
+        };
+      })
+      .filter((_, index) => index > 0)
+      .reverse();
+  }, [sensorHistoryAnalytics.timeline, doorTimelineRows, gasTimelineRows, motionTimelineRows, selectedVolumeSensor]);
 
   return (
     <div className="space-y-6 pb-20">
       <header className="relative overflow-hidden rounded-[2rem] border border-outline-variant/12 bg-surface-container p-6 shadow-sm sm:p-8">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(56,189,248,0.18),transparent_36%),radial-gradient(circle_at_bottom_left,rgba(34,197,94,0.12),transparent_34%)]" aria-hidden="true" />
-        <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+        <div className="relative z-10 flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
           <div className="max-w-3xl">
-            <p className="text-xs font-black uppercase tracking-[0.28em] text-outline">Sentinel analytics</p>
+            <p className="text-xs font-black uppercase tracking-[0.28em] text-outline">{t('analytics_sensor_report')}</p>
             <h1 className="mt-3 text-3xl font-black tracking-tight text-on-surface sm:text-5xl">
-              Phan tich van hanh theo du lieu backend
+              {t('analytics_sensor_title')}
             </h1>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-outline sm:text-base">
-              Dashboard tong hop snapshot, bao cao 7 ngay, nhat ky truy cap, canh bao va trang thai thiet bi de theo doi an toan nha thong minh theo thoi gian gan thuc.
+              {t('analytics_sensor_desc')}
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="rounded-2xl bg-surface-container-high px-4 py-3">
-              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-outline">Lan cap nhat</p>
-              <p className="mt-1 text-sm font-black text-on-surface">{lastUpdated ? lastUpdated.toLocaleTimeString('vi-VN') : 'Dang tai'}</p>
+          <div className="flex flex-col gap-3 lg:min-w-[520px]">
+            <div className="flex flex-wrap gap-2">
+              {PERIOD_OPTIONS.map((option) => (
+                <ToggleChip key={option.value} active={period === option.value} onClick={() => setPeriod(option.value)}>
+                  {option.label}
+                </ToggleChip>
+              ))}
             </div>
-            <button
-              type="button"
-              onClick={loadAll}
-              disabled={loading}
-              className="inline-flex min-h-12 cursor-pointer items-center gap-2 rounded-2xl bg-primary px-5 py-3 text-sm font-black text-white transition duration-200 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <span className={`material-symbols-outlined text-[19px] ${loading ? 'animate-spin' : ''}`}>refresh</span>
-              Lam moi {countdown}s
-            </button>
+            <div className="grid gap-2 sm:grid-cols-[1fr_1fr_auto]">
+              <input
+                type="date"
+                value={customStart}
+                onChange={(event) => setCustomStart(event.target.value)}
+                className="min-h-11 rounded-2xl border border-outline-variant/12 bg-surface-container-high px-4 text-sm font-semibold text-on-surface outline-none focus:border-primary/40"
+                aria-label="Ngày bắt đầu"
+              />
+              <input
+                type="date"
+                value={customEnd}
+                onChange={(event) => setCustomEnd(event.target.value)}
+                className="min-h-11 rounded-2xl border border-outline-variant/12 bg-surface-container-high px-4 text-sm font-semibold text-on-surface outline-none focus:border-primary/40"
+                aria-label="Ngày kết thúc"
+              />
+              <button
+                type="button"
+                onClick={loadAll}
+                disabled={loading}
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl bg-primary px-4 text-sm font-black text-white disabled:opacity-50"
+              >
+                <span className={`material-symbols-outlined text-[18px] ${loading ? 'animate-spin' : ''}`}>refresh</span>
+                {t('view_all')}
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -601,9 +618,6 @@ const Analytics = () => {
         <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-red-500/20 bg-red-500/8 px-4 py-3 text-sm font-semibold text-error">
           <span className="material-symbols-outlined">error</span>
           <span className="flex-1">{error}</span>
-          <button type="button" onClick={loadAll} className="cursor-pointer rounded-xl bg-red-500/10 px-3 py-2 font-black">
-            Thu lai
-          </button>
         </div>
       ) : null}
 
@@ -617,38 +631,10 @@ const Analytics = () => {
           </>
         ) : (
           <>
-            <KpiCard
-              label="Truy cap hom nay"
-              value={formatNumber(snapshot?.accessLogsToday)}
-              detail={`${formatNumber(weeklySnapshot?.totalAccessThisWeek)} trong 7 ngay`}
-              icon="door_front"
-              color={COLORS.access}
-              trend={weeklySnapshot?.accessChangeRate}
-              spark={accessTrendData}
-            />
-            <KpiCard
-              label="Canh bao hom nay"
-              value={formatNumber(snapshot?.totalAlertsToday)}
-              detail={`${formatNumber(activeAlerts.length)} canh bao dang mo`}
-              icon="warning"
-              color={COLORS.alert}
-              trend={weeklySnapshot?.alertChangeRate}
-              spark={alertTrendData}
-            />
-            <KpiCard
-              label="Rui ro cao"
-              value={formatNumber(snapshot?.criticalAlertsToday ?? highRiskCount)}
-              detail={`${formatNumber(highRiskCount)} muc high/critical trong danh sach`}
-              icon="emergency"
-              color={COLORS.danger}
-            />
-            <KpiCard
-              label="Suc khoe thiet bi"
-              value={formatPercent(healthScore)}
-              detail={`${formatNumber(snapshot?.onlineDevices ?? onlineDevices)}/${formatNumber(snapshot?.totalDevices ?? devices.length)} online`}
-              icon="sensors"
-              color={COLORS.success}
-            />
+            <StatCard label={t('fingerprints_total')} value={formatNumber(fingerprintTotal)} detail={t('fingerprints_registry_desc')} icon="fingerprint" color="#a855f7" />
+            <StatCard label="Khí gas cao nhất" value={`${analytics.peaks.gas?.gas || 0} ppm`} detail={`${criticalPoints} mốc cần chú ý`} icon="gas_meter" color={COLORS.danger} />
+            <StatCard label="Cửa đóng/mở" value={formatNumber(doorEventTotal)} detail={`${formatNumber(analytics.totals.doorOpen)} lần mở · ${formatNumber(analytics.totals.doorClose)} lần đóng`} icon="sensor_door" color={COLORS.success} />
+            <StatCard label="Có chuyển động" value={formatNumber(motionTotal)} detail={`Cập nhật lúc ${formatDateTime(lastUpdated)}`} icon="motion_sensor_active" color={COLORS.access} />
           </>
         )}
       </div>
@@ -656,89 +642,147 @@ const Analytics = () => {
       <div className="grid gap-4 xl:grid-cols-12">
         <Panel className="xl:col-span-8">
           <SectionTitle
-            label="7 ngay qua"
-            title="Xu huong truy cap va canh bao"
-            action={
-              <div className="flex items-center gap-4 text-xs font-bold text-outline">
-                <span className="inline-flex items-center gap-2"><span className="h-0.5 w-5 rounded-full" style={{ background: COLORS.access }} />Truy cap</span>
-                <span className="inline-flex items-center gap-2"><span className="h-2 w-2 rounded-sm" style={{ background: COLORS.alert }} />Canh bao</span>
-              </div>
-            }
+            label={t('overview_chart')}
+            title={t('sensor_values_over_time')}
+            action={<span className="rounded-full bg-surface-container-high px-3 py-1 text-xs font-black text-outline">{analytics.timeline.length} mốc</span>}
           />
-          {loading ? <LoadingBlock className="h-72" /> : <AreaChart accessData={accessTrendData} alertData={alertTrendData} />}
-          <p className="mt-4 rounded-2xl bg-surface-container-high/60 px-4 py-3 text-sm leading-6 text-outline">
-            {weeklySnapshot?.progressSummary || 'Chua co tong hop tu backend cho khoang 7 ngay gan nhat.'}
-          </p>
+          <div className="mb-4 flex flex-wrap gap-2">
+            {localizedSensorSeries.map((item) => (
+              <ToggleChip key={item.key} active={activeSensorKeys.includes(item.key)} onClick={() => toggleSensor(item.key)}>
+                <span className="inline-flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full" style={{ background: item.color }} />
+                  {item.label}
+                </span>
+              </ToggleChip>
+            ))}
+          </div>
+          {loading ? <LoadingBlock className="h-80" /> : <LineChart data={analytics.timeline} series={selectedSensorSeries} title={t('sensor_values_over_time')} />}
         </Panel>
 
         <Panel className="xl:col-span-4">
-          <SectionTitle label="Ty le su kien" title="Thanh cong / tu choi / can thiep" />
-          {loading ? <LoadingBlock className="h-64" /> : (
-            <DonutChart segments={eventSegments} centerValue={formatPercent(successRate)} centerLabel="success" />
-          )}
-        </Panel>
-      </div>
-
-      <div className="grid gap-4 xl:grid-cols-12">
-        <Panel className="xl:col-span-4">
-          <SectionTitle label="Device health" title="Trang thai doi thiet bi" />
-          {loading ? <LoadingBlock className="h-64" /> : (
-            <>
-              <Gauge value={healthScore} />
-              <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-                <div className="rounded-2xl bg-surface-container-high p-3">
-                  <p className="text-2xl font-black text-on-surface">{formatNumber(snapshot?.totalDevices ?? devices.length)}</p>
-                  <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-outline">Tong</p>
+          <SectionTitle label={t('common_values')} title={t('sensor_average_title')} />
+          <div className="space-y-3">
+            {localizedSensorSeries.map((item) => (
+              <div key={item.key} className="rounded-2xl bg-surface-container-high/70 px-4 py-3">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="inline-flex min-w-0 items-center gap-3 text-sm font-bold text-on-surface">
+                    <span className="material-symbols-outlined text-[20px]" style={{ color: item.color }}>{item.icon}</span>
+                    {item.label}
+                  </span>
+                  <span className="text-sm font-black" style={{ color: item.color }}>
+                    {formatNumber(analytics.averages[item.key])} {item.unit}
+                  </span>
                 </div>
-                <div className="rounded-2xl bg-surface-container-high p-3">
-                  <p className="text-2xl font-black" style={{ color: COLORS.success }}>{formatNumber(snapshot?.onlineDevices ?? onlineDevices)}</p>
-                  <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-outline">Online</p>
-                </div>
-                <div className="rounded-2xl bg-surface-container-high p-3">
-                  <p className="text-2xl font-black" style={{ color: COLORS.danger }}>{formatNumber((snapshot?.totalDevices ?? devices.length) - (snapshot?.onlineDevices ?? onlineDevices))}</p>
-                  <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-outline">Offline</p>
-                </div>
+                <p className="mt-1 text-[11px] font-semibold text-outline">
+                  {dynamicThresholds[item.key]?.note}
+                </p>
               </div>
-            </>
-          )}
-        </Panel>
-
-        <Panel className="xl:col-span-4">
-          <SectionTitle label="Access methods" title="Nguon thao tac khoa cua" />
-          {loading ? <LoadingBlock className="h-64" /> : <HorizontalBars data={methodBreakdown} />}
-        </Panel>
-
-        <Panel className="xl:col-span-4">
-          <SectionTitle label="Alert severity" title="Muc do canh bao" />
-          {loading ? <LoadingBlock className="h-64" /> : (
-            severityBreakdown.length ? <HorizontalBars data={severityBreakdown} /> : <EmptyState title="Khong co canh bao" detail="Danh sach alert hien tai khong co severity nao de thong ke." />
-          )}
+            ))}
+          </div>
         </Panel>
       </div>
 
       <div className="grid gap-4 xl:grid-cols-12">
-        <Panel className="xl:col-span-5">
-          <SectionTitle label="Access volume" title="Luot truy cap theo ngay" />
-          {loading ? <LoadingBlock className="h-64" /> : <BarChart data={accessTrendData} color={COLORS.blue} />}
-        </Panel>
-
         <Panel className="xl:col-span-7">
           <SectionTitle
-            label="Recent events"
-            title="Dong thoi gian truy cap"
-            action={<span className="rounded-full bg-surface-container-high px-3 py-1 text-xs font-black text-outline">{formatNumber(recentLogs.length)} log</span>}
+            label="Xem từng cảm biến"
+            title={`Chi tiết: ${selectedVolumeSensor.label}`}
+            action={
+              <span className="inline-flex items-center gap-2 rounded-full bg-surface-container-high px-3 py-1 text-xs font-black text-outline">
+                <span className="material-symbols-outlined text-[16px]" style={{ color: selectedVolumeSensor.color }}>{selectedVolumeSensor.icon}</span>
+                {selectedVolumeSensor.unit}
+              </span>
+            }
           />
-          {loading ? <LoadingBlock className="h-80" /> : <EventTimeline events={recentLogs.slice(0, 8)} />}
+          <div className="mb-4 flex flex-wrap gap-2">
+            {volumeSensors.map((sensor) => (
+              <ToggleChip
+                key={sensor.key}
+                active={selectedVolumeSensorKey === sensor.key}
+                onClick={() => setSelectedVolumeSensorKey(sensor.key)}
+                aria-label={`Xem chi tiết ${sensor.label}`}
+              >
+                <span className="inline-flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full" style={{ background: sensor.color }} />
+                  {sensor.label}
+                </span>
+              </ToggleChip>
+            ))}
+          </div>
+          {loading ? <LoadingBlock className="h-72" /> : <SensorBarChart data={analytics.timeline} sensor={selectedVolumeSensor} />}
         </Panel>
+
+        <Panel className="xl:col-span-5">
+          <SectionTitle label={t('sensor_summary')} title={`${t('sensor_summary')}: ${selectedVolumeSensor.label}`} />
+          {loading ? <LoadingBlock className="h-72" /> : (
+            <div className="grid gap-3 sm:grid-cols-3 xl:grid-cols-1">
+              <div className="rounded-2xl bg-surface-container-high/70 p-4">
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-outline">{primarySummaryLabel}</p>
+                <p className="mt-2 text-3xl font-black" style={{ color: selectedVolumeSensor.color }}>
+                  {formatNumber(primarySummaryValue)} {selectedVolumeSensor.unit}
+                </p>
+              </div>
+              <div className="rounded-2xl bg-surface-container-high/70 p-4">
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-outline">{t('average')}</p>
+                <p className="mt-2 text-3xl font-black" style={{ color: selectedVolumeSensor.color }}>
+                  {formatNumber(selectedVolumeAverage)} {selectedVolumeSensor.unit}
+                </p>
+              </div>
+              <div className="rounded-2xl bg-surface-container-high/70 p-4">
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-outline">{t('highest')}</p>
+                <p className="mt-2 text-3xl font-black" style={{ color: selectedVolumeSensor.color }}>
+                  {formatNumber(selectedVolumePeak)} {selectedVolumeSensor.unit}
+                </p>
+              </div>
+              <div className="sm:col-span-3 xl:col-span-1">
+                <ThresholdHint sensor={selectedVolumeSensor} value={selectedVolumePeak} thresholds={dynamicThresholds} />
+              </div>
+            </div>
+          )}
+        </Panel>
+      </div>
+
+      <DetailTimeline
+        label={t('sensor_history')}
+        title={`Các mốc thay đổi của ${selectedVolumeSensor.label}`}
+        icon={selectedVolumeSensor.icon}
+        color={selectedVolumeSensor.color}
+        rows={selectedSensorRows}
+        emptyText="Chưa có dữ liệu chi tiết cho cảm biến đang chọn."
+        period={sensorHistoryPeriod}
+        onPeriodChange={setSensorHistoryPeriod}
+      />
+
+      <div className="grid gap-4 xl:grid-cols-3">
+        <DetailTimeline
+          label="Lịch sử cửa"
+          title="Các lần cửa đóng/mở"
+          icon="sensor_door"
+          color="#22c55e"
+          rows={doorTimelineRows}
+          emptyText="Chưa có dữ liệu đóng/mở cửa trong khoảng đang xem."
+        />
+        <DetailTimeline
+          label="Lịch sử chuyển động"
+          title="Các lần phát hiện chuyển động"
+          icon="motion_sensor_active"
+          color="#a855f7"
+          rows={motionTimelineRows}
+          emptyText="Chưa có dữ liệu chuyển động trong khoảng đang xem."
+        />
+        <DetailTimeline
+          label="Lịch sử khí gas"
+          title="Các lần khí gas vượt mức nguy hiểm"
+          icon="gas_meter"
+          color="#ef4444"
+          rows={gasTimelineRows}
+          emptyText="Không có mốc khí gas nguy hiểm trong khoảng đang xem."
+        />
       </div>
 
       <Panel>
-        <SectionTitle
-          label="Live device inventory"
-          title="Thiet bi va cam bien tu backend"
-          action={<span className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-black text-emerald-500"><span className="h-2 w-2 rounded-full bg-emerald-500" />{formatNumber(onlineDevices)} online</span>}
-        />
-        {loading ? <LoadingBlock className="h-48" /> : <DeviceGrid devices={devices} />}
+        <SectionTitle label={t('device_label')} title={t('device_sensor_status')} />
+        {loading ? <LoadingBlock className="h-72" /> : <DeviceTable rows={analytics.deviceRows} formatDeviceName={formatDeviceName} />}
       </Panel>
     </div>
   );

@@ -3,7 +3,7 @@ import { useLang } from '../contexts/LangContext';
 import { smartLockApi } from '../services/api';
 
 const UserManagement = () => {
-  const { t } = useLang();
+  const { t, formatDateTime } = useLang();
   const [users, setUsers] = useState([]);
   const [sessions, setSessions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -21,7 +21,7 @@ const UserManagement = () => {
       setUsers(userData);
       setSessions(sessionData);
     } catch (err) {
-      setError(err.message || 'Unable to load administrative data.');
+      setError(err.message || t('users_desc'));
     } finally {
       setIsLoading(false);
     }
@@ -38,7 +38,7 @@ const UserManagement = () => {
         current.map(u => u.id === userId ? { ...u, active: !u.active } : u)
       );
     } catch (err) {
-      alert('Error toggling user status: ' + err.message);
+      alert(`${t('status')}: ${err.message}`);
     }
   };
 
@@ -49,37 +49,29 @@ const UserManagement = () => {
         current.map(u => u.id === userId ? { ...u, role: newRole } : u)
       );
     } catch (err) {
-      alert('Error changing user role: ' + err.message);
+      alert(`${t('role')}: ${err.message}`);
     }
-  };
-
-  const formatDateTime = (value) => {
-    if (!value) return 'N/A';
-    return new Date(value).toLocaleString('vi-VN', {
-      dateStyle: 'short',
-      timeStyle: 'short',
-    });
   };
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-20">
       <section className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 border-b border-outline-variant/10 pb-6">
         <div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black font-headline tracking-tighter text-on-surface mb-2 uppercase">User Management</h2>
-          <p className="text-outline text-xs sm:text-base lg:text-lg">Administrative control over all system users and their active sessions.</p>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black font-headline tracking-tighter text-on-surface mb-2 uppercase">{t('users_title')}</h2>
+          <p className="text-outline text-xs sm:text-base lg:text-lg">{t('users_desc')}</p>
         </div>
         <div className="flex gap-2 bg-surface-container p-1 rounded-xl border border-outline-variant/10">
           <button 
             onClick={() => setActiveTab('users')}
             className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'users' ? 'bg-primary text-white shadow-md' : 'text-outline hover:text-on-surface'}`}
           >
-            Users
+            {t('users')}
           </button>
           <button 
             onClick={() => setActiveTab('sessions')}
             className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'sessions' ? 'bg-primary text-white shadow-md' : 'text-outline hover:text-on-surface'}`}
           >
-            Global Sessions
+            {t('global_sessions')}
           </button>
         </div>
       </section>
@@ -96,12 +88,12 @@ const UserManagement = () => {
             <table className="w-full text-left border-collapse min-w-[800px]">
               <thead>
                 <tr className="bg-surface-container-high/50 border-b border-outline-variant/10">
-                  <th className="px-6 py-5 text-[9px] sm:text-[10px] font-bold text-outline uppercase tracking-widest">Full Name</th>
+                  <th className="px-6 py-5 text-[9px] sm:text-[10px] font-bold text-outline uppercase tracking-widest">{t('full_name')}</th>
                   <th className="px-6 py-5 text-[9px] sm:text-[10px] font-bold text-outline uppercase tracking-widest">Email</th>
-                  <th className="px-6 py-5 text-[9px] sm:text-[10px] font-bold text-outline uppercase tracking-widest">Role</th>
-                  <th className="px-6 py-5 text-[9px] sm:text-[10px] font-bold text-outline uppercase tracking-widest">Status</th>
-                  <th className="px-6 py-5 text-[9px] sm:text-[10px] font-bold text-outline uppercase tracking-widest">Last Login</th>
-                  <th className="px-6 py-5 text-[9px] sm:text-[10px] font-bold text-outline uppercase tracking-widest">Actions</th>
+                  <th className="px-6 py-5 text-[9px] sm:text-[10px] font-bold text-outline uppercase tracking-widest">{t('role')}</th>
+                  <th className="px-6 py-5 text-[9px] sm:text-[10px] font-bold text-outline uppercase tracking-widest">{t('status')}</th>
+                  <th className="px-6 py-5 text-[9px] sm:text-[10px] font-bold text-outline uppercase tracking-widest">{t('last_login')}</th>
+                  <th className="px-6 py-5 text-[9px] sm:text-[10px] font-bold text-outline uppercase tracking-widest">{t('actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-outline-variant/10">
@@ -113,7 +105,7 @@ const UserManagement = () => {
                    ))
                 ) : users.map(user => (
                   <tr key={user.id} className="hover:bg-surface-container-highest/20 transition-colors">
-                    <td className="px-6 py-5 font-bold text-on-surface">{user.fullName || 'N/A'}</td>
+                    <td className="px-6 py-5 font-bold text-on-surface">{user.fullName || t('unknown_info')}</td>
                     <td className="px-6 py-5 text-sm text-outline">{user.email}</td>
                     <td className="px-6 py-5">
                       <select 
@@ -129,7 +121,7 @@ const UserManagement = () => {
                     <td className="px-6 py-5">
                       <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase ${user.active ? 'bg-emerald-500/10 text-emerald-500' : 'bg-error/10 text-error'}`}>
                         <span className={`w-1.5 h-1.5 rounded-full ${user.active ? 'bg-emerald-500' : 'bg-error'}`}></span>
-                        {user.active ? 'Active' : 'Disabled'}
+                        {user.active ? t('active') : t('disabled')}
                       </span>
                     </td>
                     <td className="px-6 py-5 text-sm text-outline">{formatDateTime(user.lastLogin)}</td>
@@ -138,7 +130,7 @@ const UserManagement = () => {
                         onClick={() => handleToggleActive(user.id)}
                         className={`text-xs font-bold px-4 py-2 rounded-xl transition-all ${user.active ? 'bg-error/10 text-error hover:bg-error/20' : 'bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20'}`}
                       >
-                        {user.active ? 'Disable' : 'Enable'}
+                        {user.active ? t('disable') : t('enable')}
                       </button>
                     </td>
                   </tr>
@@ -151,11 +143,11 @@ const UserManagement = () => {
             <table className="w-full text-left border-collapse min-w-[900px]">
               <thead>
                 <tr className="bg-surface-container-high/50 border-b border-outline-variant/10">
-                  <th className="px-6 py-5 text-[10px] font-bold text-outline uppercase tracking-widest">Device / Browser</th>
-                  <th className="px-6 py-5 text-[10px] font-bold text-outline uppercase tracking-widest">IP Address</th>
-                  <th className="px-6 py-5 text-[10px] font-bold text-outline uppercase tracking-widest">Signed In</th>
-                  <th className="px-6 py-5 text-[10px] font-bold text-outline uppercase tracking-widest">Last Active</th>
-                  <th className="px-6 py-5 text-[10px] font-bold text-outline uppercase tracking-widest">Status</th>
+                  <th className="px-6 py-5 text-[10px] font-bold text-outline uppercase tracking-widest">{t('device_label')} / Browser</th>
+                  <th className="px-6 py-5 text-[10px] font-bold text-outline uppercase tracking-widest">IP</th>
+                  <th className="px-6 py-5 text-[10px] font-bold text-outline uppercase tracking-widest">{t('signed_in')}</th>
+                  <th className="px-6 py-5 text-[10px] font-bold text-outline uppercase tracking-widest">{t('last_active')}</th>
+                  <th className="px-6 py-5 text-[10px] font-bold text-outline uppercase tracking-widest">{t('status')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-outline-variant/10">
@@ -169,7 +161,7 @@ const UserManagement = () => {
                   <tr key={session.id} className="hover:bg-surface-container-highest/20 transition-colors">
                     <td className="px-6 py-5">
                       <div className="flex flex-col">
-                        <span className="font-bold text-on-surface text-sm">{session.deviceName || 'Unknown'}</span>
+                        <span className="font-bold text-on-surface text-sm">{session.deviceName || t('unknown_device')}</span>
                         <span className="text-[10px] text-outline truncate max-w-xs">{session.userAgent}</span>
                       </div>
                     </td>
@@ -178,11 +170,11 @@ const UserManagement = () => {
                     <td className="px-6 py-5 text-sm text-outline">{formatDateTime(session.lastActiveAt)}</td>
                     <td className="px-6 py-5">
                       {session.loggedOutAt ? (
-                        <span className="text-[10px] font-bold text-outline uppercase">Logged Out</span>
+                        <span className="text-[10px] font-bold text-outline uppercase">{t('logged_out')}</span>
                       ) : (
                         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-bold uppercase">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                          Active
+                          {t('active')}
                         </span>
                       )}
                     </td>

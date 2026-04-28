@@ -8,44 +8,10 @@ import UserAvatar from './UserAvatar';
 import ProfileMenu from './ProfileMenu';
 import { smartLockApi } from '../services/api';
 
-const formatAlertTitle = (alertType, t) => {
-  switch (alertType) {
-    case 'GAS_LEAK':
-      return t('alert_gas_leak');
-    case 'INTRUDER_ALERT':
-      return t('alert_intruder');
-    case 'FIRE_ALARM':
-      return t('alert_fire');
-    case 'WRONG_PASSWORD':
-      return t('alert_wrong_password');
-    case 'TAMPER_ALERT':
-      return t('alert_tamper');
-    case 'BATTERY_LOW':
-      return t('alert_battery_low');
-    case 'OFFLINE_ALERT':
-      return t('alert_offline');
-    default:
-      return alertType || t('reminder_info');
-  }
-};
-
-const formatAlertTime = (value) => {
-  if (!value) return 'Vua xong';
-
-  const diff = Date.now() - new Date(value).getTime();
-  const minutes = Math.max(1, Math.round(diff / 60000));
-
-  if (minutes < 60) return `${minutes} phut truoc`;
-  const hours = Math.round(minutes / 60);
-  if (hours < 24) return `${hours} gio truoc`;
-  const days = Math.round(hours / 24);
-  return `${days} ngay truoc`;
-};
-
 const Header = () => {
   const location = useLocation();
   const { theme, toggleTheme } = useTheme();
-  const { lang, toggleLang, t } = useLang();
+  const { lang, toggleLang, t, formatAlertType, formatRelativeTime } = useLang();
   const { timeStr, dateStr } = useTimeWeather();
   const { user } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -166,8 +132,8 @@ const Header = () => {
               type="button"
               onClick={() => setNotificationsOpen((current) => !current)}
               className={`relative flex h-11 w-11 items-center justify-center rounded-xl border text-on-surface transition-colors hover:border-primary/30 hover:text-primary ${darkNavSurface}`}
-              title="Notifications"
-              aria-label="Open notifications"
+              title={t('notifications')}
+              aria-label={t('open_notifications')}
               aria-haspopup="dialog"
               aria-expanded={notificationsOpen}
             >
@@ -183,9 +149,9 @@ const Header = () => {
               <div className={`absolute right-0 top-[calc(100%+0.75rem)] z-50 w-[22rem] overflow-hidden rounded-[1.5rem] border shadow-[0_20px_50px_rgba(0,0,0,0.18)] ${darkPanelSurface}`}>
                 <div className="flex items-start justify-between gap-4 border-b border-outline-variant/12 px-4 py-4">
                   <div>
-                    <p className="text-sm font-bold text-on-surface">Thong bao gan day</p>
+                    <p className="text-sm font-bold text-on-surface">{t('recent_notifications')}</p>
                     <p className="mt-1 text-xs text-outline">
-                      {activeAlertCount > 0 ? `${activeAlertCount} canh bao chua xu ly` : 'Khong co thong bao moi'}
+                      {activeAlertCount > 0 ? `${activeAlertCount} ${t('unresolved_alerts')}` : t('no_new_notifications')}
                     </p>
                   </div>
                   <Link
@@ -193,15 +159,15 @@ const Header = () => {
                     onClick={() => setNotificationsOpen(false)}
                     className="text-xs font-semibold text-primary hover:underline"
                   >
-                    Xem tat ca
+                    {t('view_all')}
                   </Link>
                 </div>
 
                 <div className="max-h-[22rem] space-y-2 overflow-y-auto p-3">
                   {recentAlerts.length === 0 ? (
                     <div className="rounded-2xl border border-green-500/18 bg-green-500/8 px-4 py-4">
-                      <p className="text-sm font-semibold text-green-700">He thong an toan</p>
-                      <p className="mt-1 text-xs leading-5 text-outline">Khong co canh bao nao can xu ly o thoi diem hien tai.</p>
+                      <p className="text-sm font-semibold text-green-700">{t('system_safe')}</p>
+                      <p className="mt-1 text-xs leading-5 text-outline">{t('system_safe_desc')}</p>
                     </div>
                   ) : (
                     recentAlerts.map((alert) => (
@@ -211,16 +177,16 @@ const Header = () => {
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0">
-                            <p className="truncate text-sm font-semibold text-on-surface">{formatAlertTitle(alert.alertType, t)}</p>
+                            <p className="truncate text-sm font-semibold text-on-surface">{formatAlertType(alert.alertType)}</p>
                             <p className="mt-1 text-xs leading-5 text-outline">
-                              {alert.message || 'Can kiem tra ngay de tranh su co tiep theo.'}
+                              {alert.message || t('hero_needs_review')}
                             </p>
                           </div>
                           <span className="shrink-0 rounded-full bg-error/10 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-error">
                             {alert.severity || 'alert'}
                           </span>
                         </div>
-                        <p className="mt-2 text-[11px] text-outline">{formatAlertTime(alert.createdAt)}</p>
+                        <p className="mt-2 text-[11px] text-outline">{formatRelativeTime(alert.createdAt)}</p>
                       </div>
                     ))
                   )}

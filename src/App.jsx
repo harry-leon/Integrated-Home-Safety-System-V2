@@ -17,6 +17,7 @@ import Settings from './pages/Settings';
 import UserManagement from './pages/UserManagement';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
 
 const Placeholder = ({ title }) => (
   <div className="flex bg-surface-container items-center justify-center h-full min-h-[400px] border border-outline-variant/10 rounded-3xl animate-in zoom-in duration-300">
@@ -57,6 +58,7 @@ const AppRoutes = () => {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route element={<ProtectedRoute />}>
         <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />

@@ -8,6 +8,7 @@ export const AlertModalProvider = ({ children }) => {
   const [activeAlert, setActiveAlert] = useState(null);
   const recentAlertKeysRef = useRef(new Map());
   const activeAlertRef = useRef(null);
+  const isClosingRef = useRef(false);
   const DEDUPE_WINDOW_MS = 1500;
 
   React.useEffect(() => {
@@ -45,11 +46,12 @@ export const AlertModalProvider = ({ children }) => {
   }, []);
 
   const closeAlert = useCallback(() => {
+    isClosingRef.current = true;
     setActiveAlert(null);
-    // Give a small delay for animation before processing next in queue
+    setQueue((prev) => prev.slice(1));
     setTimeout(() => {
-      setQueue((prev) => prev.slice(1));
-    }, 300);
+      isClosingRef.current = false;
+    }, 50);
   }, []);
 
   const playAlertSound = useCallback((type) => {
@@ -61,7 +63,7 @@ export const AlertModalProvider = ({ children }) => {
 
   // Effect to process queue
   React.useEffect(() => {
-    if (!activeAlert && queue.length > 0) {
+    if (!activeAlert && !isClosingRef.current && queue.length > 0) {
       const nextAlert = queue[0];
       setActiveAlert(nextAlert);
       playAlertSound(nextAlert.type);
