@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useLang } from '../contexts/LangContext';
 import House3D from '../components/House3D';
 
 const BOTTOM_BADGES = [
@@ -31,6 +32,7 @@ const Login = () => {
   const navigate  = useNavigate();
   const location  = useLocation();
   const { login, isAuthenticated } = useAuth();
+  const { lang, toggleLang, t } = useLang();
 
   const [email,    setEmail]    = useState('');
   const [password, setPassword] = useState('');
@@ -192,6 +194,15 @@ const Login = () => {
         <span className="text-[8px] text-blue-400/40 font-['Inter'] tracking-widest">AUTH v5.0.GRID</span>
       </div>
 
+      <button
+        type="button"
+        onClick={toggleLang}
+        className="pointer-events-auto absolute right-6 top-12 z-[20] rounded-xl border border-white/10 bg-white/10 px-3 py-2 text-xs font-black text-white backdrop-blur hover:border-blue-300/40"
+        title={t('switch_language')}
+      >
+        {lang === 'vn' ? 'VI' : 'EN'}
+      </button>
+
       {/* Main layout */}
       <main className="relative z-10 pointer-events-none w-full max-w-[1440px] mx-auto px-6 md:px-14 min-h-screen grid grid-cols-1 md:grid-cols-12 gap-0 md:gap-12 items-center py-12">
 
@@ -303,8 +314,8 @@ const Login = () => {
               </div>
 
               {/* Heading */}
-              <h3 className="text-[32px] font-extrabold tracking-tight leading-tight mb-2">Đăng nhập</h3>
-              <p className="text-sm text-slate-400/70 mb-9">Nhập thông tin định danh để điều khiển thiết bị.</p>
+              <h3 className="text-[32px] font-extrabold tracking-tight leading-tight mb-2">{t('login_title')}</h3>
+              <p className="text-sm text-slate-400/70 mb-9">{t('login_desc')}</p>
 
               <form className="space-y-6" onSubmit={handleSubmit}>
                 {error && (
@@ -339,7 +350,7 @@ const Login = () => {
                       Mã khóa
                     </label>
                     <Link to="/forgot-password" className="text-[11px] text-[#38bdf8]/70 hover:text-[#38bdf8] transition-colors">
-                      Quên mã khóa?
+                      {t('forgot_password')}
                     </Link>
                   </div>
                   <div className="relative group/f">
@@ -368,7 +379,7 @@ const Login = () => {
                   <input id="remember" type="checkbox" disabled={loading}
                     className="w-4 h-4 rounded bg-white/5 border-white/20 accent-[#0f62fe] outline-none" />
                   <label htmlFor="remember" className="text-xs text-slate-500 cursor-pointer select-none">
-                    Duy trì phiên đăng nhập
+                    {t('remember_session')}
                   </label>
                 </div>
 
@@ -387,7 +398,7 @@ const Login = () => {
                       </>
                     ) : (
                       <>
-                        Thiết lập kết nối an toàn
+                        {t('login_submit')}
                         <span className="material-symbols-outlined text-lg">arrow_forward</span>
                       </>
                     )}
@@ -423,9 +434,9 @@ const Login = () => {
               {/* Footer */}
               <div className="mt-8 pt-6 border-t border-white/[0.06] text-center">
                 <p className="text-sm text-slate-500">
-                  Yêu cầu cấp quyền?{' '}
+                  {t('no_account')}{' '}
                   <Link to="/register" className="text-[#38bdf8] hover:text-[#7dd3fc] font-semibold transition-colors">
-                    Đăng ký ngay →
+                    {t('register_title')} →
                   </Link>
                 </p>
               </div>

@@ -54,7 +54,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
           {!isCollapsed && (
             <div className="min-w-0">
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">Sentinel</p>
-              <h2 className="mt-2 text-2xl font-black tracking-tight text-on-surface">Integrated Home Safety</h2>
+              <h2 className="mt-2 text-2xl font-black tracking-tight text-on-surface">{t('app_brand_full')}</h2>
             </div>
           )}
 
@@ -74,7 +74,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
         )}
       </div>
 
-      <nav className={`flex-1 space-y-1 ${isCollapsed ? 'px-2' : 'px-3'}`} aria-label="Primary Navigation">
+      <nav className={`flex-1 space-y-1 ${isCollapsed ? 'px-2' : 'px-3'}`} aria-label="Navigation">
         {filteredNavItems.map((item) => {
           const isActive = location.pathname === item.path;
           return (

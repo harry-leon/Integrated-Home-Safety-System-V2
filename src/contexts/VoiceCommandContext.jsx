@@ -5,9 +5,10 @@ import { useAuth } from './AuthContext';
 import { useLang } from './LangContext';
 import { smartLockApi } from '../services/api';
 import { playErrorTone, playStartTone, playSuccessTone, speakText } from '../utils/audioFeedback';
-import { parseVoiceCommand, voiceHelpItems } from '../utils/voiceCommands';
+import { createVoiceCommand, parseVoiceCommand, voiceHelpItems } from '../utils/voiceCommands';
 
 const VoiceCommandContext = createContext(null);
+const CUSTOM_COMMANDS_STORAGE_KEY = 'sentinel_voice_commands';
 
 const getSpeechRecognition = () => {
   if (typeof window === 'undefined') return null;
@@ -27,6 +28,71 @@ const getLatestLockState = (logs) => {
 
 const describeError = (error, fallback) => error?.message || fallback;
 
+// ── Build spoken success feedback per command type ─────────────────────────
+const buildSuccessSpeech = (command, lang) => {
+  const isVn = lang === 'vn';
+
+  switch (command.type) {
+    case 'help':
+      return isVn ? 'Danh sách lệnh giọng nói đã mở.' : 'Voice help is open.';
+
+    case 'navigate': {
+      const routeNames = {
+        '/':            isVn ? 'Tổng quan' : 'Dashboard',
+        '/remote':      isVn ? 'Điều khiển' : 'Remote control',
+        '/logs':        isVn ? 'Nhật ký' : 'Logs',
+        '/analytics':   isVn ? 'Phân tích' : 'Analytics',
+        '/fingerprints':isVn ? 'Vân tay' : 'Fingerprints',
+        '/settings':    isVn ? 'Cài đặt' : 'Settings',
+      };
+      const name = routeNames[command.path] || command.label;
+      return isVn ? `Mở ${name} thành công.` : `${name} opened successfully.`;
+    }
+
+    case 'lock': {
+      const action = command.targetState === 'locked'
+        ? (isVn ? 'Khóa cửa' : 'Lock door')
+        : (isVn ? 'Mở khóa cửa' : 'Unlock door');
+      return isVn ? `${action} thành công.` : `${action} successful.`;
+    }
+
+    case 'resolve-alert':
+      return isVn ? 'Xử lý cảnh báo thành công.' : 'Resolve alert successful.';
+
+    case 'setting': {
+      const settingNames = {
+        autoLockEnabled: isVn ? 'Tự khóa cửa' : 'Auto lock',
+        gasAlertEnabled: isVn ? 'Cảnh báo khí gas' : 'Gas alert',
+        pirAlertEnabled: isVn ? 'Cảnh báo chuyển động' : 'Motion alert',
+      };
+      const name = settingNames[command.key] || command.label;
+      const state = command.value
+        ? (isVn ? 'bật' : 'enabled')
+        : (isVn ? 'tắt' : 'disabled');
+      return isVn ? `${name} ${state} thành công.` : `${name} ${state} successfully.`;
+    }
+
+    case 'device': {
+      return isVn
+        ? `Chuyển thiết bị thành công.`
+        : `Device switched successfully.`;
+    }
+
+    default:
+      return isVn ? `${command.label} thành công.` : `${command.label} successful.`;
+  }
+};
+
+const readStoredCommands = () => {
+  if (typeof window === 'undefined') return [];
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(CUSTOM_COMMANDS_STORAGE_KEY) || '[]');
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+};
+
 export const VoiceCommandProvider = ({ children }) => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
@@ -39,6 +105,7 @@ export const VoiceCommandProvider = ({ children }) => {
   const [feedback, setFeedback] = useState('Voice control is ready.');
   const [error, setError] = useState('');
   const [commandHistory, setCommandHistory] = useState([]);
+  const [customCommands, setCustomCommands] = useState(readStoredCommands);
   const [devices, setDevices] = useState([]);
   const [activeAlerts, setActiveAlerts] = useState([]);
   const [selectedDeviceId, setSelectedDeviceId] = useState('');
@@ -73,6 +140,21 @@ export const VoiceCommandProvider = ({ children }) => {
       ...current,
     ].slice(0, 10));
   }, []);
+
+  const persistCustomCommands = useCallback((nextCommands) => {
+    setCustomCommands(nextCommands);
+    window.localStorage.setItem(CUSTOM_COMMANDS_STORAGE_KEY, JSON.stringify(nextCommands));
+  }, []);
+
+  const addCustomCommand = useCallback((payload) => {
+    const command = createVoiceCommand(payload);
+    persistCustomCommands([command, ...customCommands].slice(0, 24));
+    return command;
+  }, [customCommands, persistCustomCommands]);
+
+  const removeCustomCommand = useCallback((commandId) => {
+    persistCustomCommands(customCommands.filter((command) => command.id !== commandId));
+  }, [customCommands, persistCustomCommands]);
 
   const loadVoiceData = useCallback(async () => {
     if (!isAuthenticated) return;
@@ -232,7 +314,7 @@ export const VoiceCommandProvider = ({ children }) => {
   ]);
 
   const handleRecognizedSpeech = useCallback(async (spokenText) => {
-    const nextCommand = parseVoiceCommand(spokenText, devices);
+    const nextCommand = parseVoiceCommand(spokenText, devices, customCommands);
     setParsedCommand(nextCommand);
 
     if (!spokenText.trim()) {
@@ -257,7 +339,7 @@ export const VoiceCommandProvider = ({ children }) => {
       await executeCommand(nextCommand);
       addHistory({ transcript: spokenText, command: nextCommand.label, status: 'success' });
       playSuccessTone();
-      speakText(nextCommand.type === 'help' ? 'Voice help is open.' : 'Done.', recognitionLang);
+      speakText(buildSuccessSpeech(nextCommand, lang), recognitionLang);
     } catch (err) {
       const message = describeError(err, 'Unable to run the voice command.');
       setError(message);
@@ -267,7 +349,7 @@ export const VoiceCommandProvider = ({ children }) => {
     } finally {
       setIsExecuting(false);
     }
-  }, [addHistory, devices, executeCommand, recognitionLang]);
+  }, [addHistory, customCommands, devices, executeCommand, recognitionLang]);
 
   const startListening = useCallback(() => {
     if (!isAuthenticated) {
@@ -339,7 +421,7 @@ export const VoiceCommandProvider = ({ children }) => {
         .trim();
       transcriptRef.current = nextTranscript;
       setTranscript(nextTranscript);
-      setParsedCommand(parseVoiceCommand(nextTranscript, devices));
+      setParsedCommand(parseVoiceCommand(nextTranscript, devices, customCommands));
     };
 
     recognition.onerror = (event) => {
@@ -367,7 +449,7 @@ export const VoiceCommandProvider = ({ children }) => {
       recognition.stop();
       recognitionRef.current = null;
     };
-  }, [devices, handleRecognizedSpeech, isAuthenticated, recognitionLang]);
+  }, [customCommands, devices, handleRecognizedSpeech, isAuthenticated, recognitionLang]);
 
   useEffect(() => {
     loadVoiceData();
@@ -422,6 +504,7 @@ export const VoiceCommandProvider = ({ children }) => {
     feedback,
     error,
     commandHistory,
+    customCommands,
     devices,
     selectedDevice,
     activeAlerts,
@@ -434,9 +517,13 @@ export const VoiceCommandProvider = ({ children }) => {
     runSampleCommand,
     runTranscript: handleRecognizedSpeech,
     refreshVoiceData: loadVoiceData,
+    addCustomCommand,
+    removeCustomCommand,
   }), [
+    addCustomCommand,
     activeAlerts,
     commandHistory,
+    customCommands,
     devices,
     error,
     executeCommand,
@@ -454,6 +541,7 @@ export const VoiceCommandProvider = ({ children }) => {
     stopListening,
     toggleListening,
     transcript,
+    removeCustomCommand,
   ]);
 
   return (

@@ -465,6 +465,51 @@ body {
   opacity: 0.4;
 }
 
+@keyframes float-icon {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes house-guide-pulse {
+  0%, 100% {
+    opacity: 0.72;
+    transform: scale(0.92);
+  }
+  50% {
+    opacity: 0.14;
+    transform: scale(1.28);
+  }
+}
+
+@keyframes house-guide-glow {
+  0%, 100% {
+    box-shadow:
+      0 0 34px rgba(56, 189, 248, 0.24),
+      inset 0 0 20px rgba(15, 98, 254, 0.12);
+  }
+  50% {
+    box-shadow:
+      0 0 54px rgba(56, 189, 248, 0.42),
+      0 0 18px rgba(168, 85, 247, 0.18),
+      inset 0 0 28px rgba(15, 98, 254, 0.2);
+  }
+}
+
+.house-guide-ping {
+  animation: house-guide-pulse 1.8s ease-in-out infinite;
+}
+
+.house-guide-glow {
+  animation: house-guide-glow 2.6s ease-in-out infinite;
+}
+
+html[data-house-guide-hidden="true"] .house-guide-callout {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
+  transition: opacity 180ms ease, transform 180ms ease, visibility 180ms ease;
+}
+
 /* ── Enhanced card hover ─────────────────────────────────────────── */
 .card-hover:hover {
   transform: translateY(-2px);

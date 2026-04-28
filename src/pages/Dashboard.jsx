@@ -170,7 +170,7 @@ const mergeAlertIntoList = (currentAlerts, incomingAlert) => {
 };
 
 const Dashboard = () => {
-  const { t } = useLang();
+  const { t, formatDateTime, formatRelativeTime, formatAlertType, formatAccessAction, formatAccessMethod, formatDeviceName, translateSystemText } = useLang();
   const { weather } = useTimeWeather();
   const {
     isSupported: isVoiceSupported,
@@ -398,6 +398,7 @@ const Dashboard = () => {
           setTelemetrySource('polling');
         }
       } catch {
+        // Polling is best-effort; keep the current dashboard state on transient errors.
       }
     };
 
@@ -446,40 +447,40 @@ const Dashboard = () => {
 
   const heroStatus = topAlert
     ? {
-        eyebrow: 'Cần xử lý ngay',
+        eyebrow: t('hero_attention'),
         title: formatAlertType(topAlert.alertType),
-        description: 'Hệ thống đang phát hiện sự kiện cần kiểm tra ngay lập tức.',
+        description: t('hero_needs_review'),
         tone: 'border-error/20 bg-error/5',
         accent: 'text-error',
       }
     : {
-        eyebrow: 'Hệ thống ổn định',
-        title: 'Bảo mật Sentinel đang hoạt động',
+        eyebrow: t('hero_stable'),
+        title: t('system_safe'),
         description: primaryDevice?.online
-          ? `${primaryDevice.deviceName || 'Thiết bị'} đang kết nối bình thường.`
-          : 'Chưa có thiết bị online. Kiểm tra kết nối trước khi điều khiển.',
+          ? `${formatDeviceName(primaryDevice.deviceName)} ${t('hero_device_online')}`
+          : t('hero_no_device_online'),
         tone: 'border-primary/20 bg-primary/5',
         accent: 'text-primary',
       };
 
   const statusChips = [
     {
-      label: 'Trạng thái cửa',
-      value: isLocked ? 'Đã khóa' : 'Đang mở',
+      label: t('door_status'),
+      value: isLocked ? t('door_locked_now') : t('door_unlocked_now'),
       icon: isLocked ? 'lock' : 'lock_open',
       tone: isLocked ? 'text-primary' : 'text-amber-500',
       bgColor: isLocked ? 'bg-primary/5' : 'bg-amber-500/5',
     },
     {
-      label: 'Cảnh báo',
-      value: activeAlerts.length > 0 ? `${activeAlerts.length} đang bật` : 'An toàn',
+      label: t('alerts'),
+      value: activeAlerts.length > 0 ? `${activeAlerts.length} ${t('active_alerts_count_suffix')}` : t('safe'),
       icon: activeAlerts.length > 0 ? 'report' : 'verified',
       tone: activeAlerts.length > 0 ? 'text-error' : 'text-emerald-500',
       bgColor: activeAlerts.length > 0 ? 'bg-error/5' : 'bg-emerald-500/5',
     },
     {
-      label: 'Thiết bị',
-      value: primaryDevice?.online ? 'Online' : 'Offline',
+      label: t('device_label'),
+      value: primaryDevice?.online ? t('online') : t('offline'),
       icon: primaryDevice?.online ? 'sensors' : 'sensors_off',
       tone: primaryDevice?.online ? 'text-blue-500' : 'text-error',
       bgColor: primaryDevice?.online ? 'bg-blue-500/5' : 'bg-error/5',
@@ -488,55 +489,55 @@ const Dashboard = () => {
 
   const lightLevel = getLightLevel(primaryDevice?.ldrValue, primaryDeviceSettings?.ldrThreshold);
   const lightDetailText = primaryDevice?.ldrValue != null
-    ? `Muc sang: ${lightLevel.label} - Nguong canh bao: ${lightLevel.threshold} lx`
-    : 'Chua co du lieu LDR';
+    ? `${t('brightness')}: ${translateSystemText(lightLevel.label)} - ${t('threshold_label')}: ${lightLevel.threshold} lx`
+    : t('no_sensor_data');
 
   const environmentCards = [
     {
-      label: 'Thời tiết',
+      label: t('weather'),
       value: primaryDevice?.temperature != null ? `${primaryDevice.temperature}°C` : `${weather.temp}°C`,
       detail: primaryDevice?.weatherDesc || weather.desc,
       icon: 'thermostat',
       color: 'bg-orange-500/10 text-orange-500',
-      summary: 'Dữ liệu thời gian thực',
+      summary: t('weather_support'),
     },
     {
-      label: 'Ánh sáng',
+      label: t('brightness'),
       value: primaryDevice?.ldrValue != null ? `${primaryDevice.ldrValue} lx` : 'N/A',
       icon: 'wb_sunny',
       color: 'bg-amber-500/10 text-amber-500',
       detail: lightDetailText,
-      summary: 'Cảm biến quang trở',
+      summary: t('ldr_sensor'),
     },
     {
-      label: 'Môi trường Gas',
+      label: t('gas'),
       value: primaryDevice?.gasValue != null ? `${primaryDevice.gasValue} ppm` : 'N/A',
-      detail: primaryDevice?.gasValue != null ? `Tình trạng: ${primaryDevice.gasValue >= 300 ? 'Cảnh báo Gas' : 'An toàn'}` : 'Chưa có dữ liệu Gas',
+      detail: primaryDevice?.gasValue != null ? `${t('status')}: ${primaryDevice.gasValue >= 300 ? t('gas_alert') : t('safe')}` : t('no_sensor_data'),
       icon: 'air',
       color: 'bg-blue-500/10 text-blue-500',
-      summary: primaryDevice?.pirTriggered ? 'Phát hiện chuyển động' : 'Khu vực an toàn',
+      summary: primaryDevice?.pirTriggered ? t('motion_detected') : t('no_intrusion'),
     },
   ];
 
   const weeklyCards = [
     {
-      label: 'Lượt truy cập',
+      label: t('total_access'),
       value: weeklySnap?.totalAccessThisWeek ?? '--',
-      detail: weeklySnap?.accessChangeRate ? `${weeklySnap.accessChangeRate.toFixed(1)}% so với tuần trước` : 'Ổn định so với tuần trước',
+      detail: weeklySnap?.accessChangeRate ? `${weeklySnap.accessChangeRate.toFixed(1)}%` : t('no_major_change'),
       icon: 'insights',
       color: 'bg-indigo-500/10 text-indigo-500',
     },
     {
-      label: 'Cảnh báo mới',
+      label: t('new_alerts'),
       value: weeklySnap?.alertsThisWeek ?? '--',
-      detail: weeklySnap?.alertsThisWeek > 0 ? 'Cần kiểm tra nhật ký' : 'Không có sự cố mới',
+      detail: weeklySnap?.alertsThisWeek > 0 ? t('review_logs') : t('no_new_alerts'),
       icon: 'notifications_active',
       color: 'bg-rose-500/10 text-rose-500',
     },
     {
-      label: 'Mức nguy cấp',
+      label: t('critical_level'),
       value: weeklySnap?.criticalAlertsThisWeek ?? '--',
-      detail: weeklySnap?.criticalAlertsThisWeek > 0 ? 'Cần xử lý khẩn cấp' : 'Hệ thống an toàn',
+      detail: weeklySnap?.criticalAlertsThisWeek > 0 ? t('prioritize_now') : t('system_safe'),
       icon: 'emergency',
       color: 'bg-red-600/10 text-red-600',
     },
@@ -721,13 +722,13 @@ const Dashboard = () => {
                 recentEvents.map((event) => (
                   <div key={event.id} className="grid gap-2 rounded-2xl bg-surface-container-high px-4 py-4 md:grid-cols-[150px_minmax(0,1fr)_120px] md:items-center">
                     <div>
-                      <p className="text-sm font-semibold text-on-surface">{event.action}</p>
-                      <p className="mt-1 text-xs text-outline">{event.method || 'REMOTE'}</p>
+                      <p className="text-sm font-semibold text-on-surface">{formatAccessAction(event.action)}</p>
+                      <p className="mt-1 text-xs text-outline">{formatAccessMethod(event.method || 'REMOTE')}</p>
                     </div>
                     <div className="min-w-0">
-                      <p className="truncate text-sm text-on-surface">{event.detail || `${event.action} qua ${event.method}`}</p>
+                      <p className="truncate text-sm text-on-surface">{event.detail || `${formatAccessAction(event.action)} qua ${event.method}`}</p>
                       <p className="mt-1 text-xs text-outline">
-                        {event.personName || event.userName || event.deviceName || 'He thong'}
+                        {event.personName || event.userName || formatDeviceName(event.deviceName) || t('system_actor')}
                       </p>
                     </div>
                     <p className="text-xs text-outline md:text-right">{formatDateTime(event.createdAt)}</p>
@@ -851,14 +852,14 @@ const Dashboard = () => {
                 className="flex items-center justify-center gap-2 rounded-2xl bg-primary/10 px-4 py-3 text-sm font-bold text-primary transition-all hover:bg-primary hover:text-white"
               >
                 <span className="material-symbols-outlined text-[18px]">videocam</span>
-                Camera live
+                {t('live')} camera
               </Link>
               <Link
                 to="/logs"
                 className="flex items-center justify-center gap-2 rounded-2xl bg-surface-container-high border border-outline-variant/15 px-4 py-3 text-sm font-bold text-on-surface transition-all hover:border-primary/30"
               >
                 <span className="material-symbols-outlined text-[18px]">history</span>
-                Nhat ky anh
+                {t('logs')}
               </Link>
             </div>
           </div>
