@@ -1,20 +1,20 @@
 # Integrated Home Safety System V2
 
 [![Java 17](https://img.shields.io/badge/Java-17-007396?logo=openjdk&logoColor=white)](https://openjdk.org/)
-[![Spring Boot 3.2](https://img.shields.io/badge/Spring%20Boot-3.2-6DB33F?logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![Spring Boot 3.2](https://img.shields.io/badge/Spring%20Boot-3.2.4-6DB33F?logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![React 19](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=111827)](https://react.dev/)
 [![Vite 8](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)](https://vite.dev/)
 [![Next.js 16](https://img.shields.io/badge/Next.js-16-000000?logo=nextdotjs&logoColor=white)](https://nextjs.org/)
 [![License](https://img.shields.io/badge/License-TBD-lightgrey)](#license)
 
-Integrated Home Safety System V2 is a full-stack smart lock and home safety platform for monitoring devices, collecting telemetry from ESP32-based hardware, managing user access, and remotely controlling door locks through a web dashboard.
+A full-stack IoT smart lock and home safety platform that combines **ESP32 sensor hardware**, a **Spring Boot backend**, and a **React dashboard** to deliver centralized access control, real-time environmental monitoring, fingerprint management, and intelligent alert workflows — all accessible from a single web interface.
 
-> Status note:
-> This repository currently contains two frontend workspaces:
-> - `src/` at the repository root: the active Vite + React dashboard used by the smart lock UI.
-> - `frontend/`: a separate Next.js workspace that still contains mostly starter content.
+> **Workspace note:**
+> This repository contains two frontend workspaces:
+> - `src/` (root) — the **active** Vite + React dashboard powering the smart lock UI.
+> - `frontend/` — a separate Next.js workspace (starter state, not actively used).
 >
-> For local dashboard development, use the root Vite app unless your team intentionally works on the `frontend/` workspace.
+> Use the root Vite app for all dashboard development.
 
 ## Demo / Screenshot
 
@@ -26,7 +26,7 @@ Integrated Home Safety System V2 is a full-stack smart lock and home safety plat
 - [Core Features](#core-features)
 - [Architecture](#architecture)
 - [Tech Stack](#tech-stack)
-- [Target Users](#target-users)
+- [Project Structure](#project-structure)
 - [System Requirements](#system-requirements)
 - [Installation](#installation)
 - [Environment Variables](#environment-variables)
@@ -34,87 +34,195 @@ Integrated Home Safety System V2 is a full-stack smart lock and home safety plat
 - [Run with Docker](#run-with-docker)
 - [Testing](#testing)
 - [Build for Production](#build-for-production)
-- [Project Structure](#project-structure)
-- [API Usage Examples](#api-usage-examples)
+- [API Reference](#api-reference)
+- [WebSocket Topics](#websocket-topics)
+- [Blynk Virtual Pin Map](#blynk-virtual-pin-map)
+- [Firmware (ESP32)](#firmware-esp32)
+- [Database & Migrations](#database--migrations)
+- [Security Model](#security-model)
+- [Frontend Pages & Components](#frontend-pages--components)
 - [Development Workflow](#development-workflow)
+- [CI/CD Pipeline](#cicd-pipeline)
+- [Deployment](#deployment)
 - [Contributing](#contributing)
 - [Roadmap](#roadmap)
 - [FAQ](#faq)
 - [Troubleshooting](#troubleshooting)
 - [License](#license)
 
+---
+
 ## Overview
 
-This project is designed to support a connected home safety scenario where a smart lock, sensors, and a management dashboard work together in one system.
+This platform solves the problem of **fragmented home security** by unifying access control, environmental sensors, and alert management into one system.
 
-The platform combines:
+The system is composed of three layers:
 
-- a Spring Boot backend for authentication, authorization, telemetry ingestion, analytics, device control, and audit trails
-- a Vite + React dashboard for operators and end users
-- an ESP32 firmware patch for pushing environmental telemetry to the backend
-- seed data and role-based scenarios for local development and authorization testing
+1. **Hardware layer** — ESP32 microcontroller reads MQ2 (gas), LDR (light), PIR (motion) sensors and pushes telemetry to both **Blynk Cloud** and the **Spring Boot backend** via HTTP POST.
+2. **Backend layer** — Spring Boot REST API handles authentication (JWT), role-based access control (RBAC), device management, telemetry ingestion, alert generation, fingerprint enrollment, audit logging, analytics, and real-time WebSocket push.
+3. **Frontend layer** — React 19 + Vite 8 single-page application provides a dashboard with live telemetry charts, remote lock control, fingerprint management, access logs, analytics, settings, and admin user management.
 
-The main problem the project solves is centralizing home access control and safety signals into a single interface, so users can monitor device state, view alerts, review logs, and trigger secure actions with step-up verification.
+---
 
 ## Core Features
 
-- JWT-based authentication with role-aware access control
-- Step-up verification for sensitive actions such as remote lock toggling and settings updates
-- Device monitoring for online status, telemetry, and recent activity
-- Alert management with resolution flow and export support
-- Access log tracking and weekly analytics snapshots
-- User profile management, avatar upload, and login activity history
-- Admin endpoints for user/session visibility and role management
-- ESP32 telemetry ingestion for gas, light, PIR motion, temperature, and weather data
-- WebSocket push updates for live telemetry and device events
-- Blynk webhook integration for device wake-up and physical event acknowledgements
+### Access & Authentication
+- JWT-based authentication with `ADMIN`, `MEMBER`, `VIEWER` roles
+- Step-up re-authentication (`/api/auth/re-auth`) for sensitive actions
+- `X-Verification-Token` header required for lock toggle, fingerprint enroll/delete, settings changes
+- Session expiry detection with automatic redirect to login
+
+### Device & Lock Control
+- Remote door lock/unlock via Blynk virtual pin commands
+- Device online status monitoring
+- Per-device settings (gas threshold, alert enable, etc.)
+
+### Fingerprint Management
+- Enroll new fingerprints with auto-slot allocation
+- Delete and rename fingerprints
+- Access level normalization: `ADMIN`, `STANDARD`, `GUEST`
+- Commands pushed to ESP32 via Blynk pins (V100–V104)
+
+### Telemetry & Sensors
+- Real-time ingestion from ESP32: gas (MQ2), light (LDR), motion (PIR), temperature
+- WebSocket push to dashboard via STOMP over SockJS
+- Historical sensor data storage
+
+### Alerts & Notifications
+- Alert types: `GAS_LEAK`, `FIRE_ALARM`, `INTRUDER_ALERT`, `WRONG_PASSWORD`, `TAMPER_ALERT`, `BATTERY_LOW`, `OFFLINE_ALERT`
+- Alert resolution workflow with verification
+- CSV export for alerts and access logs
+- Real-time alert push via WebSocket
+
+### Analytics & Audit
+- Analytics snapshots and weekly reports per device
+- Full access log with method tracking: `PASSWORD`, `FINGERPRINT`, `RFID`, `REMOTE`, `PHYSICAL_KEY`
+- Admin user management: toggle active, change roles
+
+### Dashboard UX
+- 3D house visualization (Three.js)
+- Dark/light theme toggle
+- Multi-language support (Vietnamese/English)
+- Voice command integration
+- Floating mic widget, animated cursor effects
+- Profile management with avatar upload
+
+---
 
 ## Architecture
 
 ```text
-ESP32 / Sensors
-    -> POST /api/telemetry/report
-    -> Blynk webhook callbacks
-
-Spring Boot backend
-    -> Auth, RBAC, device control, alerts, analytics, audit logs
-    -> Flyway migrations
-    -> H2 for local development / PostgreSQL for production
-    -> WebSocket topics for live updates
-
-Vite React dashboard (root app)
-    -> Login, dashboard, remote control, logs, analytics, settings, admin
+┌─────────────────┐
+│   ESP32 + Sensors│
+│  (MQ2, LDR, PIR)│
+└────────┬────────┘
+         │ HTTP POST /api/telemetry/report
+         │ Blynk Virtual Pins
+         ▼
+┌─────────────────────────────────────────────┐
+│            Spring Boot Backend              │
+│                                             │
+│  ┌─────────┐ ┌──────────┐ ┌──────────────┐ │
+│  │   Auth   │ │  Device  │ │  Fingerprint │ │
+│  │  (JWT)   │ │  Control │ │  Management  │ │
+│  └─────────┘ └──────────┘ └──────────────┘ │
+│  ┌─────────┐ ┌──────────┐ ┌──────────────┐ │
+│  │ Alerts  │ │Analytics │ │  Telemetry   │ │
+│  └─────────┘ └──────────┘ └──────────────┘ │
+│  ┌─────────┐ ┌──────────┐ ┌──────────────┐ │
+│  │  Audit  │ │ Settings │ │    Admin     │ │
+│  └─────────┘ └──────────┘ └──────────────┘ │
+│                                             │
+│  Database: H2 (dev) / PostgreSQL (prod)     │
+│  Migrations: Flyway (V1–V11)               │
+│  WebSocket: STOMP + SockJS (/ws-smart-lock) │
+│  IoT Bridge: Blynk Cloud External API       │
+└──────────────────┬──────────────────────────┘
+                   │ REST API + WebSocket
+                   ▼
+┌─────────────────────────────────────────────┐
+│         Vite + React Dashboard              │
+│                                             │
+│  Pages: Dashboard, Remote Control,          │
+│  Fingerprints, Logs, Analytics,             │
+│  Settings, User Management                  │
+│                                             │
+│  Real-time: STOMP subscription              │
+│  3D: Three.js house model                   │
+│  i18n: Vietnamese / English                 │
+└─────────────────────────────────────────────┘
 ```
+
+---
 
 ## Tech Stack
 
-| Layer | Technology |
-| --- | --- |
-| Frontend (active) | React 19, Vite 8, React Router, Tailwind CSS, Three.js |
-| Frontend (secondary workspace) | Next.js 16, React 19, TypeScript, Tailwind CSS |
-| Backend | Java 17, Spring Boot 3.2, Spring Security, Spring Data JPA, Spring WebSocket |
-| Authentication | JWT |
-| Database | H2 (local default), PostgreSQL (production profile) |
-| Database Migration | Flyway |
-| API Docs | springdoc-openapi |
-| Firmware | ESP32 Arduino sketch patch |
-| DevOps | Docker, Docker Compose, GitHub Actions, Vercel config, Render deploy hook |
+| Layer | Technology | Version |
+| --- | --- | --- |
+| **Frontend (active)** | React, Vite, React Router, Tailwind CSS, Three.js, STOMP.js, SockJS | React 19, Vite 8 |
+| **Frontend (secondary)** | Next.js, React, TypeScript, Tailwind CSS | Next.js 16 |
+| **Backend** | Spring Boot, Spring Security, Spring Data JPA, Spring WebSocket, Lombok | Spring Boot 3.2.4, Java 17 |
+| **Authentication** | JWT (jjwt 0.11.5) | — |
+| **Database** | H2 (dev), PostgreSQL (prod) | — |
+| **Migrations** | Flyway | — |
+| **API Docs** | springdoc-openapi (Swagger UI) | 2.5.0 |
+| **IoT Platform** | Blynk Cloud External API | — |
+| **Firmware** | ESP32 Arduino (WiFi, HTTPClient, ArduinoJson, BlynkSimpleEsp32) | — |
+| **DevOps** | Docker, GitHub Actions, Vercel, Render | — |
 
-## Target Users
+---
 
-- developers working on an IoT-enabled home safety platform
-- teams building or demoing smart lock access-control workflows
-- internal stakeholders validating telemetry, alerts, and role-based permissions
+## Project Structure
+
+```text
+Integrated-Home-Safety-System-V2/
+├─ .github/workflows/
+│  ├─ ci.yml                    # CI: build backend + lint/build frontend
+│  └─ cd.yml                    # CD: Render deploy hook + Vercel info
+├─ backend/
+│  ├─ Dockerfile                # Multi-stage build (Maven → JRE Alpine)
+│  ├─ pom.xml
+│  └─ src/main/java/com/smartlock/
+│     ├─ config/                # Security, WebSocket, OpenAPI, JWT filter
+│     ├─ controller/            # 11 REST controllers
+│     ├─ dto/                   # Request/response DTOs
+│     ├─ model/                 # 13 JPA entities + 6 enums
+│     ├─ repository/            # 13 Spring Data repositories
+│     ├─ service/               # 16 service classes
+│     └─ common/                # Shared utilities (VerificationService)
+├─ firmware/
+│  ├─ ESP32_Backend_Telemetry_Test.ino   # Full sensor → backend test sketch
+│  └─ ESP32_Telemetry_Patch.ino          # Patch for existing firmware
+├─ frontend/                    # Secondary Next.js workspace (starter)
+├─ src/                         # Active Vite + React dashboard
+│  ├─ components/               # 13 UI components
+│  ├─ contexts/                 # 6 React contexts (Auth, Theme, Lang, etc.)
+│  ├─ pages/                    # 9 page components
+│  ├─ services/                 # API client + WebSocket realtime service
+│  ├─ utils/                    # Utility functions
+│  ├─ App.jsx                   # Router + provider tree
+│  └─ index.css                 # Global styles + Tailwind
+├─ public/                      # Static assets (favicon, preview image)
+├─ docker-compose.yml
+├─ package.json                 # Root Vite app dependencies
+├─ vite.config.js               # Dev server (port 3000) + API proxy
+├─ vercel.json                  # Vercel deployment config
+└─ README.md
+```
+
+---
 
 ## System Requirements
 
-- Node.js `>= 20`
-- npm `>= 10`
-- Java `17`
-- Maven `>= 3.9`
-- Docker and Docker Compose (optional)
-- PostgreSQL (optional for production-like runs)
-- ESP32 hardware and Blynk setup (optional for live device integration)
+- **Node.js** >= 20
+- **npm** >= 10
+- **Java** 17
+- **Maven** >= 3.9
+- **Docker** & Docker Compose (optional)
+- **PostgreSQL** (optional, for production profile)
+- **ESP32** hardware + Blynk account (optional, for live device integration)
+
+---
 
 ## Installation
 
@@ -125,17 +233,13 @@ git clone https://github.com/harry-leon/Integrated-Home-Safety-System-V2.git
 cd Integrated-Home-Safety-System-V2
 ```
 
-### 2. Install root frontend dependencies
-
-This installs dependencies for the active Vite dashboard in the repository root.
+### 2. Install frontend dependencies
 
 ```bash
 npm install
 ```
 
-### 3. Install backend dependencies
-
-From the `backend/` workspace:
+### 3. Build backend
 
 ```bash
 cd backend
@@ -143,43 +247,27 @@ mvn clean package -DskipTests
 cd ..
 ```
 
-### 4. Optional: install dependencies for the secondary Next.js workspace
-
-Only do this if you intentionally need the `frontend/` app.
-
-```bash
-cd frontend
-npm install
-cd ..
-```
+---
 
 ## Environment Variables
 
 ### Root `.env`
 
-The repository root already contains a simple `.env` file. A practical local setup looks like this:
-
 ```env
 PROJECT_NAME=smart-lock-system
 BACKEND_PORT=8080
 FRONTEND_PORT=3000
-NEXT_PUBLIC_API_URL=http://localhost:8080
 VITE_API_BASE_URL=http://localhost:8080
 ```
 
-Notes:
+> `VITE_API_BASE_URL` is optional for local dev — `vite.config.js` proxies `/api` to `localhost:8080` automatically.
 
-- `VITE_API_BASE_URL` is optional for local development because `vite.config.js` already proxies `/api` to `http://localhost:8080`.
-- `NEXT_PUBLIC_API_URL` is only relevant if you use the separate `frontend/` Next.js workspace.
+### Backend (`application.yml`)
 
-### Backend configuration
-
-Local development defaults to H2 through [`backend/src/main/resources/application.yml`](./backend/src/main/resources/application.yml).
-
-Production-style runs use [`backend/src/main/resources/application-prod.yml`](./backend/src/main/resources/application-prod.yml) and expect:
+Local dev uses H2 by default. For production, set:
 
 ```env
-PORT=8080
+SPRING_PROFILES_ACTIVE=prod
 SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/smartlock
 SPRING_DATASOURCE_USERNAME=your_db_user
 SPRING_DATASOURCE_PASSWORD=your_db_password
@@ -187,9 +275,9 @@ JWT_SECRET_KEY=replace_with_a_secure_secret
 JWT_EXPIRATION=86400000
 ```
 
-### Security note
+> ⚠️ The `blynk.auth-token` is currently in `application.yml`. Move it to environment variables before production deployment.
 
-The backend currently ships with a committed `blynk.auth-token` in `application.properties`. That token should be moved to environment-based configuration before any real deployment.
+---
 
 ## Run Locally
 
@@ -200,40 +288,25 @@ cd backend
 mvn spring-boot:run
 ```
 
-Expected default URL:
+| URL | Purpose |
+| --- | --- |
+| `http://localhost:8080` | API base |
+| `http://localhost:8080/h2-console` | H2 database console |
+| `http://localhost:8080/swagger-ui/index.html` | Swagger UI |
 
-- API: `http://localhost:8080`
-- H2 console: `http://localhost:8080/h2-console`
-- Swagger UI: `http://localhost:8080/swagger-ui/index.html`
-
-### Active frontend dashboard
-
-Run the Vite app from the repository root:
+### Frontend Dashboard
 
 ```bash
 npm run dev
 ```
 
-Expected URL:
+Dashboard: `http://localhost:3000`
 
-- Dashboard: `http://localhost:3000`
-
-### Optional secondary Next.js workspace
-
-The `frontend/` workspace is separate from the active root dashboard and still looks like starter scaffolding.
-
-```bash
-cd frontend
-npm run dev
-```
-
-If the root Vite app is already using port `3000`, start the Next.js app on another port.
+---
 
 ## Run with Docker
 
-### Backend-only container
-
-The backend has a working Dockerfile:
+### Backend only
 
 ```bash
 docker build -t smart-lock-backend ./backend
@@ -242,141 +315,133 @@ docker run --rm -p 8080:8080 smart-lock-backend
 
 ### Docker Compose
 
-The repository includes a `docker-compose.yml` file:
-
 ```bash
 docker compose up --build
 ```
 
-However, the compose setup is not fully turnkey at the moment because it points the `frontend` service to `./frontend`, and that workspace does not currently include a Dockerfile.
+> ⚠️ The `frontend/` service in `docker-compose.yml` requires a Dockerfile that doesn't exist yet. Use Docker for backend only, or update the compose file to build the root Vite app.
 
-Use Docker Compose only after one of these is completed:
-
-- add a Dockerfile for `frontend/`, or
-- update `docker-compose.yml` to build the root Vite app instead
+---
 
 ## Testing
 
-### Backend tests
+### Backend
 
 ```bash
 cd backend
 mvn test
 ```
 
-Current known issue:
+> **Known issue:** `V4__add_user_profile_and_login_sessions.sql` uses `gen_random_uuid()` which is not available in H2.
 
-- `mvn test` currently fails on H2 during Flyway migration `V4__add_user_profile_and_login_sessions.sql`
-- the failing SQL uses `gen_random_uuid()`, which is not available in the default H2 setup
-
-### Root frontend build check
+### Frontend build verification
 
 ```bash
 npm run build
 ```
 
-Current status:
-
-- verified successfully in this repository
-
-### Secondary Next.js workspace build
-
-```bash
-cd frontend
-npm run build
-```
-
-Current status:
-
-- verified successfully in this repository
+---
 
 ## Build for Production
 
-### Root Vite dashboard
+| Target | Command | Output |
+| --- | --- | --- |
+| Frontend | `npm run build` | `dist/` |
+| Backend | `cd backend && mvn clean package -DskipTests` | `backend/target/*.jar` |
 
-```bash
-npm run build
-```
+---
 
-Production output:
+## API Reference
 
-- `dist/`
+### Authentication
 
-### Backend JAR
+| Method | Endpoint | Auth | Description |
+| --- | --- | --- | --- |
+| `POST` | `/api/auth/login` | Public | Login, returns JWT |
+| `POST` | `/api/auth/register` | Public | Register new account |
+| `POST` | `/api/auth/re-auth` | JWT | Step-up verification, returns verification token |
+| `POST` | `/api/auth/logout` | JWT | Logout |
 
-```bash
-cd backend
-mvn clean package -DskipTests
-```
+### Devices
 
-Production output:
+| Method | Endpoint | Auth | Description |
+| --- | --- | --- | --- |
+| `GET` | `/api/devices` | JWT | List accessible devices |
+| `POST` | `/api/devices/{id}/lock/toggle` | JWT + Verify | Toggle door lock |
 
-- `backend/target/*.jar`
+### Fingerprints
 
-### Secondary Next.js workspace
+| Method | Endpoint | Auth | Description |
+| --- | --- | --- | --- |
+| `GET` | `/api/fingerprints?deviceId=` | JWT | List fingerprints |
+| `POST` | `/api/fingerprints/enroll` | ADMIN + Verify | Enroll new fingerprint |
+| `DELETE` | `/api/fingerprints/{id}` | ADMIN + Verify | Delete fingerprint |
+| `PATCH` | `/api/fingerprints/{id}` | ADMIN | Rename fingerprint |
 
-```bash
-cd frontend
-npm run build
-```
+### Telemetry
 
-## Project Structure
+| Method | Endpoint | Auth | Description |
+| --- | --- | --- | --- |
+| `POST` | `/api/telemetry/report` | Public | ESP32 sensor data ingestion |
 
-```text
-Integrated-Home-Safety-System-V2/
-├─ .github/workflows/          # CI/CD workflows
-├─ backend/                    # Spring Boot API, security, migrations, tests
-│  ├─ src/main/java/com/smartlock/
-│  ├─ src/main/resources/
-│  └─ src/test/
-├─ firmware/                   # ESP32 telemetry patch
-├─ frontend/                   # Secondary Next.js workspace (starter state)
-├─ public/                     # Static assets for the root Vite app
-├─ src/                        # Primary Vite + React dashboard
-├─ dashboard.html              # Additional dashboard asset/reference
-├─ docker-compose.yml
-├─ package.json                # Root Vite app
-├─ vercel.json                 # Vercel config targeting the root Vite app
-└─ README.md
-```
+### Alerts
 
-## API Usage Examples
+| Method | Endpoint | Auth | Description |
+| --- | --- | --- | --- |
+| `GET` | `/api/alerts` | JWT | List alerts (paginated) |
+| `POST` | `/api/alerts/{id}/resolve` | JWT + Verify | Resolve alert |
+| `GET` | `/api/alerts/export` | JWT | Export alerts as CSV |
 
-### Login
+### Other Endpoints
+
+| Group | Base Path | Description |
+| --- | --- | --- |
+| Access Logs | `/api/access-logs` | Audit log listing + CSV export |
+| Analytics | `/api/analytics` | Snapshots + weekly reports |
+| Settings | `/api/settings` | Device settings + notification settings |
+| Profile | `/api/me` | Profile, avatar upload, login history |
+| Admin | `/api/admin` | User list, sessions, role changes |
+| Blynk | `/api/integration/blynk` | Webhook callbacks from Blynk/device |
+
+### Example: Login
 
 ```bash
 curl -X POST http://localhost:8080/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{
-    "email": "admin@smartlock.com",
-    "password": "password"
-  }'
+  -d '{"email": "admin@smartlock.com", "password": "password"}'
 ```
 
-Successful responses return a payload including `accessToken`, `tokenType`, `userId`, `fullName`, `email`, and `role`.
-
-### Step-up verification
-
-Sensitive operations require a verification token in the `X-Verification-Token` header.
+### Example: Step-up verification flow
 
 ```bash
+# 1. Re-authenticate to get verification token
 curl -X POST http://localhost:8080/api/auth/re-auth \
   -H "Authorization: Bearer <access-token>" \
   -H "Content-Type: application/json" \
-  -d '{
-    "password": "password"
-  }'
-```
+  -d '{"password": "password"}'
 
-### Toggle a lock remotely
-
-```bash
+# 2. Use verification token for sensitive action
 curl -X POST http://localhost:8080/api/devices/<device-id>/lock/toggle \
   -H "Authorization: Bearer <access-token>" \
   -H "X-Verification-Token: <verification-token>"
 ```
 
-### Submit telemetry from firmware
+### Example: Enroll fingerprint
+
+```bash
+curl -X POST http://localhost:8080/api/fingerprints/enroll \
+  -H "Authorization: Bearer <access-token>" \
+  -H "X-Verification-Token: <verification-token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "deviceId": "<device-uuid>",
+    "personName": "Nguyen Van A",
+    "accessLevel": "STANDARD",
+    "note": "Front door access"
+  }'
+```
+
+### Example: Submit telemetry from ESP32
 
 ```bash
 curl -X POST http://localhost:8080/api/telemetry/report \
@@ -391,130 +456,300 @@ curl -X POST http://localhost:8080/api/telemetry/report \
   }'
 ```
 
-### Key backend route groups
+---
 
-- `/api/auth` - login, registration, re-authentication, logout
-- `/api/devices` - list devices, read device details, toggle lock command
-- `/api/telemetry` - telemetry ingestion
-- `/api/alerts` - alert listing, resolution, export
-- `/api/access-logs` - audit log listing and export
-- `/api/analytics` - snapshots and weekly reports
-- `/api/settings` - device and notification settings
-- `/api/me` - profile, avatar upload, login history
-- `/api/admin` - user and session administration
-- `/api/integration/blynk` - webhook callbacks from Blynk/device side
+## WebSocket Topics
+
+The backend uses STOMP over SockJS at endpoint `/ws-smart-lock`.
+
+| Topic | Payload | Description |
+| --- | --- | --- |
+| `/topic/devices/{deviceCode}/telemetry` | Sensor data JSON | Live telemetry for a specific device |
+| `/topic/devices/{deviceCode}/alerts` | Alert JSON | Device-specific alerts |
+| `/topic/alerts` | Alert JSON | Global alert broadcast |
+
+---
+
+## Blynk Virtual Pin Map
+
+| Pin | Constant | Direction | Description |
+| --- | --- | --- | --- |
+| V1 | `PIN_GAS_VALUE` | ESP32 → Blynk | Gas sensor reading |
+| V2 | `PIN_TEST_LED` | ESP32 → Blynk | Gas threshold LED |
+| V3 | `PIN_LDR_VALUE` | ESP32 → Blynk | Light sensor reading |
+| V4 | `PIN_PIR_VALUE` | ESP32 → Blynk | Motion detection |
+| V20 | `PIN_DOOR_CONTROL` | Backend → Blynk | Door open/close command |
+| V30 | `PIN_DOOR_STATUS` | Blynk → Backend | Door status feedback |
+| V40 | `PIN_ALERT_ENABLE` | Backend → Blynk | Alert enable/disable |
+| V50 | `PIN_TEMPERATURE` | ESP32 → Blynk | Temperature reading |
+| V51 | `PIN_WEATHER_CONDITION` | ESP32 → Blynk | Weather description |
+| V100 | `PIN_FINGER_ID` | Backend → Blynk | Finger slot ID for enroll/delete |
+| V101 | `PIN_FINGERPRINT_REGISTER` | Backend → Blynk | Trigger fingerprint enrollment |
+| V102 | `PIN_FINGERPRINT_DELETE` | Backend → Blynk | Trigger fingerprint deletion |
+| V103 | `PIN_DISPLAY` | Backend → Blynk | Display message on device |
+| V104 | `PIN_NAME` | Backend → Blynk | Person name for enrollment |
+
+---
+
+## Firmware (ESP32)
+
+### Hardware Pins
+
+| Pin | Sensor | Type |
+| --- | --- | --- |
+| GPIO 35 | MQ2 (Gas) | Analog |
+| GPIO 34 | LDR (Light) | Analog |
+| GPIO 27 | PIR (Motion) | Digital |
+
+### Telemetry Flow
+
+1. ESP32 reads sensors every 1 second
+2. Values are written to Blynk virtual pins (V1–V4)
+3. JSON payload is POSTed to `http://<backend-ip>:8080/api/telemetry/report`
+4. Backend returns `202 Accepted`
+
+### Configuration
+
+Edit the firmware `.ino` file to set:
+
+```cpp
+#define BLYNK_TEMPLATE_ID   "YOUR_TEMPLATE_ID"
+#define BLYNK_AUTH_TOKEN    "YOUR_BLYNK_AUTH_TOKEN"
+char ssid[] = "YOUR_WIFI_SSID";
+char pass[] = "YOUR_WIFI_PASSWORD";
+const char* BACKEND_TELEMETRY_URL = "http://192.168.1.100:8080/api/telemetry/report";
+```
+
+---
+
+## Database & Migrations
+
+### Flyway Migrations (V1–V11)
+
+| Version | Description |
+| --- | --- |
+| V1 | Initial schema (users, devices, alerts, access_logs, sensor_data, etc.) |
+| V2 | Seed data (devices, admin user, sample data) |
+| V3 | Add retry count to device commands |
+| V4 | User profile and login sessions |
+| V5 | Normalize user-device permissions |
+| V6 | Seed authorization test accounts |
+| V7 | Reset test account passwords |
+| V8 | Ensure test account consistency |
+| V9 | Fix incorrect role prefixes |
+| V10 | Fix user role mappings |
+| V11 | Normalize legacy enum values |
+
+### Entity Models (13 entities)
+
+`User`, `UserDetail`, `UserLoginSession`, `Device`, `DeviceCommand`, `DeviceSettings`, `SensorData`, `AccessLog`, `Alert`, `Fingerprint`, `NotificationSettings`, `UserDevice`, `WeeklyReport`
+
+### Enums
+
+- **UserRole:** `ADMIN`, `MEMBER`, `VIEWER`
+- **AccessMethod:** `PASSWORD`, `FINGERPRINT`, `RFID`, `REMOTE`, `PHYSICAL_KEY`
+- **AccessAction:** `ENROLLED`, `DELETED`, etc.
+- **AlertType:** `GAS_LEAK`, `FIRE_ALARM`, `INTRUDER_ALERT`, `WRONG_PASSWORD`, `TAMPER_ALERT`, `BATTERY_LOW`, `OFFLINE_ALERT`
+- **CommandStatus:** pending / completed states
+- **UserDevicePermission:** device-level access grants
+
+---
+
+## Security Model
+
+### Authentication Flow
+
+```text
+Client → POST /api/auth/login → JWT accessToken
+Client → Bearer token in Authorization header → Authenticated requests
+Client → POST /api/auth/re-auth → Verification token (for sensitive ops)
+Client → X-Verification-Token header → Protected action executed
+```
+
+### Public Endpoints (no auth required)
+
+- `/api/auth/**` — login, register
+- `/api/integration/**` — Blynk webhooks
+- `/api/telemetry/**` — ESP32 data ingestion
+- `/ws-smart-lock/**` — WebSocket
+- `/h2-console/**`, `/swagger-ui/**` — dev tools
+
+### Role-Based Access
+
+| Role | Capabilities |
+| --- | --- |
+| `ADMIN` | Full access, user management, fingerprint enroll/delete, role changes |
+| `MEMBER` | Device access, logs, alerts, settings (based on device grants) |
+| `VIEWER` | Read-only access to assigned devices |
+
+---
+
+## Frontend Pages & Components
+
+### Pages (9)
+
+| Page | Route | Description |
+| --- | --- | --- |
+| Login | `/login` | Authentication with animated UI |
+| Register | `/register` | New account creation |
+| Dashboard | `/` | Live telemetry, device status, 3D house model |
+| Remote Control | `/remote` | Door lock/unlock with step-up verification |
+| Fingerprints | `/fingerprints` | Enroll, delete, rename fingerprints |
+| Logs | `/logs` | Access log viewer with filters and export |
+| Analytics | `/analytics` | Charts, weekly reports, snapshots |
+| User Management | `/users` | Admin: user list, role changes, toggle active |
+| Settings | `/settings` | Device settings, notification preferences, profile |
+
+### Key Components (13)
+
+| Component | Purpose |
+| --- | --- |
+| `House3D` | Three.js 3D house visualization |
+| `Header` | Top navigation with time/weather display |
+| `Sidebar` | Navigation menu |
+| `ReAuthModal` | Step-up re-authentication dialog |
+| `ReminderAlertModal` | Alert notification modal |
+| `FloatingMicWidget` | Voice command interface |
+| `TubesCursor` | Animated cursor effect |
+| `ProfileMenu` | User profile dropdown |
+| `GuestAccessModal` | Guest access management |
+| `ProtectedRoute` | Auth guard for routes |
+
+### Context Providers (6)
+
+`AuthContext`, `ThemeContext`, `LangContext`, `TimeWeatherContext`, `VoiceCommandContext`, `AlertModalContext`
+
+---
 
 ## Development Workflow
 
 ### Recommended local flow
 
-1. Start the backend first.
-2. Start the root Vite dashboard.
-3. Log in with a seeded account.
-4. Use telemetry or webhook calls to simulate device behavior.
-5. Review alerts, logs, analytics, and remote-control flows from the dashboard.
+1. Start the backend: `cd backend && mvn spring-boot:run`
+2. Start the dashboard: `npm run dev` (from root)
+3. Open `http://localhost:3000`
+4. Log in with a seeded account
+5. Use telemetry API or ESP32 to simulate device data
+6. Test alerts, logs, remote control, fingerprints from the dashboard
 
-### Seeded test accounts
+### Seeded Test Accounts
 
-The migration scripts seed the following accounts, all with password `password`:
+All accounts use password: `password`
 
-| Email | Suggested purpose |
-| --- | --- |
-| `admin@smartlock.com` | admin access |
-| `user@smartlock.com` | regular member |
-| `owner@smartlock.com` | owner-level device access scenario |
-| `control@smartlock.com` | control permission scenario |
-| `viewer@smartlock.com` | view-only permission scenario |
-| `nogrant@smartlock.com` | no device grant scenario |
+| Email | Role | Purpose |
+| --- | --- | --- |
+| `admin@smartlock.com` | ADMIN | Full admin access |
+| `user@smartlock.com` | MEMBER | Regular member |
+| `owner@smartlock.com` | MEMBER | Owner-level device access |
+| `control@smartlock.com` | MEMBER | Control permission testing |
+| `viewer@smartlock.com` | VIEWER | View-only access |
+| `nogrant@smartlock.com` | MEMBER | No device grants (denied scenario) |
 
-### CI/CD notes
+---
 
-- GitHub Actions CI runs on `main` and `dev`
-- backend CI builds and tests the Spring Boot app
-- frontend CI currently builds the `frontend/` Next.js workspace
-- root `vercel.json` targets the Vite app at the repository root
+## CI/CD Pipeline
 
-This means the repository currently mixes two frontend delivery strategies and should be consolidated.
+### CI (`ci.yml`)
+
+Triggers on push/PR to `main` and `dev`:
+
+- **Backend job:** Checkout → JDK 17 → `mvn clean package`
+- **Frontend job:** Checkout → Node 20 → `npm install` → `npm run lint` → `npm run build` (targets `frontend/` workspace)
+
+### CD (`cd.yml`)
+
+Triggers on push to `main` and `dev`:
+
+- **Backend:** Calls Render deploy hook (`RENDER_DEPLOY_HOOK_URL` secret)
+- **Frontend:** Info step — Vercel auto-deploys via GitHub integration
+
+---
+
+## Deployment
+
+| Component | Platform | Config |
+| --- | --- | --- |
+| Frontend (Vite) | Vercel | `vercel.json` — builds with `npm run build`, serves from `dist/` |
+| Backend (Spring Boot) | Render | Dockerfile multi-stage build (Maven 3.9 → JRE 17 Alpine) |
+
+---
 
 ## Contributing
 
-Contributions are possible, but the project would benefit from a clearer contribution policy.
-
-Recommended workflow:
-
-1. Fork the repository or create a feature branch from `dev`
-2. Use a descriptive branch name such as `feature/device-alert-export`
+1. Fork or create a feature branch from `dev`
+2. Use descriptive branch names: `feature/device-alert-export`, `fix/fingerprint-slot`
 3. Keep changes scoped to one concern
-4. Run relevant checks before opening a pull request
-5. Open a pull request into `dev` or the branch required by your team process
-6. Wait for CI and code review before merging
+4. Run `npm run build` and `mvn clean package` before opening a PR
+5. Open a pull request into `dev`
+6. Wait for CI and code review
 
-[TODO: Add a formal CONTRIBUTING.md and Code of Conduct if this project will be maintained as open source.]
+---
 
 ## Roadmap
 
-- Consolidate the repository around one frontend application strategy
-- Fix Flyway/H2 compatibility for local tests and startup
-- Externalize secrets such as JWT and Blynk tokens
-- Add a frontend Dockerfile or align Docker Compose to the active Vite app
-- Add end-to-end tests for auth, telemetry, alerts, and remote commands
-- Publish real screenshots, architecture diagrams, and deployment documentation
+- [ ] Consolidate to single frontend strategy (Vite or Next.js)
+- [ ] Fix Flyway/H2 `gen_random_uuid()` compatibility
+- [ ] Externalize JWT secret and Blynk auth token
+- [ ] Add Dockerfile for root Vite app
+- [ ] Add end-to-end tests for auth, telemetry, alerts, remote commands
+- [ ] Add push notifications (FCM/WebPush)
+- [ ] RFID card management module
+- [ ] Multi-home/multi-location support
+
+---
 
 ## FAQ
 
-### Which frontend should I use?
+**Which frontend should I use?**
+Use the root Vite app (`src/`). The `frontend/` Next.js app is not actively used.
 
-Use the root Vite app for the current smart lock dashboard. The `frontend/` Next.js app is present, but still contains mostly starter content.
+**Do I need ESP32 hardware?**
+No. Use seeded data and API calls for development. Hardware is only needed for live sensor testing.
 
-### Do I need real hardware to work on this project?
+**Which database is used locally?**
+H2 in-memory by default. PostgreSQL is used in production via `application-prod.yml`.
 
-No. You can work on the web app and backend with seeded data and API calls. Hardware becomes necessary only when validating live ESP32 telemetry and Blynk-driven workflows.
+**How does the step-up verification work?**
+Call `POST /api/auth/re-auth` with your password to get a verification token. Pass this token in the `X-Verification-Token` header for sensitive operations (lock toggle, fingerprint enroll/delete, settings update).
 
-### Which database is used locally?
+**How does fingerprint enrollment work end-to-end?**
+1. Admin calls `POST /api/fingerprints/enroll` with device ID, person name, and verification token.
+2. Backend saves the fingerprint record and auto-assigns a slot if not specified.
+3. Backend sends Blynk commands (V100=slot, V104=name, V101=trigger) to the ESP32.
+4. ESP32 enters fingerprint enrollment mode for the specified slot.
 
-H2 is the default local database. PostgreSQL is configured through the production profile.
-
-### Are there seeded accounts for testing?
-
-Yes. Several accounts are seeded through Flyway migrations, and the shared plaintext password is `password`.
+---
 
 ## Troubleshooting
 
 ### `mvn test` fails during Flyway migration
 
-Cause:
+**Cause:** `V4` uses `gen_random_uuid()` which is not available in H2.
+**Fix:** Replace with H2-compatible UUID strategy or use profile-aware migrations.
 
-- `V4__add_user_profile_and_login_sessions.sql` uses `gen_random_uuid()`
-- the default H2 setup does not provide that function
+### `docker compose up` does not start frontend
 
-Recommended fix direction:
+**Cause:** `docker-compose.yml` references `./frontend` which has no Dockerfile.
+**Fix:** Use backend-only Docker, or add a Dockerfile for the root Vite app.
 
-- replace `gen_random_uuid()` with an H2-compatible UUID strategy for local runs, or
-- isolate PostgreSQL-specific migration logic behind profile-aware paths
+### API requests fail from dashboard
 
-### `docker compose up --build` does not start the frontend
+**Check:** Backend running on `:8080`, dashboard on `:3000`, Vite proxy is active.
 
-Cause:
+### Blynk webhook returns `401 Unauthorized`
 
-- `docker-compose.yml` expects a Docker build context at `./frontend`
-- `frontend/` does not currently include a Dockerfile
+**Check:** Request includes valid device token or the configured global Blynk auth token.
 
-### API requests from the dashboard fail in local development
+### WebSocket not connecting
 
-Check:
+**Check:** Backend CORS allows your frontend origin. WebSocket endpoint is `/ws-smart-lock` with SockJS fallback.
 
-- backend is running on `http://localhost:8080`
-- root Vite app is running on `http://localhost:3000`
-- if you are not using the Vite proxy, set `VITE_API_BASE_URL`
-
-### Blynk webhook calls return `401 Unauthorized`
-
-The webhook controller validates a token. Ensure the request includes a valid device token or the configured global Blynk token.
+---
 
 ## License
 
 This repository does not currently include a `LICENSE` file.
 
-License status: `TBD`
+License status: **TBD**
 
-[TODO: Add an explicit license such as MIT, Apache-2.0, GPL-3.0, or Proprietary.]
+[TODO: Add an explicit license (MIT, Apache-2.0, GPL-3.0, or Proprietary).]
