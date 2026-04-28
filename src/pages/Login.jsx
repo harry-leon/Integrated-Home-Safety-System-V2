@@ -39,40 +39,12 @@ const Login = () => {
   const [showPass, setShowPass] = useState(false);
   const [error,    setError]    = useState('');
   const [loading,  setLoading]  = useState(false);
-  const [showHouseGuide, setShowHouseGuide] = useState(true);
 
   const cardRef = useRef(null);
-
-  const hideHouseGuide = React.useCallback(() => {
-    document.documentElement.dataset.houseGuideHidden = 'true';
-    setShowHouseGuide(false);
-  }, []);
 
   React.useEffect(() => {
     if (isAuthenticated) navigate('/', { replace: true });
   }, [isAuthenticated, navigate]);
-
-  React.useEffect(() => {
-    delete document.documentElement.dataset.houseGuideHidden;
-  }, []);
-
-  React.useEffect(() => {
-    if (!showHouseGuide) return undefined;
-    const hide = (e) => {
-      if (e.target?.closest?.('[data-auth-card="true"]')) return;
-      hideHouseGuide();
-    };
-    document.addEventListener('pointerdown', hide, true);
-    document.addEventListener('mousedown',   hide, true);
-    document.addEventListener('touchstart',  hide, true);
-    document.addEventListener('wheel',       hide, true);
-    return () => {
-      document.removeEventListener('pointerdown', hide, true);
-      document.removeEventListener('mousedown',   hide, true);
-      document.removeEventListener('touchstart',  hide, true);
-      document.removeEventListener('wheel',       hide, true);
-    };
-  }, [hideHouseGuide, showHouseGuide]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -88,10 +60,7 @@ const Login = () => {
     }
   };
 
-  const hideGuideFromScene = (e) => {
-    if (e.target?.closest?.('[data-auth-card="true"]')) return;
-    hideHouseGuide();
-  };
+  const hideGuideFromScene = (_e) => {};
 
   /* ── Card mouse glow ─────────────────────────────────────────── */
   const handleCardMouseMove = (e) => {
@@ -116,7 +85,7 @@ const Login = () => {
     >
       {/* 3-D house canvas */}
       <div className="absolute inset-0 z-[4]">
-        <House3D onInteract={hideHouseGuide} />
+        <House3D onInteract={() => {}} />
       </div>
 
       {/* Interaction layer — passes clicks to House3D */}
@@ -124,46 +93,8 @@ const Login = () => {
         aria-hidden="true"
         data-testid="house-interaction-layer"
         className="absolute inset-y-0 left-0 z-[8] w-full cursor-grab active:cursor-grabbing md:w-[58vw]"
-        onClick={hideHouseGuide}
-        onMouseDown={hideHouseGuide}
-        onPointerDown={hideHouseGuide}
-        onTouchStart={hideHouseGuide}
-        onWheel={hideHouseGuide}
         style={{ background: 'rgba(255,255,255,0.001)' }}
       />
-
-      {/* House guide callout */}
-      {showHouseGuide && (
-        <div className="house-guide-callout pointer-events-none absolute left-4 right-4 top-12 z-[9] md:left-[18vw] md:right-auto md:top-[48%] md:w-[min(360px,46vw)] md:-translate-y-1/2">
-          <div className="absolute -left-8 top-1/2 hidden h-px w-8 bg-gradient-to-l from-blue-300/55 to-transparent md:block" />
-          <div className="absolute -left-14 top-1/2 hidden h-6 w-6 -translate-y-1/2 rounded-full border border-blue-300/45 shadow-[0_0_22px_rgba(96,165,250,0.42)] md:block">
-            <span className="absolute inset-1 rounded-full bg-blue-300/18 house-guide-ping" />
-          </div>
-          <div className="ui-demo-reveal rounded-2xl border border-white/[0.10] bg-white/[0.055] px-4 py-3 shadow-[0_18px_46px_rgba(2,6,23,0.38)] backdrop-blur-2xl">
-            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.22em] text-blue-300/85">
-              <span className="material-symbols-outlined text-[16px]">touch_app</span>
-              Tương tác căn nhà
-            </div>
-            <div className="mt-3 grid gap-2 text-[11px] leading-relaxed text-slate-300">
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-[16px] text-blue-300">360</span>
-                <span>Kéo trên vùng nhà để xoay 360°</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-[16px] text-cyan-300">layers</span>
-                <span>Bấm vào nhà để tách hoặc thu tầng</span>
-              </div>
-              <div className="hidden items-center gap-2 md:flex">
-                <span className="material-symbols-outlined text-[16px] text-amber-300">zoom_in</span>
-                <span>Cuộn trên vùng nhà để zoom</span>
-              </div>
-            </div>
-            <p className="mt-3 border-t border-white/[0.08] pt-2 text-[9px] font-bold uppercase tracking-[0.2em] text-slate-500">
-              Tự ẩn sau thao tác đầu tiên
-            </p>
-          </div>
-        </div>
-      )}
 
       {/* Vignette */}
       <div className="absolute inset-0 z-[1] pointer-events-none"

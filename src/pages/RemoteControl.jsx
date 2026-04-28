@@ -19,20 +19,20 @@ const RANGE_SETTINGS = [
 ];
 
 const VOICE_ACTION_PRESETS = [
-  { value: 'navigate:/', label: 'Mo dashboard' },
-  { value: 'navigate:/remote', label: 'Mo dieu khien' },
-  { value: 'navigate:/logs', label: 'Mo nhat ky' },
-  { value: 'navigate:/analytics', label: 'Mo analytics' },
-  { value: 'navigate:/settings', label: 'Mo cai dat' },
-  { value: 'lock:locked', label: 'Khoa cua' },
-  { value: 'lock:unlocked', label: 'Mo khoa' },
-  { value: 'setting:autoLockEnabled:true', label: 'Bat auto lock' },
-  { value: 'setting:autoLockEnabled:false', label: 'Tat auto lock' },
-  { value: 'setting:gasAlertEnabled:true', label: 'Bat canh bao gas' },
-  { value: 'setting:gasAlertEnabled:false', label: 'Tat canh bao gas' },
-  { value: 'setting:pirAlertEnabled:true', label: 'Bat canh bao PIR' },
-  { value: 'setting:pirAlertEnabled:false', label: 'Tat canh bao PIR' },
-  { value: 'resolve-alert', label: 'Xu ly canh bao moi nhat' },
+  { value: 'navigate:/', labelKey: 'voice_preset_open_dashboard' },
+  { value: 'navigate:/remote', labelKey: 'voice_preset_open_remote' },
+  { value: 'navigate:/logs', labelKey: 'voice_preset_open_logs' },
+  { value: 'navigate:/analytics', labelKey: 'voice_preset_open_analytics' },
+  { value: 'navigate:/settings', labelKey: 'voice_preset_open_settings' },
+  { value: 'lock:locked', labelKey: 'voice_preset_lock_door' },
+  { value: 'lock:unlocked', labelKey: 'voice_preset_unlock_door' },
+  { value: 'setting:autoLockEnabled:true', labelKey: 'voice_preset_enable_auto_lock' },
+  { value: 'setting:autoLockEnabled:false', labelKey: 'voice_preset_disable_auto_lock' },
+  { value: 'setting:gasAlertEnabled:true', labelKey: 'voice_preset_enable_gas_alert' },
+  { value: 'setting:gasAlertEnabled:false', labelKey: 'voice_preset_disable_gas_alert' },
+  { value: 'setting:pirAlertEnabled:true', labelKey: 'voice_preset_enable_pir_alert' },
+  { value: 'setting:pirAlertEnabled:false', labelKey: 'voice_preset_disable_pir_alert' },
+  { value: 'resolve-alert', labelKey: 'voice_preset_resolve_alert' },
 ];
 
 const buildVoiceCommandPayload = ({ phrase, label, actionPreset, matchMode }) => {
@@ -94,6 +94,8 @@ const RemoteControl = () => {
   const [voiceMatchMode, setVoiceMatchMode] = useState('exact');
   const isBootstrappingSettings = useRef(false);
   const verificationPromiseRef = useRef(null);
+  const showAlertRef = useRef(showAlert);
+  useEffect(() => { showAlertRef.current = showAlert; }, [showAlert]);
 
   const requestVerificationToken = useCallback(async ({ title, description }) => {
     if (verificationState.token && verificationState.expiresAt > Date.now()) {
@@ -211,11 +213,12 @@ const RemoteControl = () => {
         setStatusError('');
         setHasPendingSettingsChange(false);
 
-        showAlert({
+        showAlertRef.current({
           type: 'success',
           title: t('reminder_success'),
           message: t('preferences'),
           confirmText: t('reminder_ok'),
+          dedupeKey: `settings-saved-${selectedDeviceId}`,
         });
       } catch (error) {
         setStatusError(error.message || t('preferences_desc'));
@@ -223,7 +226,7 @@ const RemoteControl = () => {
     }, 700);
 
     return () => window.clearTimeout(timer);
-  }, [deviceSettings, hasPendingSettingsChange, requestVerificationToken, selectedDeviceId, showAlert, t]);
+  }, [deviceSettings, hasPendingSettingsChange, requestVerificationToken, selectedDeviceId, t]);
 
   useEffect(() => {
     return () => {
@@ -352,7 +355,7 @@ const RemoteControl = () => {
             className="hidden items-center gap-2 rounded-xl border border-primary/20 bg-primary-container px-4 py-2 font-bold text-on-primary-container shadow-sm transition-all hover:opacity-90 sm:flex"
           >
             <span className="material-symbols-outlined text-[18px]">key</span>
-            Guest access
+            {t('guest_access')}
           </button>
 
           <div className="flex items-center gap-2 rounded-full border border-outline-variant/10 bg-surface-container px-4 py-2 shadow-sm transition-colors duration-300">
@@ -609,7 +612,7 @@ const RemoteControl = () => {
                     className="min-h-11 rounded-2xl border border-outline-variant/12 bg-surface-container px-4 text-sm font-semibold text-on-surface outline-none focus:border-primary/40"
                   >
                     {VOICE_ACTION_PRESETS.map((action) => (
-                      <option key={action.value} value={action.value}>{action.label}</option>
+                      <option key={action.value} value={action.value}>{t(action.labelKey)}</option>
                     ))}
                   </select>
                   <select
@@ -617,8 +620,8 @@ const RemoteControl = () => {
                     onChange={(event) => setVoiceMatchMode(event.target.value)}
                     className="min-h-11 rounded-2xl border border-outline-variant/12 bg-surface-container px-4 text-sm font-semibold text-on-surface outline-none focus:border-primary/40"
                   >
-                    <option value="exact">Exact</option>
-                    <option value="contains">Contains</option>
+                    <option value="exact">{t('voice_match_exact')}</option>
+                    <option value="contains">{t('voice_match_contains')}</option>
                   </select>
                 </div>
                 <button

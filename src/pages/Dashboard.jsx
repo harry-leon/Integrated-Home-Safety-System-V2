@@ -555,14 +555,6 @@ const Dashboard = () => {
 
   const environmentCards = [
     {
-      label: t('weather'),
-      value: primaryDevice?.temperature != null ? `${primaryDevice.temperature}°C` : `${weather.temp}°C`,
-      detail: primaryDevice?.weatherDesc || weather.desc,
-      icon: 'thermostat',
-      color: 'bg-orange-500/10 text-orange-500',
-      summary: t('weather_support'),
-    },
-    {
       label: t('brightness'),
       value: primaryDevice?.ldrValue != null ? `${primaryDevice.ldrValue} lx` : 'N/A',
       icon: 'wb_sunny',
@@ -755,6 +747,71 @@ const Dashboard = () => {
                     {voiceError}
                   </p>
                 ) : null}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Weather Widget */}
+      <section className="overflow-hidden rounded-[2rem] border border-outline-variant/12 bg-gradient-to-br from-primary/5 via-surface-container to-surface-container shadow-sm">
+        <div className="relative p-6 sm:p-8">
+          <div className="absolute right-0 top-0 h-48 w-48 rounded-full bg-primary/5 blur-3xl" />
+          <div className="relative z-10">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-primary text-[20px]">location_on</span>
+                  <p className="text-sm font-semibold text-outline">Hà Nội, Việt Nam</p>
+                </div>
+                <div className="mt-4 flex items-start gap-6">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-primary/10">
+                      <span className="material-symbols-outlined text-primary text-[48px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                        {weather.icon}
+                      </span>
+                    </div>
+                    <div>
+                      <p className="text-5xl font-black tracking-tight text-on-surface">{primaryDevice?.temperature ?? weather.temp}°</p>
+                      <p className="mt-1 text-sm font-medium text-outline">{primaryDevice?.weatherDesc || weather.desc}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-xs font-semibold uppercase tracking-wider text-outline">{t('weather')}</p>
+                <p className="mt-1 text-xs text-outline">{dateStr.split(',')[0]}</p>
+              </div>
+            </div>
+
+            <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              <div className="rounded-xl bg-surface-container-high/60 px-4 py-3 backdrop-blur-sm">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[18px] text-primary">thermostat</span>
+                  <p className="text-xs font-semibold text-outline">Cảm giác</p>
+                </div>
+                <p className="mt-2 text-lg font-bold text-on-surface">{weather.feelsLike}°C</p>
+              </div>
+              <div className="rounded-xl bg-surface-container-high/60 px-4 py-3 backdrop-blur-sm">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[18px] text-blue-500">water_drop</span>
+                  <p className="text-xs font-semibold text-outline">Độ ẩm</p>
+                </div>
+                <p className="mt-2 text-lg font-bold text-on-surface">{weather.humidity}%</p>
+              </div>
+              <div className="rounded-xl bg-surface-container-high/60 px-4 py-3 backdrop-blur-sm">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[18px] text-cyan-500">air</span>
+                  <p className="text-xs font-semibold text-outline">Gió</p>
+                </div>
+                <p className="mt-2 text-lg font-bold text-on-surface">{weather.windSpeed} km/h</p>
+              </div>
+              <div className="rounded-xl bg-surface-container-high/60 px-4 py-3 backdrop-blur-sm">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[18px] text-amber-500">wb_sunny</span>
+                  <p className="text-xs font-semibold text-outline">UV Index</p>
+                </div>
+                <p className="mt-2 text-lg font-bold text-on-surface">{weather.uvIndex}</p>
               </div>
             </div>
           </div>

@@ -102,7 +102,7 @@ export const VoiceCommandProvider = ({ children }) => {
   const [isExecuting, setIsExecuting] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [parsedCommand, setParsedCommand] = useState(null);
-  const [feedback, setFeedback] = useState('Voice control is ready.');
+  const [feedback, setFeedback] = useState('');
   const [error, setError] = useState('');
   const [commandHistory, setCommandHistory] = useState([]);
   const [customCommands, setCustomCommands] = useState(readStoredCommands);
@@ -214,7 +214,7 @@ export const VoiceCommandProvider = ({ children }) => {
         verificationPromiseRef.current = null;
       }
     } catch (err) {
-      setVerificationError(describeError(err, 'Unable to verify your password.'));
+      setVerificationError(describeError(err, t('voice_error_verify')));
     } finally {
       setIsVerifying(false);
     }
@@ -222,14 +222,14 @@ export const VoiceCommandProvider = ({ children }) => {
 
   const executeCommand = useCallback(async (command) => {
     if (!command || command.type === 'error') {
-      throw new Error(command?.detail || 'No supported command was found.');
+      throw new Error(command?.detail || t('voice_no_match'));
     }
 
     setShowHelp(false);
 
     if (command.type === 'help') {
       setShowHelp(true);
-      setFeedback('Here are the supported voice commands.');
+      setFeedback(t('voice_examples'));
       return;
     }
 
@@ -248,28 +248,28 @@ export const VoiceCommandProvider = ({ children }) => {
 
     const currentDevice = selectedDevice || devices[0];
     if (!currentDevice) {
-      throw new Error('No device is available for voice control.');
+      throw new Error(t('voice_error_no_device'));
     }
 
     if (command.type === 'lock') {
       if (!currentDevice.online) {
-        throw new Error('The selected device is offline. Reconnect it before sending a command.');
+        throw new Error(t('next_action_offline'));
       }
 
       const logs = await smartLockApi.getAccessLogs({ deviceId: currentDevice.id, page: 0, size: 8 }).catch(() => []);
       const currentLockState = getLatestLockState(logs);
       if (currentLockState === 'unknown') {
         navigate('/remote');
-        throw new Error('Door state is unknown. Review the device on the control page before toggling the lock.');
+        throw new Error(t('voice_error_unknown_state'));
       }
 
       if (command.targetState === currentLockState) {
-        setFeedback(`The selected device is already ${currentLockState}.`);
+        setFeedback(currentLockState === 'locked' ? t('locked') : t('unlocked'));
         return;
       }
 
       const commandId = await smartLockApi.sendLockToggle(currentDevice.id);
-      setFeedback(`Command queued successfully. Reference: ${commandId}`);
+      setFeedback(`${t('latest_command')}: ${commandId}`);
       return;
     }
 
@@ -277,18 +277,18 @@ export const VoiceCommandProvider = ({ children }) => {
       const alertsData = activeAlerts.length > 0 ? activeAlerts : await smartLockApi.getAlerts({ isResolved: false, size: 10 }).catch(() => []);
       const alertToResolve = (Array.isArray(alertsData) ? alertsData : []).filter((alert) => !alert.resolved)[0];
       if (!alertToResolve) {
-        setFeedback('There are no active alerts to resolve.');
+        setFeedback(t('no_active_alerts'));
         return;
       }
 
       const verificationToken = await requestVerificationToken({
-        title: 'Resolve alert by voice',
-        description: `Enter your password to resolve ${alertToResolve.alertType || 'the latest active alert'}.`,
+        title: t('voice_verify'),
+        description: `${t('voice_verify')}: ${alertToResolve.alertType || t('system_notification')}`,
       });
 
       await smartLockApi.resolveAlert(alertToResolve.id, verificationToken);
       setActiveAlerts((current) => current.filter((alert) => alert.id !== alertToResolve.id));
-      setFeedback('Alert resolved successfully.');
+      setFeedback(t('reminder_success'));
       return;
     }
 
@@ -296,13 +296,13 @@ export const VoiceCommandProvider = ({ children }) => {
       const settings = deviceSettings || await smartLockApi.getDeviceSettings(currentDevice.id);
       const nextSettings = { ...settings, [command.key]: command.value };
       const verificationToken = await requestVerificationToken({
-        title: 'Update device setting by voice',
-        description: `Enter your password to ${command.label.toLowerCase()} for ${currentDevice.deviceName || 'the selected device'}.`,
+        title: t('preferences'),
+        description: t('preferences_desc'),
       });
 
       const updated = await smartLockApi.updateDeviceSettings(currentDevice.id, nextSettings, verificationToken);
       setDeviceSettings(updated || nextSettings);
-      setFeedback(`Setting updated: ${command.label}`);
+      setFeedback(`${t('preferences')}: ${command.label}`);
     }
   }, [
     activeAlerts,
@@ -318,12 +318,12 @@ export const VoiceCommandProvider = ({ children }) => {
     setParsedCommand(nextCommand);
 
     if (!spokenText.trim()) {
-      setFeedback('No speech was captured.');
+      setFeedback(t('voice_no_speech'));
       return;
     }
 
     if (!nextCommand) {
-      const message = 'Voice captured, but no supported command was found.';
+      const message = t('voice_no_match');
       setFeedback(message);
       setError(message);
       addHistory({ transcript: spokenText, status: 'unmatched' });
@@ -333,7 +333,7 @@ export const VoiceCommandProvider = ({ children }) => {
 
     setIsExecuting(true);
     setError('');
-    setFeedback(`Command recognized: ${nextCommand.label}`);
+    setFeedback(`${t('voice_recognized')}: ${nextCommand.label}`);
 
     try {
       await executeCommand(nextCommand);
@@ -341,7 +341,7 @@ export const VoiceCommandProvider = ({ children }) => {
       playSuccessTone();
       speakText(buildSuccessSpeech(nextCommand, lang), recognitionLang);
     } catch (err) {
-      const message = describeError(err, 'Unable to run the voice command.');
+      const message = describeError(err, t('voice_error_run'));
       setError(message);
       setFeedback(message);
       addHistory({ transcript: spokenText, command: nextCommand.label, status: 'error', error: message });
@@ -353,12 +353,12 @@ export const VoiceCommandProvider = ({ children }) => {
 
   const startListening = useCallback(() => {
     if (!isAuthenticated) {
-      setError('Please log in before using voice control.');
+      setError(t('voice_error_login'));
       return;
     }
 
     if (!recognitionRef.current) {
-      setError('Voice recognition is not supported in this browser.');
+      setError(t('voice_error_unsupported'));
       return;
     }
 
@@ -368,11 +368,11 @@ export const VoiceCommandProvider = ({ children }) => {
       setParsedCommand(null);
       setError('');
       setShowHelp(false);
-      setFeedback('Listening...');
+      setFeedback(t('voice_listening'));
       playStartTone();
       recognitionRef.current.start();
     } catch {
-      setError('Voice recognition is already active.');
+      setError(t('voice_error_active'));
     }
   }, [isAuthenticated]);
 
@@ -411,7 +411,7 @@ export const VoiceCommandProvider = ({ children }) => {
     recognition.onstart = () => {
       setIsListening(true);
       setError('');
-      setFeedback('Listening...');
+      setFeedback(t('voice_listening'));
     };
 
     recognition.onresult = (event) => {
@@ -426,8 +426,8 @@ export const VoiceCommandProvider = ({ children }) => {
 
     recognition.onerror = (event) => {
       const message = event.error === 'not-allowed'
-        ? 'Microphone permission was denied.'
-        : 'Voice recognition failed. Try again.';
+        ? t('voice_error_permission')
+        : t('voice_error_failed');
       setIsListening(false);
       setError(message);
       setFeedback(message);
