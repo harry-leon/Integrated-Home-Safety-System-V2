@@ -280,7 +280,6 @@ const RemoteControl = () => {
       setStatusError(t('hero_no_device_online'));
       return;
     }
-
     setIsSendingCommand(true);
     setStatusMessage('');
     setStatusError('');

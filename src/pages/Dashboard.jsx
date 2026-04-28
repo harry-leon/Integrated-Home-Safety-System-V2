@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useLang } from '../contexts/LangContext';
 import { useTimeWeather } from '../contexts/TimeWeatherContext';
 import { useVoiceCommand } from '../contexts/VoiceCommandContext';
@@ -7,24 +7,24 @@ import { useAlertModal } from '../contexts/AlertModalContext';
 import { smartLockApi } from '../services/api';
 import { createAlertSubscription, createTelemetrySubscription } from '../services/realtime';
 
-const formatAlertType = (alertType) => {
+const formatAlertType = (alertType, t) => {
   switch (alertType) {
     case 'GAS_LEAK':
-      return 'Canh bao khi gas';
+      return t('alert_gas_leak');
     case 'INTRUDER_ALERT':
-      return 'Canh bao dot nhap';
+      return t('alert_intruder');
     case 'FIRE_ALARM':
-      return 'Canh bao chay';
+      return t('alert_fire');
     case 'WRONG_PASSWORD':
-      return 'Sai mat khau';
+      return t('alert_wrong_password');
     case 'TAMPER_ALERT':
-      return 'Canh bao pha hoai';
+      return t('alert_tamper');
     case 'BATTERY_LOW':
-      return 'Pin yeu';
+      return t('alert_battery_low');
     case 'OFFLINE_ALERT':
-      return 'Thiet bi offline';
+      return t('alert_offline');
     default:
-      return alertType || 'Canh bao';
+      return alertType || t('reminder_warning');
   }
 };
 
@@ -148,6 +148,31 @@ const applyTelemetryToDevices = (deviceList, payload) => {
   });
 };
 
+const getDeviceTelemetryTime = (device) => {
+  const timestamp = device?.lastSensorAt || device?.lastSeen;
+  const parsed = timestamp ? new Date(timestamp).getTime() : 0;
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const getPreferredDashboardDevice = (deviceList) => {
+  if (!Array.isArray(deviceList) || deviceList.length === 0) {
+    return null;
+  }
+
+  return [...deviceList].sort((left, right) => {
+    const telemetryDelta = getDeviceTelemetryTime(right) - getDeviceTelemetryTime(left);
+    if (telemetryDelta !== 0) {
+      return telemetryDelta;
+    }
+
+    if (left.online !== right.online) {
+      return Number(right.online) - Number(left.online);
+    }
+
+    return (left.deviceName || '').localeCompare(right.deviceName || '');
+  })[0];
+};
+
 const mergeAlertIntoList = (currentAlerts, incomingAlert) => {
   if (!incomingAlert?.id) {
     return currentAlerts;
@@ -183,6 +208,7 @@ const Dashboard = () => {
     stopListening: stopVoiceRecognition,
   } = useVoiceCommand();
   const { showAlert } = useAlertModal();
+  const navigate = useNavigate();
 
   const triggerAlertModal = React.useCallback((payload) => {
     const alertType = (payload.alertType || '').toUpperCase();
@@ -192,20 +218,21 @@ const Dashboard = () => {
     if (severity === 'CRITICAL' || severity === 'HIGH' || isSafetyCritical) {
       showAlert({
         type: (severity === 'CRITICAL' || isSafetyCritical) ? 'error' : 'warning',
-        title: (severity === 'CRITICAL' || isSafetyCritical) ? t('reminder_error') : t('reminder_warning'),
+        dedupeKey: payload.id ? `alert:${payload.id}` : `alert:${alertType}:${payload.createdAt || ''}`,
+        title: formatAlertType(alertType, t),
         message: alertType === 'GAS_LEAK' ? (t('reminder_gas_detected') || payload.message) :
                  alertType === 'INTRUDER_ALERT' ? (t('reminder_intruder_detected') || payload.message) :
                  alertType === 'FIRE_ALARM' ? (t('reminder_fire_detected') || payload.message || 'Phát hiện cháy!') :
-                 (payload.message || formatAlertType(alertType)),
+                 (payload.message || formatAlertType(alertType, t)),
         confirmText: t('reminder_check_now') || 'Kiểm tra ngay',
         showCancelButton: !isSafetyCritical,
         preventClose: isSafetyCritical,
         onConfirm: () => {
-          window.location.href = '/logs';
+          navigate('/analytics');
         }
       });
     }
-  }, [showAlert, t]);
+  }, [navigate, showAlert, t]);
 
   const [alerts, setAlerts] = useState([]);
   const [weeklySnap, setWeeklySnap] = useState(null);
@@ -217,7 +244,11 @@ const Dashboard = () => {
   const [lastTelemetryAt, setLastTelemetryAt] = useState(null);
   const [telemetrySource, setTelemetrySource] = useState('snapshot');
   const [primaryDeviceSettings, setPrimaryDeviceSettings] = useState(null);
-  const primaryDevice = devices[0] || null;
+  const telemetryDeviceCodes = useMemo(
+    () => Array.from(new Set(devices.map((device) => device?.deviceCode).filter(Boolean))),
+    [devices],
+  );
+  const primaryDevice = useMemo(() => getPreferredDashboardDevice(devices), [devices]);
 
   useEffect(() => {
     let active = true;
@@ -243,8 +274,9 @@ const Dashboard = () => {
 
         if (Array.isArray(deviceData)) {
           setDevices(deviceData);
-          if (deviceData[0]?.lastSensorAt) {
-            setLastTelemetryAt((current) => current || deviceData[0].lastSensorAt);
+          const preferredDevice = getPreferredDashboardDevice(deviceData);
+          if (preferredDevice?.lastSensorAt) {
+            setLastTelemetryAt((current) => current || preferredDevice.lastSensorAt);
             setTelemetrySource((current) => current || 'snapshot');
           }
         }
@@ -269,26 +301,54 @@ const Dashboard = () => {
   }, []);
 
   useEffect(() => {
-    if (!primaryDevice?.deviceCode) {
+    if (telemetryDeviceCodes.length === 0) {
       setTelemetryStatus('idle');
       return undefined;
     }
 
-    return createTelemetrySubscription({
-      deviceCode: primaryDevice.deviceCode,
-      onStatusChange: (status) => {
-        setTelemetryStatus(status);
-        if (status === 'live') {
-          setIsFallbackActive(false);
-        }
-      },
-      onMessage: (payload) => {
-        setDevices((current) => applyTelemetryToDevices(current, payload));
-        setLastTelemetryAt(payload.recordedAt || new Date().toISOString());
-        setTelemetrySource('websocket');
-      },
-    });
-  }, [primaryDevice?.deviceCode]);
+    const statusByDevice = new Map();
+
+    const updateAggregateStatus = () => {
+      const statuses = Array.from(statusByDevice.values());
+
+      if (statuses.some((status) => status === 'live')) {
+        setTelemetryStatus('live');
+        setIsFallbackActive(false);
+        return;
+      }
+
+      if (statuses.some((status) => status === 'connecting')) {
+        setTelemetryStatus('connecting');
+        return;
+      }
+
+      if (statuses.some((status) => status === 'reconnecting')) {
+        setTelemetryStatus('reconnecting');
+        return;
+      }
+
+      setTelemetryStatus('idle');
+    };
+
+    const cleanups = telemetryDeviceCodes.map((deviceCode) =>
+      createTelemetrySubscription({
+        deviceCode,
+        onStatusChange: (status) => {
+          statusByDevice.set(deviceCode, status);
+          updateAggregateStatus();
+        },
+        onMessage: (payload) => {
+          setDevices((current) => applyTelemetryToDevices(current, payload));
+          setLastTelemetryAt(payload.recordedAt || new Date().toISOString());
+          setTelemetrySource('websocket');
+        },
+      }),
+    );
+
+    return () => {
+      cleanups.forEach((cleanup) => cleanup?.());
+    };
+  }, [telemetryDeviceCodes]);
 
   // Subscribe to the device-specific alert topic (only when device is known)
   useEffect(() => {
@@ -301,7 +361,7 @@ const Dashboard = () => {
         triggerAlertModal(payload);
       },
     });
-  }, [primaryDevice?.deviceCode, showAlert, t]);
+  }, [primaryDevice?.deviceCode, triggerAlertModal]);
 
   // Always subscribe to global alert topic regardless of device status
   useEffect(() => {
@@ -312,8 +372,7 @@ const Dashboard = () => {
         triggerAlertModal(payload);
       },
     });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showAlert, t]);
+  }, [triggerAlertModal]);
 
   useEffect(() => {
     if (!primaryDevice?.lastSensorAt) {
@@ -334,17 +393,17 @@ const Dashboard = () => {
       if (prevOnlineState && !primaryDevice.online) {
         showAlert({
           type: 'warning',
-          title: t('reminder_warning'),
+          title: formatAlertType('OFFLINE_ALERT', t),
           message: t('reminder_device_offline'),
           confirmText: t('reminder_check_now'),
           onConfirm: () => {
-            window.location.href = '/remote';
+            navigate('/analytics');
           }
         });
       }
       setPrevOnlineState(primaryDevice.online);
     }
-  }, [primaryDevice?.online, prevOnlineState, showAlert, t]);
+  }, [navigate, primaryDevice?.online, prevOnlineState, showAlert, t]);
 
   useEffect(() => {
     if (!primaryDevice?.id) {
@@ -392,7 +451,9 @@ const Dashboard = () => {
 
         setDevices(deviceData);
 
-        const refreshedDevice = deviceData.find((device) => device.deviceCode === primaryDevice.deviceCode) || deviceData[0] || null;
+        const refreshedDevice =
+          deviceData.find((device) => device.deviceCode === primaryDevice.deviceCode) ||
+          getPreferredDashboardDevice(deviceData);
         if (refreshedDevice?.lastSensorAt) {
           setLastTelemetryAt(refreshedDevice.lastSensorAt);
           setTelemetrySource('polling');
@@ -618,7 +679,7 @@ const Dashboard = () => {
                               {topAlertStyle.label}
                             </p>
                             <span className={`rounded-full px-2 py-1 text-[10px] font-bold uppercase tracking-[0.14em] ${topAlertStyle.badge}`}>
-                              {formatAlertType(topAlert.alertType)}
+                              {formatAlertType(topAlert.alertType, t)}
                             </span>
                           </div>
                           <p className="mt-2 text-base font-semibold text-on-surface">

@@ -3,16 +3,20 @@ import { Outlet, Link, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import FloatingMicWidget from './FloatingMicWidget';
+import { useAuth } from '../contexts/AuthContext';
 
 const mobileNavItems = [
-  { label: 'Tong quan', icon: 'dashboard', path: '/' },
-  { label: 'Dieu khien', icon: 'lock', path: '/remote' },
-  { label: 'Nhat ky', icon: 'history', path: '/logs' },
-  { label: 'Tai khoan', icon: 'person', path: '/settings' },
+  { label: 'Tong quan', icon: 'dashboard', path: '/', roles: ['ADMIN', 'MEMBER', 'VIEWER'] },
+  { label: 'Dieu khien', icon: 'lock', path: '/remote', roles: ['ADMIN', 'MEMBER', 'VIEWER'] },
+  { label: 'Phan tich', icon: 'analytics', path: '/analytics', roles: ['ADMIN', 'MEMBER'] },
+  { label: 'Nhat ky', icon: 'history', path: '/logs', roles: ['ADMIN'] },
+  { label: 'Users', icon: 'manage_accounts', path: '/users', roles: ['ADMIN'] },
+  { label: 'Tai khoan', icon: 'person', path: '/settings', roles: ['ADMIN', 'MEMBER', 'VIEWER'] },
 ];
 
 const Layout = () => {
   const location = useLocation();
+  const { user } = useAuth();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
     const stored = localStorage.getItem('sidebar_collapsed');
     return stored === 'true';
@@ -43,7 +47,9 @@ const Layout = () => {
         aria-label="Mobile Navigation"
         className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around border-t border-outline-variant/20 bg-surface/95 px-4 py-3 backdrop-blur-xl md:hidden"
       >
-        {mobileNavItems.map((item) => {
+        {mobileNavItems
+          .filter((item) => !item.roles || item.roles.includes(user?.role))
+          .map((item) => {
           const isActive =
             item.path === '/' ? location.pathname === '/' : location.pathname.startsWith(item.path);
 

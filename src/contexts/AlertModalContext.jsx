@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useRef } from 'react';
 import ReminderAlertModal from '../components/ReminderAlertModal';
 
 const AlertModalContext = createContext();
@@ -6,10 +6,42 @@ const AlertModalContext = createContext();
 export const AlertModalProvider = ({ children }) => {
   const [queue, setQueue] = useState([]);
   const [activeAlert, setActiveAlert] = useState(null);
+  const recentAlertKeysRef = useRef(new Map());
+  const activeAlertRef = useRef(null);
+  const DEDUPE_WINDOW_MS = 1500;
+
+  React.useEffect(() => {
+    activeAlertRef.current = activeAlert;
+  }, [activeAlert]);
 
   const showAlert = useCallback((config) => {
-    // config: { type, title, message, confirmText, cancelText, onConfirm, showCancelButton }
-    setQueue((prev) => [...prev, { id: Date.now(), ...config }]);
+    // config: { type, title, message, confirmText, cancelText, onConfirm, showCancelButton, dedupeKey }
+    const now = Date.now();
+    const fallbackKey = `${config?.type || 'warning'}|${config?.title || ''}|${config?.message || ''}`;
+    const dedupeKey = config?.dedupeKey || fallbackKey;
+    const lastSeen = recentAlertKeysRef.current.get(dedupeKey) || 0;
+
+    if (now - lastSeen < DEDUPE_WINDOW_MS) {
+      return;
+    }
+    setQueue((prev) => {
+      const active = activeAlertRef.current;
+      const activeKey = active?.dedupeKey || `${active?.type || 'warning'}|${active?.title || ''}|${active?.message || ''}`;
+      if (active && activeKey === dedupeKey) {
+        return prev;
+      }
+
+      const alreadyQueued = prev.some((item) => {
+        const itemKey = item?.dedupeKey || `${item?.type || 'warning'}|${item?.title || ''}|${item?.message || ''}`;
+        return itemKey === dedupeKey;
+      });
+      if (alreadyQueued) {
+        return prev;
+      }
+
+      recentAlertKeysRef.current.set(dedupeKey, now);
+      return [...prev, { id: now, ...config, dedupeKey }];
+    });
   }, []);
 
   const closeAlert = useCallback(() => {

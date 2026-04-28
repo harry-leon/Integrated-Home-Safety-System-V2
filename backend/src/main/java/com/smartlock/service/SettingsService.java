@@ -6,6 +6,7 @@ import com.smartlock.model.DeviceSettings;
 import com.smartlock.model.NotificationSettings;
 import com.smartlock.model.User;
 import com.smartlock.repository.DeviceSettingsRepository;
+import com.smartlock.repository.DeviceRepository;
 import com.smartlock.repository.NotificationSettingsRepository;
 import com.smartlock.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,8 @@ public class SettingsService {
     private final DeviceSettingsRepository deviceSettingsRepository;
     private final NotificationSettingsRepository notificationSettingsRepository;
     private final UserRepository userRepository;
+    private final DeviceRepository deviceRepository;
+    private final BlynkService blynkService;
 
     public DeviceSettingsDTO getDeviceSettings(UUID deviceId) {
         DeviceSettings settings = deviceSettingsRepository.findByDeviceId(deviceId)
@@ -40,8 +43,17 @@ public class SettingsService {
         if (dto.getMaxPassFail() != null) settings.setMaxPassFail(dto.getMaxPassFail());
         if (dto.getKeypadLockDuration() != null) settings.setKeypadLockDuration(dto.getKeypadLockDuration());
         if (dto.getLightDuration() != null) settings.setLightDuration(dto.getLightDuration());
-        
-        return mapToDeviceDTO(deviceSettingsRepository.save(settings));
+
+        DeviceSettings saved = deviceSettingsRepository.save(settings);
+        deviceRepository.findById(deviceId).ifPresent(device ->
+                blynkService.updateVirtualPin(
+                        device,
+                        BlynkService.PIN_ALERT_ENABLE,
+                        saved.isGasAlertEnabled() ? "1" : "0"
+                )
+        );
+
+        return mapToDeviceDTO(saved);
     }
 
     public NotificationSettingsDTO getNotificationSettings(String username) {
