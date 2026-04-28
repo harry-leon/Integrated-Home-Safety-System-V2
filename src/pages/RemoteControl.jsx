@@ -7,19 +7,50 @@ import ReAuthModal from '../components/ReAuthModal';
 import { smartLockApi } from '../services/api';
 
 const QUICK_SETTINGS = [
-  { label: 'Auto lock', icon: 'lock_clock', key: 'autoLockEnabled', color: 'text-primary' },
-  { label: 'Gas alert', icon: 'gas_meter', key: 'gasAlertEnabled', color: 'text-tertiary' },
-  { label: 'PIR alert', icon: 'motion_sensor_active', key: 'pirAlertEnabled', color: 'text-secondary' },
+  { labelKey: 'auto_lock', icon: 'lock_clock', key: 'autoLockEnabled', color: 'text-primary' },
+  { labelKey: 'gas_alert', icon: 'gas_meter', key: 'gasAlertEnabled', color: 'text-tertiary' },
+  { labelKey: 'motion_alert', icon: 'motion_sensor_active', key: 'pirAlertEnabled', color: 'text-secondary' },
 ];
 
 const RANGE_SETTINGS = [
-  { label: 'Gas threshold (PPM)', key: 'gasThreshold', max: 1000 },
-  { label: 'Light threshold (Lux)', key: 'ldrThreshold', max: 1000 },
-  { label: 'Auto-lock delay (seconds)', key: 'autoLockDelay', max: 120 },
+  { labelKey: 'gas_threshold', key: 'gasThreshold', max: 1000 },
+  { labelKey: 'light_threshold', key: 'ldrThreshold', max: 1000 },
+  { labelKey: 'auto_lock_delay', key: 'autoLockDelay', max: 120 },
 ];
 
+const VOICE_ACTION_PRESETS = [
+  { value: 'navigate:/', labelKey: 'voice_preset_open_dashboard' },
+  { value: 'navigate:/remote', labelKey: 'voice_preset_open_remote' },
+  { value: 'navigate:/logs', labelKey: 'voice_preset_open_logs' },
+  { value: 'navigate:/analytics', labelKey: 'voice_preset_open_analytics' },
+  { value: 'navigate:/settings', labelKey: 'voice_preset_open_settings' },
+  { value: 'lock:locked', labelKey: 'voice_preset_lock_door' },
+  { value: 'lock:unlocked', labelKey: 'voice_preset_unlock_door' },
+  { value: 'setting:autoLockEnabled:true', labelKey: 'voice_preset_enable_auto_lock' },
+  { value: 'setting:autoLockEnabled:false', labelKey: 'voice_preset_disable_auto_lock' },
+  { value: 'setting:gasAlertEnabled:true', labelKey: 'voice_preset_enable_gas_alert' },
+  { value: 'setting:gasAlertEnabled:false', labelKey: 'voice_preset_disable_gas_alert' },
+  { value: 'setting:pirAlertEnabled:true', labelKey: 'voice_preset_enable_pir_alert' },
+  { value: 'setting:pirAlertEnabled:false', labelKey: 'voice_preset_disable_pir_alert' },
+  { value: 'resolve-alert', labelKey: 'voice_preset_resolve_alert' },
+];
+
+const buildVoiceCommandPayload = ({ phrase, label, actionPreset, matchMode }) => {
+  const [type, first, second] = actionPreset.split(':');
+  const base = {
+    phrase: phrase.trim(),
+    label: label.trim() || phrase.trim(),
+    matchMode,
+  };
+
+  if (type === 'navigate') return { ...base, type, path: first || '/' };
+  if (type === 'lock') return { ...base, type, targetState: first || 'locked' };
+  if (type === 'setting') return { ...base, type, key: first, value: second === 'true' };
+  return { ...base, type: 'resolve-alert' };
+};
+
 const RemoteControl = () => {
-  const { t } = useLang();
+  const { t, formatDeviceName } = useLang();
   const {
     isSupported: isVoiceSupported,
     isListening,
@@ -29,6 +60,9 @@ const RemoteControl = () => {
     feedback: voiceFeedback,
     error: voiceError,
     helpItems: voiceHelpItems,
+    customCommands,
+    addCustomCommand,
+    removeCustomCommand,
     startListening: startVoiceRecognition,
     stopListening: stopVoiceRecognition,
     runTranscript: runVoiceTranscript,
@@ -54,8 +88,14 @@ const RemoteControl = () => {
   });
   const [verificationError, setVerificationError] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
+  const [voicePhrase, setVoicePhrase] = useState('');
+  const [voiceLabel, setVoiceLabel] = useState('');
+  const [voiceActionPreset, setVoiceActionPreset] = useState('navigate:/analytics');
+  const [voiceMatchMode, setVoiceMatchMode] = useState('exact');
   const isBootstrappingSettings = useRef(false);
   const verificationPromiseRef = useRef(null);
+  const showAlertRef = useRef(showAlert);
+  useEffect(() => { showAlertRef.current = showAlert; }, [showAlert]);
 
   const requestVerificationToken = useCallback(async ({ title, description }) => {
     if (verificationState.token && verificationState.expiresAt > Date.now()) {
@@ -91,11 +131,11 @@ const RemoteControl = () => {
         if (normalized.length > 0) {
           setSelectedDeviceId(normalized[0].id);
         } else {
-          setStatusMessage('No devices are configured yet.');
+          setStatusMessage(t('no_sensor_data'));
         }
       } catch (error) {
         if (active) {
-          setStatusError(error.message || 'Unable to load devices.');
+          setStatusError(error.message || t('no_sensor_data'));
         }
       } finally {
         if (active) {
@@ -140,7 +180,7 @@ const RemoteControl = () => {
         }
       } catch (error) {
         if (active) {
-          setStatusError(error.message || 'Unable to load device status.');
+          setStatusError(error.message || t('no_sensor_data'));
         }
       } finally {
         window.setTimeout(() => {
@@ -164,28 +204,29 @@ const RemoteControl = () => {
     const timer = window.setTimeout(async () => {
       try {
         const verificationToken = await requestVerificationToken({
-          title: 'Confirm settings update',
-          description: 'Enter your password to save device thresholds and automation rules.',
+          title: t('voice_verify'),
+          description: t('preferences_desc'),
         });
 
         await smartLockApi.updateDeviceSettings(selectedDeviceId, deviceSettings, verificationToken);
-        setStatusMessage('Device settings saved.');
+        setStatusMessage(t('preferences'));
         setStatusError('');
         setHasPendingSettingsChange(false);
 
-        showAlert({
+        showAlertRef.current({
           type: 'success',
           title: t('reminder_success'),
-          message: t('settings_saved_successfully') || 'Device settings saved.',
+          message: t('preferences'),
           confirmText: t('reminder_ok'),
+          dedupeKey: `settings-saved-${selectedDeviceId}`,
         });
       } catch (error) {
-        setStatusError(error.message || 'Unable to save device settings.');
+        setStatusError(error.message || t('preferences_desc'));
       }
     }, 700);
 
     return () => window.clearTimeout(timer);
-  }, [deviceSettings, hasPendingSettingsChange, requestVerificationToken, selectedDeviceId, showAlert, t]);
+  }, [deviceSettings, hasPendingSettingsChange, requestVerificationToken, selectedDeviceId, t]);
 
   useEffect(() => {
     return () => {
@@ -239,7 +280,7 @@ const RemoteControl = () => {
   const handleToggleLock = async () => {
     if (!selectedDeviceId) return;
     if (!currentDevice?.online) {
-      setStatusError('This device is offline. Reconnect it before sending a command.');
+      setStatusError(t('hero_no_device_online'));
       return;
     }
     setIsSendingCommand(true);
@@ -249,9 +290,9 @@ const RemoteControl = () => {
     try {
       const commandId = await smartLockApi.sendLockToggle(selectedDeviceId);
       setLocked((current) => !current);
-      setStatusMessage(`Command queued successfully. Reference: ${commandId}`);
+      setStatusMessage(`${t('latest_command')}: ${commandId}`);
     } catch (error) {
-      setStatusError(error.message || 'Unable to send lock command.');
+      setStatusError(error.message || t('next_action_offline'));
     } finally {
       setIsSendingCommand(false);
     }
@@ -260,7 +301,27 @@ const RemoteControl = () => {
   const updateSetting = (key, value) => {
     setDeviceSettings((current) => ({ ...current, [key]: value }));
     setHasPendingSettingsChange(true);
-    setStatusMessage('Saving device changes...');
+    setStatusMessage(t('loading'));
+    setStatusError('');
+  };
+
+  const handleSaveVoiceCommand = (event) => {
+    event.preventDefault();
+    if (!voicePhrase.trim()) {
+      setStatusError(t('voice_speak_now'));
+      return;
+    }
+
+    addCustomCommand(buildVoiceCommandPayload({
+      phrase: voicePhrase,
+      label: voiceLabel,
+      actionPreset: voiceActionPreset,
+      matchMode: voiceMatchMode,
+    }));
+
+    setVoicePhrase('');
+    setVoiceLabel('');
+    setStatusMessage(t('save_command'));
     setStatusError('');
   };
 
@@ -271,7 +332,7 @@ const RemoteControl = () => {
           <h2 className="text-4xl font-extrabold tracking-tight font-headline text-on-surface transition-colors duration-300">
             {t('remote_control')}
           </h2>
-          <p className="mt-1 font-medium text-outline">Real-time access control and device safety.</p>
+          <p className="mt-1 font-medium text-outline">{t('page_remote_subtitle')}</p>
         </div>
 
         <div className="flex flex-wrap items-center gap-4">
@@ -283,7 +344,7 @@ const RemoteControl = () => {
             >
               {devices.map((device) => (
                 <option key={device.id} value={device.id}>
-                  {device.deviceName}
+                  {formatDeviceName(device.deviceName)}
                 </option>
               ))}
             </select>
@@ -294,13 +355,13 @@ const RemoteControl = () => {
             className="hidden items-center gap-2 rounded-xl border border-primary/20 bg-primary-container px-4 py-2 font-bold text-on-primary-container shadow-sm transition-all hover:opacity-90 sm:flex"
           >
             <span className="material-symbols-outlined text-[18px]">key</span>
-            Guest access
+            {t('guest_access')}
           </button>
 
           <div className="flex items-center gap-2 rounded-full border border-outline-variant/10 bg-surface-container px-4 py-2 shadow-sm transition-colors duration-300">
             <div className={`h-2 w-2 rounded-full ${currentDevice?.online ? 'bg-green-500 animate-pulse' : 'bg-error'}`} />
             <span className="text-xs font-semibold text-on-surface">
-              {currentDevice?.online ? 'SYSTEM ONLINE' : 'DEVICE OFFLINE'}
+              {currentDevice?.online ? t('system_online_short') : t('device_offline_short')}
             </span>
           </div>
         </div>
@@ -309,7 +370,7 @@ const RemoteControl = () => {
       <div className="grid grid-cols-1 gap-6 md:grid-cols-12">
         <div className="group relative flex flex-col items-center justify-center overflow-hidden rounded-[2rem] border border-outline-variant/10 bg-surface-container p-10 shadow-sm transition-colors duration-300 md:col-span-7">
           <h3 className="relative z-10 mb-12 text-xs font-bold uppercase tracking-widest text-outline">
-            Current lock state
+            {t('door_status')}
           </h3>
 
           <button
@@ -333,21 +394,21 @@ const RemoteControl = () => {
                 {locked ? t('locked') : t('unlocked')}
               </span>
               <span className="mt-3 text-xs font-semibold uppercase tracking-[0.16em] text-outline">
-                {isSendingCommand ? 'Sending command...' : locked ? 'Tap to unlock' : 'Tap to lock'}
+                {isSendingCommand ? t('loading') : locked ? t('unlock_now') : t('lock_now')}
               </span>
             </div>
           </button>
 
           <p className="relative z-10 mt-12 max-w-xs text-center font-medium text-outline">
-            {locked ? 'Unlock' : 'Lock'} the selected entry point. Commands are written to the audit log.
+            {locked ? t('unlock_now') : t('lock_now')}. {t('page_logs_subtitle')}
           </p>
 
           {currentDevice && (
             <p className="relative z-10 mt-4 text-center text-xs text-outline">
-              Device: <span className="font-semibold text-on-surface">{currentDevice.deviceName}</span>
+              {t('device_label')}: <span className="font-semibold text-on-surface">{formatDeviceName(currentDevice.deviceName)}</span>
               {' · '}
-              {currentDevice.online ? 'Online' : 'Offline'}
-              {currentDevice.lastCommandStatus ? ` · Last command: ${currentDevice.lastCommandStatus}` : ''}
+              {currentDevice.online ? t('online') : t('offline')}
+              {currentDevice.lastCommandStatus ? ` · ${t('latest_command')}: ${currentDevice.lastCommandStatus}` : ''}
             </p>
           )}
 
@@ -366,7 +427,7 @@ const RemoteControl = () => {
 
         <div className="grid grid-cols-1 gap-6 md:col-span-5">
           <div className="flex flex-col justify-between rounded-[2rem] border border-outline-variant/10 bg-surface-container p-8 shadow-sm transition-colors duration-300 focus-within:ring">
-            <h4 className="mb-6 text-sm font-bold uppercase tracking-wider text-outline">Quick settings</h4>
+            <h4 className="mb-6 text-sm font-bold uppercase tracking-wider text-outline">{t('preferences')}</h4>
             <div className="space-y-6">
               {QUICK_SETTINGS.map((item) => (
                 <div key={item.key} className="flex items-center justify-between">
@@ -374,7 +435,7 @@ const RemoteControl = () => {
                     <div className={`flex h-10 w-10 items-center justify-center rounded-xl bg-surface-container-high ${item.color}`}>
                       <span className="material-symbols-outlined">{item.icon}</span>
                     </div>
-                    <span className="font-semibold text-on-surface">{item.label}</span>
+                    <span className="font-semibold text-on-surface">{t(item.labelKey)}</span>
                   </div>
 
                   <label className="relative inline-flex cursor-pointer items-center">
@@ -393,12 +454,12 @@ const RemoteControl = () => {
           </div>
 
           <div className="rounded-[2rem] border border-outline-variant/10 bg-surface-container p-8 shadow-sm transition-colors duration-300">
-            <h4 className="mb-8 text-sm font-bold uppercase tracking-wider text-outline">Thresholds</h4>
+            <h4 className="mb-8 text-sm font-bold uppercase tracking-wider text-outline">{t('threshold_label')}</h4>
             <div className="space-y-8">
               {RANGE_SETTINGS.map((item) => (
                 <div key={item.key}>
                   <div className="mb-4 flex justify-between">
-                    <span className="text-sm font-medium text-outline">{item.label}</span>
+                    <span className="text-sm font-medium text-outline">{t(item.labelKey)}</span>
                     <span className="text-sm font-bold text-primary">{deviceSettings?.[item.key] ?? '--'}</span>
                   </div>
                   <input
@@ -414,7 +475,7 @@ const RemoteControl = () => {
               ))}
             </div>
 
-            {isLoading ? <p className="mt-4 text-xs text-outline">Syncing device settings...</p> : null}
+            {isLoading ? <p className="mt-4 text-xs text-outline">{t('loading')}</p> : null}
           </div>
         </div>
       </div>
@@ -427,13 +488,13 @@ const RemoteControl = () => {
             <div className="relative z-10 max-w-2xl">
               <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/8 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-primary">
                 <span className={`h-2 w-2 rounded-full ${isListening ? 'bg-error animate-pulse' : 'bg-primary'}`} />
-                Voice control
+                {t('voice_control')}
               </div>
               <h3 className="mt-5 text-3xl font-black tracking-tight text-on-surface sm:text-4xl">
-                Control the device with your voice
+                {t('voice_control')}
               </h3>
               <p className="mt-3 max-w-xl text-sm leading-7 text-outline">
-                The global voice engine listens for lock, unlock, alert, navigation, device switch, and quick-setting commands from any protected page.
+                {t('voice_speak_now')}
               </p>
 
               <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -448,7 +509,7 @@ const RemoteControl = () => {
                   }`}
                 >
                   <span className="material-symbols-outlined text-[20px]">{isListening ? 'mic_off' : 'mic'}</span>
-                  {isListening ? 'Stop listening' : 'Start voice command'}
+                  {isListening ? t('voice_stop') : t('voice_start')}
                 </button>
 
                 <button
@@ -458,19 +519,19 @@ const RemoteControl = () => {
                   className="inline-flex items-center gap-2 rounded-2xl border border-outline-variant/16 bg-surface px-5 py-3 text-sm font-semibold text-on-surface transition-colors hover:border-primary/30 hover:text-primary disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <span className="material-symbols-outlined text-[18px]">play_arrow</span>
-                  Run again
+                  {t('latest_command')}
                 </button>
               </div>
 
               <div className="mt-8 rounded-[1.75rem] border border-outline-variant/12 bg-background/70 p-5">
                 <div className="flex items-center justify-between gap-4">
-                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-outline">Live transcript</p>
+                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-outline">{t('voice_transcript')}</p>
                   <span className="text-xs font-semibold text-outline">
-                    {isVoiceSupported ? 'Browser speech API ready' : 'Speech API unavailable'}
+                    {isVoiceSupported ? t('voice_ready') : t('no_data')}
                   </span>
                 </div>
                 <p className="mt-4 min-h-[68px] text-lg font-semibold leading-8 text-on-surface">
-                  {voiceTranscript || (isListening ? 'Listening...' : 'No voice command captured yet.')}
+                  {voiceTranscript || (isListening ? t('voice_listening') : t('voice_no_transcript'))}
                 </p>
                 <p className="mt-3 text-sm text-outline">{voiceFeedback}</p>
                 {voiceError ? (
@@ -484,7 +545,7 @@ const RemoteControl = () => {
 
           <div className="space-y-5 bg-surface-container-high p-8 lg:p-10">
             <div>
-              <p className="text-sm font-bold uppercase tracking-[0.16em] text-outline">Recognized action</p>
+              <p className="text-sm font-bold uppercase tracking-[0.16em] text-outline">{t('latest_command')}</p>
               <div className="mt-4 rounded-[1.5rem] border border-outline-variant/12 bg-background px-5 py-5">
                 {voiceCommand ? (
                   <>
@@ -493,9 +554,9 @@ const RemoteControl = () => {
                   </>
                 ) : (
                   <>
-                    <p className="text-lg font-bold text-on-surface">No command mapped yet</p>
+                    <p className="text-lg font-bold text-on-surface">{t('voice_no_transcript')}</p>
                     <p className="mt-2 text-sm leading-6 text-outline">
-                      Speak a supported phrase, then review the parsed action here before running it.
+                      {t('voice_speak_now')}
                     </p>
                   </>
                 )}
@@ -503,7 +564,7 @@ const RemoteControl = () => {
             </div>
 
             <div>
-              <p className="text-sm font-bold uppercase tracking-[0.16em] text-outline">Sample phrases</p>
+              <p className="text-sm font-bold uppercase tracking-[0.16em] text-outline">{t('voice_examples')}</p>
               <div className="mt-4 space-y-3">
                 {voiceHelpItems.slice(0, 5).map((command) => (
                   <button
@@ -518,13 +579,93 @@ const RemoteControl = () => {
               </div>
             </div>
 
+            <form onSubmit={handleSaveVoiceCommand} className="rounded-[1.5rem] border border-outline-variant/12 bg-background px-5 py-5">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-sm font-bold text-on-surface">{t('custom_commands')}</p>
+                  <p className="mt-1 text-xs leading-5 text-outline">{t('custom_commands_desc')}</p>
+                </div>
+                <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-black text-primary">
+                  {customCommands.length}
+                </span>
+              </div>
+
+              <div className="mt-4 grid gap-3">
+                <input
+                  type="text"
+                  value={voicePhrase}
+                  onChange={(event) => setVoicePhrase(event.target.value)}
+                  placeholder={t('voice_speak_now')}
+                  className="min-h-11 rounded-2xl border border-outline-variant/12 bg-surface-container px-4 text-sm font-semibold text-on-surface outline-none focus:border-primary/40"
+                />
+                <input
+                  type="text"
+                  value={voiceLabel}
+                  onChange={(event) => setVoiceLabel(event.target.value)}
+                  placeholder={t('latest_command')}
+                  className="min-h-11 rounded-2xl border border-outline-variant/12 bg-surface-container px-4 text-sm font-semibold text-on-surface outline-none focus:border-primary/40"
+                />
+                <div className="grid gap-3 sm:grid-cols-[1fr_0.72fr]">
+                  <select
+                    value={voiceActionPreset}
+                    onChange={(event) => setVoiceActionPreset(event.target.value)}
+                    className="min-h-11 rounded-2xl border border-outline-variant/12 bg-surface-container px-4 text-sm font-semibold text-on-surface outline-none focus:border-primary/40"
+                  >
+                    {VOICE_ACTION_PRESETS.map((action) => (
+                      <option key={action.value} value={action.value}>{t(action.labelKey)}</option>
+                    ))}
+                  </select>
+                  <select
+                    value={voiceMatchMode}
+                    onChange={(event) => setVoiceMatchMode(event.target.value)}
+                    className="min-h-11 rounded-2xl border border-outline-variant/12 bg-surface-container px-4 text-sm font-semibold text-on-surface outline-none focus:border-primary/40"
+                  >
+                    <option value="exact">{t('voice_match_exact')}</option>
+                    <option value="contains">{t('voice_match_contains')}</option>
+                  </select>
+                </div>
+                <button
+                  type="submit"
+                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl bg-primary px-4 text-sm font-black text-white transition hover:opacity-90"
+                >
+                  <span className="material-symbols-outlined text-[18px]">add</span>
+                  {t('save_command')}
+                </button>
+              </div>
+
+              {customCommands.length ? (
+                <div className="mt-4 space-y-2">
+                  {customCommands.slice(0, 5).map((command) => (
+                    <div key={command.id} className="flex items-center justify-between gap-3 rounded-2xl bg-surface-container px-3 py-3">
+                      <button
+                        type="button"
+                        onClick={() => runSampleCommand(command.phrase)}
+                        className="min-w-0 flex-1 text-left"
+                      >
+                        <p className="truncate text-sm font-black text-on-surface">{command.phrase}</p>
+                        <p className="truncate text-xs font-semibold text-outline">{command.label}</p>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeCustomCommand(command.id)}
+                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-outline transition hover:bg-error/10 hover:text-error"
+                        aria-label={`Remove ${command.phrase}`}
+                      >
+                        <span className="material-symbols-outlined text-[18px]">delete</span>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+            </form>
+
             <div className="rounded-[1.5rem] border border-outline-variant/12 bg-background px-5 py-5">
-              <p className="text-sm font-bold text-on-surface">How it works</p>
+              <p className="text-sm font-bold text-on-surface">{t('how_it_works')}</p>
               <ul className="mt-3 space-y-2 text-sm leading-6 text-outline">
-                <li>1. Start listening and speak a short command.</li>
-                <li>2. The global engine parses and runs supported commands.</li>
-                <li>3. Lock and unlock run immediately; settings and alert resolution still verify identity.</li>
-                <li>4. Use the floating mic to control the app from other pages.</li>
+                <li>1. {t('voice_start')}.</li>
+                <li>2. {t('voice_speak_now')}</li>
+                <li>3. {t('voice_verify')}.</li>
+                <li>4. {t('voice_panel')}.</li>
               </ul>
             </div>
           </div>
@@ -535,8 +676,8 @@ const RemoteControl = () => {
         isOpen={verificationDialog.isOpen}
         title={verificationDialog.title}
         description={verificationDialog.description}
-        confirmLabel="Verify"
-        cancelLabel="Cancel"
+        confirmLabel={t('voice_verify')}
+        cancelLabel={t('voice_cancel')}
         isSubmitting={isVerifying}
         error={verificationError}
         onConfirm={handleVerificationConfirm}

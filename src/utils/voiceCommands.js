@@ -1,159 +1,380 @@
+// ── Normalize: strip diacritics, lowercase, collapse whitespace ───────────────
 export const normalizeSpeech = (value) =>
   (value || '')
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
+    .replace(/\s+/g, ' ')
     .trim();
 
+// ── Phrase-based matcher ──────────────────────────────────────────────────────
+// Each entry has `phrases` (array of normalized strings).
+// A match fires when the spoken text CONTAINS any of those phrases.
+// Longer phrases are checked first (most specific wins).
+
+const matchesPhrases = (normalized, phrases) =>
+  phrases.some((phrase) => normalized.includes(phrase));
+
+// ── Route commands ────────────────────────────────────────────────────────────
 const routeCommands = [
   {
     path: '/',
-    label: 'Open dashboard',
-    patterns: [/\b(dashboard|overview|home)\b/, /\b(trang chu|tong quan)\b/],
+    label: 'Mở tổng quan',
+    labelEn: 'Open dashboard',
+    phrases: [
+      // EN
+      'open dashboard', 'go to dashboard', 'show dashboard',
+      'go home', 'open home', 'show overview', 'go to overview',
+      // VN — normalized (no diacritics)
+      'mo trang chu', 'mo tong quan', 'di den trang chu',
+      'xem tong quan', 'trang chu', 'tong quan',
+    ],
   },
   {
     path: '/remote',
-    label: 'Open control page',
-    patterns: [/\b(remote|control|controller)\b/, /\b(dieu khien|mo trang dieu khien)\b/],
+    label: 'Mở điều khiển',
+    labelEn: 'Open remote control',
+    phrases: [
+      // EN
+      'open remote', 'open control', 'go to remote', 'go to control',
+      'show remote', 'remote control', 'device control',
+      // VN
+      'mo dieu khien', 'di den dieu khien', 'trang dieu khien',
+      'dieu khien thiet bi', 'mo trang dieu khien',
+    ],
   },
   {
     path: '/logs',
-    label: 'Open logs',
-    patterns: [/\b(logs?|history|event log)\b/, /\b(nhat ky|lich su)\b/],
+    label: 'Mở nhật ký',
+    labelEn: 'Open logs',
+    phrases: [
+      // EN
+      'open logs', 'show logs', 'go to logs', 'view logs',
+      'open history', 'show history', 'event log', 'access log',
+      // VN
+      'mo nhat ky', 'xem nhat ky', 'di den nhat ky',
+      'nhat ky su kien', 'lich su truy cap', 'nhat ky',
+    ],
   },
   {
     path: '/analytics',
-    label: 'Open analytics',
-    patterns: [/\b(analytics|analysis|report|reports)\b/, /\b(phan tich|bao cao)\b/],
+    label: 'Mở phân tích',
+    labelEn: 'Open analytics',
+    phrases: [
+      // EN
+      'open analytics', 'show analytics', 'go to analytics',
+      'view analytics', 'open reports', 'show reports', 'view reports',
+      // VN
+      'mo phan tich', 'xem phan tich', 'di den phan tich',
+      'bao cao hoat dong', 'xem bao cao', 'phan tich hoat dong',
+    ],
   },
   {
     path: '/fingerprints',
-    label: 'Open fingerprints',
-    patterns: [/\b(fingerprint|fingerprints|biometric)\b/, /\b(van tay|sinh trac)\b/],
+    label: 'Mở vân tay',
+    labelEn: 'Open fingerprints',
+    phrases: [
+      // EN
+      'open fingerprints', 'show fingerprints', 'go to fingerprints',
+      'biometric', 'fingerprint management',
+      // VN
+      'mo van tay', 'xem van tay', 'quan ly van tay',
+      'di den van tay', 'sinh trac hoc',
+    ],
   },
   {
     path: '/settings',
-    label: 'Open settings',
-    patterns: [/\b(settings?|account|profile)\b/, /\b(cai dat|tai khoan|ho so)\b/],
+    label: 'Mở cài đặt',
+    labelEn: 'Open settings',
+    phrases: [
+      // EN
+      'open settings', 'go to settings', 'show settings',
+      'account settings', 'open account', 'open profile',
+      // VN
+      'mo cai dat', 'di den cai dat', 'xem cai dat',
+      'cai dat tai khoan', 'mo tai khoan', 'ho so ca nhan',
+    ],
   },
 ];
 
+// ── Setting commands ──────────────────────────────────────────────────────────
 const settingCommands = [
   {
     key: 'autoLockEnabled',
     value: true,
-    label: 'Enable auto lock',
-    patterns: [/\b(enable|turn on|switch on|start)\s+auto\s*lock\b/, /\b(auto\s*lock)\s+(on|enable)\b/, /\b(bat|mo)\s+(khoa tu dong|auto lock)\b/],
+    label: 'Bật tự khóa cửa',
+    labelEn: 'Enable auto lock',
+    phrases: [
+      // EN
+      'enable auto lock', 'turn on auto lock', 'switch on auto lock',
+      'activate auto lock', 'start auto lock', 'auto lock on',
+      // VN
+      'bat khoa tu dong', 'mo khoa tu dong', 'kich hoat khoa tu dong',
+      'bat tu dong khoa', 'khoa tu dong bat',
+    ],
   },
   {
     key: 'autoLockEnabled',
     value: false,
-    label: 'Disable auto lock',
-    patterns: [/\b(disable|turn off|switch off|stop)\s+auto\s*lock\b/, /\b(auto\s*lock)\s+(off|disable)\b/, /\b(tat)\s+(khoa tu dong|auto lock)\b/],
+    label: 'Tắt tự khóa cửa',
+    labelEn: 'Disable auto lock',
+    phrases: [
+      // EN
+      'disable auto lock', 'turn off auto lock', 'switch off auto lock',
+      'deactivate auto lock', 'stop auto lock', 'auto lock off',
+      // VN
+      'tat khoa tu dong', 'vo hieu khoa tu dong', 'tat tu dong khoa',
+      'khoa tu dong tat',
+    ],
   },
   {
     key: 'gasAlertEnabled',
     value: true,
-    label: 'Enable gas alert',
-    patterns: [/\b(enable|turn on|switch on)\s+gas\s+alert\b/, /\bgas\s+alert\s+(on|enable)\b/, /\b(bat|mo)\s+canh bao gas\b/],
+    label: 'Bật cảnh báo khí gas',
+    labelEn: 'Enable gas alert',
+    phrases: [
+      // EN
+      'enable gas alert', 'turn on gas alert', 'switch on gas alert',
+      'activate gas alert', 'gas alert on',
+      // VN
+      'bat canh bao gas', 'mo canh bao gas', 'kich hoat canh bao gas',
+      'bat canh bao khi gas',
+    ],
   },
   {
     key: 'gasAlertEnabled',
     value: false,
-    label: 'Disable gas alert',
-    patterns: [/\b(disable|turn off|switch off)\s+gas\s+alert\b/, /\bgas\s+alert\s+(off|disable)\b/, /\btat\s+canh bao gas\b/],
+    label: 'Tắt cảnh báo khí gas',
+    labelEn: 'Disable gas alert',
+    phrases: [
+      // EN
+      'disable gas alert', 'turn off gas alert', 'switch off gas alert',
+      'deactivate gas alert', 'gas alert off',
+      // VN
+      'tat canh bao gas', 'vo hieu canh bao gas', 'tat canh bao khi gas',
+    ],
   },
   {
     key: 'pirAlertEnabled',
     value: true,
-    label: 'Enable PIR alert',
-    patterns: [/\b(enable|turn on|switch on)\s+(pir|motion)\s+alert\b/, /\b(pir|motion)\s+alert\s+(on|enable)\b/, /\b(bat|mo)\s+canh bao pir\b/],
+    label: 'Bật cảnh báo chuyển động',
+    labelEn: 'Enable motion alert',
+    phrases: [
+      // EN
+      'enable pir alert', 'turn on pir alert', 'enable motion alert',
+      'turn on motion alert', 'motion alert on', 'pir alert on',
+      'activate motion sensor',
+      // VN
+      'bat canh bao chuyen dong', 'mo canh bao chuyen dong',
+      'bat canh bao pir', 'kich hoat cam bien chuyen dong',
+    ],
   },
   {
     key: 'pirAlertEnabled',
     value: false,
-    label: 'Disable PIR alert',
-    patterns: [/\b(disable|turn off|switch off)\s+(pir|motion)\s+alert\b/, /\b(pir|motion)\s+alert\s+(off|disable)\b/, /\btat\s+canh bao pir\b/],
+    label: 'Tắt cảnh báo chuyển động',
+    labelEn: 'Disable motion alert',
+    phrases: [
+      // EN
+      'disable pir alert', 'turn off pir alert', 'disable motion alert',
+      'turn off motion alert', 'motion alert off', 'pir alert off',
+      // VN
+      'tat canh bao chuyen dong', 'vo hieu canh bao chuyen dong',
+      'tat canh bao pir',
+    ],
   },
 ];
 
-const matchesAny = (value, patterns) => patterns.some((pattern) => pattern.test(value));
+const normalizeCustomCommands = (commands = []) =>
+  (Array.isArray(commands) ? commands : [])
+    .map((command) => ({
+      ...command,
+      phrase: normalizeSpeech(command.phrase),
+    }))
+    .filter((command) => command.phrase && command.type);
 
-export const parseVoiceCommand = (transcript, devices = []) => {
-  const normalized = normalizeSpeech(transcript);
-  if (!normalized) return null;
+const parseCustomCommand = (normalized, devices, customCommands) => {
+  const match = normalizeCustomCommands(customCommands).find((command) => {
+    if (command.matchMode === 'contains') return normalized.includes(command.phrase);
+    return normalized === command.phrase;
+  });
 
-  if (/\b(help|what can i say|commands?)\b/.test(normalized) || /\b(tro giup|co the noi gi|lenh)\b/.test(normalized)) {
+  if (!match) return null;
+
+  if (match.type === 'navigate') {
     return {
-      type: 'help',
-      label: 'Show voice commands',
-      detail: 'Display supported voice commands.',
+      type: 'navigate',
+      path: match.path || '/',
+      label: match.label || `Custom: ${match.phrase}`,
+      detail: 'User-defined navigation command.',
+      custom: true,
     };
   }
 
-  if (/\b(clear|resolve|dismiss)\s+(the\s+)?alert(s)?\b/.test(normalized) || /\b(tat|xoa|xu ly)\s+canh bao\b/.test(normalized)) {
+  if (match.type === 'lock') {
+    return {
+      type: 'lock',
+      targetState: match.targetState || 'locked',
+      label: match.label || `Custom: ${match.phrase}`,
+      detail: 'User-defined lock command.',
+      custom: true,
+    };
+  }
+
+  if (match.type === 'setting') {
+    return {
+      type: 'setting',
+      key: match.key,
+      value: match.value,
+      label: match.label || `Custom: ${match.phrase}`,
+      detail: 'User-defined setting command.',
+      custom: true,
+    };
+  }
+
+  if (match.type === 'resolve-alert') {
     return {
       type: 'resolve-alert',
-      label: 'Resolve latest active alert',
-      detail: 'Resolve the newest active alert after password verification.',
+      label: match.label || `Custom: ${match.phrase}`,
+      detail: 'User-defined alert command.',
+      custom: true,
     };
   }
 
-  const deviceMatch = normalized.match(/\b(?:device|thiet bi|chon thiet bi|select device)\s+(\d+)\b/);
-  if (deviceMatch) {
-    const index = Number(deviceMatch[1]) - 1;
-    if (devices[index]) {
+  if (match.type === 'device') {
+    const device = devices.find((item) => item.id === match.deviceId) || devices[Number(match.deviceIndex || 1) - 1];
+    if (!device) {
       return {
-        type: 'device',
-        deviceId: devices[index].id,
-        label: `Switch to ${devices[index].deviceName || `device ${index + 1}`}`,
-        detail: 'Use this device for future voice commands.',
+        type: 'error',
+        label: 'Device not found',
+        detail: 'The device assigned to this custom command is not available.',
       };
     }
 
     return {
-      type: 'error',
-      label: 'Device not found',
-      detail: `Device ${deviceMatch[1]} is not available.`,
+      type: 'device',
+      deviceId: device.id,
+      label: match.label || `Switch to ${device.deviceName || 'selected device'}`,
+      detail: 'User-defined device selection command.',
+      custom: true,
     };
   }
 
-  const setting = settingCommands.find((command) => matchesAny(normalized, command.patterns));
+  return null;
+};
+
+export const parseVoiceCommand = (transcript, devices = [], customCommands = []) => {
+  const normalized = normalizeSpeech(transcript);
+  if (!normalized) return null;
+
+  // 1. Custom commands first (user-defined, highest priority)
+  const customCommand = parseCustomCommand(normalized, devices, customCommands);
+  if (customCommand) return customCommand;
+
+  // 2. Help
+  const helpPhrases = [
+    'help', 'what can i say', 'show commands', 'list commands', 'voice help',
+    'tro giup', 'co the noi gi', 'xem lenh', 'danh sach lenh', 'huong dan',
+  ];
+  if (matchesPhrases(normalized, helpPhrases)) {
+    return {
+      type: 'help',
+      label: 'Hiển thị lệnh giọng nói',
+      detail: 'Danh sách các lệnh được hỗ trợ.',
+    };
+  }
+
+  // 3. Resolve alert
+  const resolveAlertPhrases = [
+    'resolve alert', 'clear alert', 'dismiss alert', 'resolve all alerts',
+    'clear all alerts', 'fix alert', 'handle alert',
+    'xu ly canh bao', 'tat canh bao', 'xoa canh bao', 'giai quyet canh bao',
+    'xu ly tat ca canh bao',
+  ];
+  if (matchesPhrases(normalized, resolveAlertPhrases)) {
+    return {
+      type: 'resolve-alert',
+      label: 'Xử lý cảnh báo mới nhất',
+      detail: 'Xử lý cảnh báo đang hoạt động sau khi xác thực.',
+    };
+  }
+
+  // 4. Device selection — "device 2", "thiết bị 1", "chọn thiết bị 3"
+  const devicePhraseMatch = normalized.match(
+    /(?:device|select device|switch to device|thiet bi|chon thiet bi|doi thiet bi)\s+(\d+)/,
+  );
+  if (devicePhraseMatch) {
+    const index = Number(devicePhraseMatch[1]) - 1;
+    if (devices[index]) {
+      return {
+        type: 'device',
+        deviceId: devices[index].id,
+        label: `Chuyển sang ${devices[index].deviceName || `thiết bị ${index + 1}`}`,
+        detail: 'Dùng thiết bị này cho các lệnh tiếp theo.',
+      };
+    }
+    return {
+      type: 'error',
+      label: 'Không tìm thấy thiết bị',
+      detail: `Thiết bị ${devicePhraseMatch[1]} không khả dụng.`,
+    };
+  }
+
+  // 5. Settings — check longer phrases first (most specific)
+  const sortedSettings = [...settingCommands].sort(
+    (a, b) => Math.max(...b.phrases.map((p) => p.length)) - Math.max(...a.phrases.map((p) => p.length)),
+  );
+  const setting = sortedSettings.find((cmd) => matchesPhrases(normalized, cmd.phrases));
   if (setting) {
     return {
       type: 'setting',
       key: setting.key,
       value: setting.value,
       label: setting.label,
-      detail: 'Update selected device settings after password verification.',
+      detail: 'Cập nhật cài đặt thiết bị sau khi xác thực.',
     };
   }
 
-  const route = routeCommands.find((command) => matchesAny(normalized, command.patterns));
+  // 6. Lock / Unlock — check unlock first (more specific)
+  const unlockPhrases = [
+    'unlock the door', 'unlock door', 'open the door', 'open door',
+    'unlock it', 'please unlock',
+    'mo khoa cua', 'mo cua', 'giai phong khoa', 'mo khoa',
+  ];
+  if (matchesPhrases(normalized, unlockPhrases)) {
+    return {
+      type: 'lock',
+      targetState: 'unlocked',
+      label: 'Mở khóa cửa',
+      detail: 'Mở khóa thiết bị đang chọn.',
+    };
+  }
+
+  const lockPhrases = [
+    'lock the door', 'lock door', 'secure the door', 'secure door',
+    'lock it', 'please lock', 'close and lock',
+    'khoa cua lai', 'dong cua', 'khoa cua', 'dong va khoa',
+  ];
+  if (matchesPhrases(normalized, lockPhrases)) {
+    return {
+      type: 'lock',
+      targetState: 'locked',
+      label: 'Khóa cửa',
+      detail: 'Khóa thiết bị đang chọn.',
+    };
+  }
+
+  // 7. Navigation — check longer phrases first
+  const sortedRoutes = [...routeCommands].sort(
+    (a, b) => Math.max(...b.phrases.map((p) => p.length)) - Math.max(...a.phrases.map((p) => p.length)),
+  );
+  const route = sortedRoutes.find((cmd) => matchesPhrases(normalized, cmd.phrases));
   if (route) {
     return {
       type: 'navigate',
       path: route.path,
       label: route.label,
-      detail: `Navigate to ${route.path}.`,
-    };
-  }
-
-  if (/\b(unlock|open|open\s+(the\s+)?door)\b/.test(normalized) || /\b(mo khoa|mo cua)\b/.test(normalized)) {
-    return {
-      type: 'lock',
-      targetState: 'unlocked',
-      label: 'Unlock selected door',
-      detail: 'Unlock the selected device.',
-    };
-  }
-
-  if (/\b(lock|lock\s+(the\s+)?door|secure)\b/.test(normalized) || /\b(khoa cua|dong cua)\b/.test(normalized)) {
-    return {
-      type: 'lock',
-      targetState: 'locked',
-      label: 'Lock selected door',
-      detail: 'Lock the selected device.',
+      detail: `Điều hướng đến ${route.path}.`,
     };
   }
 
@@ -161,14 +382,39 @@ export const parseVoiceCommand = (transcript, devices = []) => {
 };
 
 export const voiceHelpItems = [
+  // EN
   'Lock the door',
   'Unlock the door',
-  'Clear alert',
+  'Open dashboard',
   'Open logs',
   'Open analytics',
-  'Select device 2',
-  'Turn on auto lock',
-  'Turn off gas alert',
-  'Tat canh bao',
-  'Mo trang dieu khien',
+  'Open settings',
+  'Select device 1',
+  'Enable auto lock',
+  'Disable gas alert',
+  'Resolve alert',
+  // VN
+  'Khóa cửa lại',
+  'Mở khóa cửa',
+  'Mở tổng quan',
+  'Mở nhật ký',
+  'Mở phân tích',
+  'Bật tự khóa cửa',
+  'Tắt cảnh báo gas',
+  'Xử lý cảnh báo',
+  'Chọn thiết bị 1',
 ];
+
+export const createVoiceCommand = (payload) => ({
+  id: payload.id || `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+  phrase: payload.phrase || '',
+  label: payload.label || payload.phrase || 'Custom command',
+  matchMode: payload.matchMode || 'exact',
+  type: payload.type || 'navigate',
+  path: payload.path || '/',
+  targetState: payload.targetState || 'locked',
+  key: payload.key || 'autoLockEnabled',
+  value: payload.value ?? true,
+  deviceId: payload.deviceId || '',
+  deviceIndex: payload.deviceIndex || 1,
+});
