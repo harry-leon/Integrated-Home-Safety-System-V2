@@ -32,6 +32,7 @@ public class FingerprintController {
     private final com.smartlock.repository.DeviceRepository deviceRepository;
     private final com.smartlock.repository.UserRepository userRepository;
     private final com.smartlock.service.AuditLogService auditLogService;
+    private final com.smartlock.service.BlynkService blynkService;
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
@@ -121,6 +122,7 @@ public class FingerprintController {
                         + " | Slot: " + fingerSlotId
                         + " | Quyen: " + accessLevel
                         + noteSuffix);
+        publishFingerprintEnroll(device, fingerSlotId, request.getPersonName().trim());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
                 "id", fingerprint.getId(),
@@ -151,6 +153,7 @@ public class FingerprintController {
         deviceAccessService.requireView(fingerprint.getDevice().getId(), authentication);
         auditLogService.logAction(fingerprint.getDevice(), AccessAction.DELETED, AccessMethod.FINGERPRINT,
                 "Da xoa van tay cua: " + fingerprint.getPersonName() + " | Slot: " + fingerprint.getFingerSlotId());
+        publishFingerprintDelete(fingerprint.getDevice(), fingerprint.getFingerSlotId(), fingerprint.getPersonName());
         fingerprintRepository.deleteById(id);
 
         return ResponseEntity.noContent().build();
@@ -208,5 +211,26 @@ public class FingerprintController {
 
     private String normalizeIncomingAccessLevel(String accessLevel) {
         return normalizeAccessLevel(accessLevel);
+    }
+
+    private void publishFingerprintEnroll(com.smartlock.model.Device device, Integer slotId, String personName) {
+        if (slotId == null || slotId <= 0) {
+            return;
+        }
+        blynkService.updateVirtualPin(device, com.smartlock.service.BlynkService.PIN_FINGER_ID, String.valueOf(slotId));
+        blynkService.updateVirtualPin(device, com.smartlock.service.BlynkService.PIN_NAME, personName);
+        blynkService.updateVirtualPin(device, com.smartlock.service.BlynkService.PIN_DISPLAY, "Enroll " + personName);
+        blynkService.updateVirtualPin(device, com.smartlock.service.BlynkService.PIN_FINGERPRINT_REGISTER, "1");
+        blynkService.updateVirtualPin(device, com.smartlock.service.BlynkService.PIN_FINGERPRINT_REGISTER, "0");
+    }
+
+    private void publishFingerprintDelete(com.smartlock.model.Device device, Integer slotId, String personName) {
+        if (slotId == null || slotId <= 0) {
+            return;
+        }
+        blynkService.updateVirtualPin(device, com.smartlock.service.BlynkService.PIN_FINGER_ID, String.valueOf(slotId));
+        blynkService.updateVirtualPin(device, com.smartlock.service.BlynkService.PIN_DISPLAY, "Delete " + personName);
+        blynkService.updateVirtualPin(device, com.smartlock.service.BlynkService.PIN_FINGERPRINT_DELETE, "1");
+        blynkService.updateVirtualPin(device, com.smartlock.service.BlynkService.PIN_FINGERPRINT_DELETE, "0");
     }
 }

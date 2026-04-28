@@ -25,3 +25,4 @@ backend/*.class
 
 # Project specific
 node_modules/
+dist/
