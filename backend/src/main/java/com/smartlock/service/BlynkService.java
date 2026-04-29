@@ -28,7 +28,7 @@ public class BlynkService {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    @Value("${blynk.auth-token:YOUR_AUTH_TOKEN}")
+    @Value("${blynk.auth-token:}")
     private String authToken;
 
     @Value("${blynk.base-url:https://blynk.cloud/external/api}")

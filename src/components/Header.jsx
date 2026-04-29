@@ -52,7 +52,7 @@ const Header = () => {
 
     const loadAlerts = async () => {
       try {
-        const alerts = await smartLockApi.getAlerts();
+        const alerts = await smartLockApi.getLiveAlerts();
         if (!mounted) return;
 
         const unresolvedAlerts = Array.isArray(alerts)

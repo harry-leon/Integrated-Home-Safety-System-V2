@@ -159,6 +159,13 @@ export const smartLockApi = {
     return data && data.content ? data.content : (Array.isArray(data) ? data : []);
   },
 
+  getLiveAlerts: async (params = {}) => {
+    const queryStr = new URLSearchParams(cleanParams(params)).toString();
+    const url = `/api/alerts/live${queryStr ? `?${queryStr}` : ''}`;
+    const data = await fetchApi(url);
+    return Array.isArray(data) ? data : [];
+  },
+
   resolveAlert: async (alertId, verificationToken) => {
     return fetchApi(`/api/alerts/${alertId}/resolve`, {
       method: 'POST',

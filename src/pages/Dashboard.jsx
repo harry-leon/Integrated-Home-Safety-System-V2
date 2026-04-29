@@ -1,11 +1,11 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLang } from '../contexts/LangContext';
 import { useTimeWeather } from '../contexts/TimeWeatherContext';
 import { useVoiceCommand } from '../contexts/VoiceCommandContext';
 import { useAlertModal } from '../contexts/AlertModalContext';
 import { smartLockApi } from '../services/api';
-import { createAlertSubscription, createTelemetrySubscription } from '../services/realtime';
+import { createTelemetrySubscription } from '../services/realtime';
 
 const formatAlertType = (alertType, t) => {
   switch (alertType) {
@@ -173,28 +173,7 @@ const getPreferredDashboardDevice = (deviceList) => {
   })[0];
 };
 
-const mergeAlertIntoList = (currentAlerts, incomingAlert) => {
-  if (!incomingAlert?.id) {
-    return currentAlerts;
-  }
-
-  const nextAlerts = Array.isArray(currentAlerts) ? [...currentAlerts] : [];
-  const existingIndex = nextAlerts.findIndex((alert) => alert.id === incomingAlert.id);
-
-  if (existingIndex >= 0) {
-    nextAlerts[existingIndex] = {
-      ...nextAlerts[existingIndex],
-      ...incomingAlert,
-    };
-  } else {
-    nextAlerts.unshift(incomingAlert);
-  }
-
-  nextAlerts.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
-  return nextAlerts;
-};
-
-  const Dashboard = () => {
+const Dashboard = () => {
   const { t, formatDateTime, formatRelativeTime, formatAlertType, formatAccessAction, formatAccessMethod, formatDeviceName, translateSystemText } = useLang();
   const { weather, dateStr } = useTimeWeather();
   const {
@@ -209,21 +188,22 @@ const mergeAlertIntoList = (currentAlerts, incomingAlert) => {
   } = useVoiceCommand();
   const { showAlert } = useAlertModal();
   const navigate = useNavigate();
+  const seenAlertIdsRef = useRef(new Set());
 
   const triggerAlertModal = React.useCallback((payload) => {
-    const alertType = (payload.alertType || '').toUpperCase();
-    const severity = (payload.severity || '').toUpperCase();
+    const alertType = (payload?.alertType || '').toUpperCase();
+    const severity = (payload?.severity || '').toUpperCase();
     const isSafetyCritical = alertType === 'GAS_LEAK' || alertType === 'INTRUDER_ALERT' || alertType === 'FIRE_ALARM';
 
     if (severity === 'CRITICAL' || severity === 'HIGH' || isSafetyCritical) {
       showAlert({
         type: (severity === 'CRITICAL' || isSafetyCritical) ? 'error' : 'warning',
-        dedupeKey: payload.id ? `alert:${payload.id}` : `alert:${alertType}:${payload.createdAt || ''}`,
+        dedupeKey: payload?.id ? `alert:${payload.id}` : `alert:${alertType}:${payload?.createdAt || ''}`,
         title: formatAlertType(alertType, t),
-        message: alertType === 'GAS_LEAK' ? (t('reminder_gas_detected') || payload.message) :
-                 alertType === 'INTRUDER_ALERT' ? (t('reminder_intruder_detected') || payload.message) :
-                 alertType === 'FIRE_ALARM' ? (t('reminder_fire_detected') || payload.message || 'Phát hiện cháy!') :
-                 (payload.message || formatAlertType(alertType, t)),
+        message: alertType === 'GAS_LEAK' ? (t('reminder_gas_detected') || payload?.message) :
+                 alertType === 'INTRUDER_ALERT' ? (t('reminder_intruder_detected') || payload?.message) :
+                 alertType === 'FIRE_ALARM' ? (t('reminder_fire_detected') || payload?.message || 'Phát hiện cháy!') :
+                 (payload?.message || formatAlertType(alertType, t)),
         confirmText: t('reminder_check_now') || 'Kiểm tra ngay',
         showCancelButton: !isSafetyCritical,
         preventClose: isSafetyCritical,
@@ -256,7 +236,7 @@ const mergeAlertIntoList = (currentAlerts, incomingAlert) => {
     const fetchData = async () => {
       try {
         const [alertsData, snapData, deviceData, logData] = await Promise.all([
-          smartLockApi.getAlerts().catch(() => null),
+          smartLockApi.getLiveAlerts().catch(() => null),
           smartLockApi.getWeeklySnapshot().catch(() => null),
           smartLockApi.getDevices().catch(() => null),
           smartLockApi.getAccessLogs({ page: 0, size: 6 }).catch(() => null),
@@ -266,6 +246,18 @@ const mergeAlertIntoList = (currentAlerts, incomingAlert) => {
 
         if (Array.isArray(alertsData)) {
           setAlerts(alertsData);
+
+          const nextNewAlerts = alertsData.filter((alert) => {
+            const alertId = alert?.id;
+            if (!alertId) return false;
+            if (seenAlertIdsRef.current.has(alertId)) return false;
+            return !alert?.resolved;
+          });
+
+          nextNewAlerts.forEach((alert) => {
+            seenAlertIdsRef.current.add(alert.id);
+            triggerAlertModal(alert);
+          });
         }
 
         if (snapData) {
@@ -349,30 +341,6 @@ const mergeAlertIntoList = (currentAlerts, incomingAlert) => {
       cleanups.forEach((cleanup) => cleanup?.());
     };
   }, [telemetryDeviceCodes]);
-
-  // Subscribe to the device-specific alert topic (only when device is known)
-  useEffect(() => {
-    if (!primaryDevice?.deviceCode) return undefined;
-
-    return createAlertSubscription({
-      deviceCode: primaryDevice.deviceCode,
-      onMessage: (payload) => {
-        setAlerts((current) => mergeAlertIntoList(current, payload));
-        triggerAlertModal(payload);
-      },
-    });
-  }, [primaryDevice?.deviceCode, triggerAlertModal]);
-
-  // Always subscribe to global alert topic regardless of device status
-  useEffect(() => {
-    return createAlertSubscription({
-      deviceCode: null, // forces /topic/alerts global topic
-      onMessage: (payload) => {
-        setAlerts((current) => mergeAlertIntoList(current, payload));
-        triggerAlertModal(payload);
-      },
-    });
-  }, [triggerAlertModal]);
 
   useEffect(() => {
     if (!primaryDevice?.lastSensorAt) {
@@ -988,3 +956,4 @@ const mergeAlertIntoList = (currentAlerts, incomingAlert) => {
 };
 
 export default Dashboard;
+
