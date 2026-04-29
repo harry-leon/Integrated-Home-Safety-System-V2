@@ -23,9 +23,9 @@ public interface AccessLogRepository extends JpaRepository<AccessLog, UUID>, Jpa
             "LEFT JOIN FETCH a.device " +
             "LEFT JOIN FETCH a.user " +
             "LEFT JOIN FETCH a.fingerprint " +
-            "WHERE (:deviceId IS NULL OR a.device.id = :deviceId) " +
-            "AND (:start IS NULL OR a.createdAt >= :start) " +
-            "AND (:end IS NULL OR a.createdAt <= :end) " +
+            "WHERE a.device.id = COALESCE(:deviceId, a.device.id) " +
+            "AND a.createdAt >= COALESCE(:start, a.createdAt) " +
+            "AND a.createdAt <= COALESCE(:end, a.createdAt) " +
             "ORDER BY a.createdAt DESC")
     List<AccessLog> findLogsOptimized(
             @org.springframework.data.repository.query.Param("deviceId") java.util.UUID deviceId,
@@ -37,16 +37,16 @@ public interface AccessLogRepository extends JpaRepository<AccessLog, UUID>, Jpa
                     "LEFT JOIN FETCH a.device " +
                     "LEFT JOIN FETCH a.user " +
                     "LEFT JOIN FETCH a.fingerprint " +
-                    "WHERE (:deviceId IS NULL OR a.device.id = :deviceId) " +
+                    "WHERE a.device.id = COALESCE(:deviceId, a.device.id) " +
                     "AND (:admin = true OR a.device.id IN :accessibleDeviceIds) " +
-                    "AND (:start IS NULL OR a.createdAt >= :start) " +
-                    "AND (:end IS NULL OR a.createdAt <= :end) " +
+                    "AND a.createdAt >= COALESCE(:start, a.createdAt) " +
+                    "AND a.createdAt <= COALESCE(:end, a.createdAt) " +
                     "ORDER BY a.createdAt DESC",
             countQuery = "SELECT COUNT(a) FROM AccessLog a " +
-                    "WHERE (:deviceId IS NULL OR a.device.id = :deviceId) " +
+                    "WHERE a.device.id = COALESCE(:deviceId, a.device.id) " +
                     "AND (:admin = true OR a.device.id IN :accessibleDeviceIds) " +
-                    "AND (:start IS NULL OR a.createdAt >= :start) " +
-                    "AND (:end IS NULL OR a.createdAt <= :end)"
+                    "AND a.createdAt >= COALESCE(:start, a.createdAt) " +
+                    "AND a.createdAt <= COALESCE(:end, a.createdAt)"
     )
     Page<AccessLog> findLogsPage(
             @org.springframework.data.repository.query.Param("deviceId") UUID deviceId,
