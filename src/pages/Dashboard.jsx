@@ -194,9 +194,9 @@ const mergeAlertIntoList = (currentAlerts, incomingAlert) => {
   return nextAlerts;
 };
 
-const Dashboard = () => {
+  const Dashboard = () => {
   const { t, formatDateTime, formatRelativeTime, formatAlertType, formatAccessAction, formatAccessMethod, formatDeviceName, translateSystemText } = useLang();
-  const { weather } = useTimeWeather();
+  const { weather, dateStr } = useTimeWeather();
   const {
     isSupported: isVoiceSupported,
     isListening,
